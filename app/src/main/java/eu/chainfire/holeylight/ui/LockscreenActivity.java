@@ -84,13 +84,13 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
                     }
                     break;
                 case Intent.ACTION_SCREEN_OFF:
-                    if ((proximityWakeLock != null) && proximityWakeLock.isHeld()) {
+                    //TODO battery// if ((proximityWakeLock != null) && proximityWakeLock.isHeld()) {
                         // The power button was pressed while this lockscreen was displaying, instead of
                         // turning off, turn on and show the real lockscreen.
                         finish();
                         PowerManager.WakeLock wakelock = powerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, BuildConfig.APPLICATION_ID + ":Lockscreen/Exit");
                         wakelock.acquire(1000);
-                    }
+                    //}
                     break;
                 case Intent.ACTION_POWER_DISCONNECTED:
                     if (!settings.isEnabledWhileScreenOffBattery()) {
