@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">Holey Light</string>
+    <string name="app_details">Copyright © 2019 – Chainfire\nTwitter: @ChainfireXDA\nTap to visit XDA thread</string>
+    <string name="app_website_url">https://forum.xda-developers.com/galaxy-s10/themes/app-holey-light-t3917675</string>
+
+    <string name="permission_required">Permissions needed</string>
+    <string name="permission_overlay">On the next screen, please allow Holey Light to appear on top. This is required to show the notification animation.</string>
+    <string name="permission_battery">In the next dialog, please allow Holey Light to stop optimizing battery usage. This is required to keep the notification animation running.</string>
+    <string name="permission_associate">In the next dialog, please link Holey Light with a device. This is required to work around an issue in Android regarding notifications. It does not seem to matter which device you choose.</string>
+    <string name="permission_notifications">In the next screen, please allow Holey Light notification access. This is required to be able to detect notifications.</string>
+
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
+
+    <string name="settings_category_operation">Operation</string>
+    <string name="settings_screen_on_title">Screen on</string>
+    <string name="settings_screen_on_description">Show light while the phone is in normal use</string>
+    <string name="settings_screen_off_charging_title">Screen off (Charging)</string>
+    <string name="settings_screen_off_charging_description">Experimental feature to show light while the screen is turned off</string>
+    <string name="settings_screen_off_battery_title">Screen off (Battery)</string>
+    <string name="settings_screen_off_battery_description">This feature is still under development and not available right now</string>
+
+    <string name="settings_category_advice">Advisory</string>
+    <string name="settings_advice_aod_title">Always On Display</string>
+    <string name="settings_advice_aod_description">AOD is advised to be disabled for consistent operation. Current setting:\n[ %s ]</string>
+    <string name="settings_advice_lock_title">Lock Automatically</string>
+    <string name="settings_advice_lock_description">It is advised to lock the device immediately (0 seconds) after screen off. Current setting:\n[ %d seconds ]</string>
+    <string name="settings_advice_irrelevant">No advice applies for the current configuration</string>
+
+    <string name="settings_category_chainfire">Chainfire</string>
+    <string name="settings_playstore_title">All my apps</string>
+    <string name="settings_playstore_description">View all my apps available on Google Play</string>
+    <string name="settings_follow_twitter_title">Follow me on Twitter</string>
+    <string name="settings_follow_twitter_description">Stay up to date with my developments</string>
+</resources>

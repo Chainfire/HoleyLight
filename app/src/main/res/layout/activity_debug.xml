@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/activity_layout"
+    tools:context=".ui.DebugActivity">
+
+    <Button
+        android:id="@+id/btnAddScaleBaseMinus"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:text="-"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:onClick="btnClick"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <TextView
+        android:id="@+id/tvAddScaleBase"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:layout_marginTop="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btnAddScaleBaseMinus" />
+
+    <Button
+        android:id="@+id/btnAddScaleBasePlus"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:text="+"
+        android:layout_marginRight="16dp"
+        android:onClick="btnClick"
+        app:layout_constraintTop_toTopOf="@id/btnAddScaleBaseMinus"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <Button
+        android:id="@+id/btnAddScaleHorizontalMinus"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:text="-"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:onClick="btnClick"
+        app:layout_constraintTop_toBottomOf="@id/btnAddScaleBaseMinus"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <TextView
+        android:id="@+id/tvAddScaleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:layout_marginTop="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btnAddScaleHorizontalMinus" />
+
+    <Button
+        android:id="@+id/btnAddScaleHorizontalPlus"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:text="+"
+        android:layout_marginRight="16dp"
+        android:onClick="btnClick"
+        app:layout_constraintTop_toTopOf="@id/btnAddScaleHorizontalMinus"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <Button
+        android:id="@+id/btnShiftVerticalMinus"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:text="-"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:onClick="btnClick"
+        app:layout_constraintTop_toBottomOf="@id/btnAddScaleHorizontalMinus"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <TextView
+        android:id="@+id/tvShiftVertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:layout_marginTop="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btnShiftVerticalMinus" />
+
+    <Button
+        android:id="@+id/btnShiftVerticalPlus"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:text="+"
+        android:layout_marginRight="16dp"
+        android:onClick="btnClick"
+        app:layout_constraintTop_toTopOf="@id/btnShiftVerticalMinus"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <Button
+        android:id="@+id/btnShiftHorizontalMinus"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:text="-"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:onClick="btnClick"
+        app:layout_constraintTop_toBottomOf="@id/btnShiftVerticalMinus"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <TextView
+        android:id="@+id/tvShiftHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:layout_marginTop="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btnShiftHorizontalMinus" />
+
+    <Button
+        android:id="@+id/btnShiftHorizontalPlus"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:text="+"
+        android:layout_marginRight="16dp"
+        android:onClick="btnClick"
+        app:layout_constraintTop_toTopOf="@id/btnShiftHorizontalMinus"
+        app:layout_constraintRight_toRightOf="parent" />
+    
+    <Button
+        android:id="@+id/btnNotificationTest1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Notification Test 1"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:onClick="btnNotificationTestClick"
+        app:layout_constraintTop_toBottomOf="@id/btnShiftHorizontalMinus"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

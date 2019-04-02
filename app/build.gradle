@@ -1,0 +1,45 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "eu.chainfire.holeylight"
+        minSdkVersion 28
+        targetSdkVersion 28
+        versionCode 10
+        versionName "0.10"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            if (variant.buildType.name == 'release') {
+                outputFileName = "HoleyLight" + "-v" + android.defaultConfig.versionName + "-" + (new Date()).format('yyyyMMddHHmmss') + ".apk"
+                //TODO the line below warns about deprecation, fix. Bloody Gradle and their breakage every other week.
+                variant.assemble.doLast {
+                    copy {
+                        from 'build/outputs/mapping/release'
+                        into 'proguard'
+                        include '**/mapping.txt'
+                    }
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'androidx.appcompat:appcompat:1.1.0-alpha03'
+    implementation 'androidx.preference:preference:1.1.0-alpha03'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha3'
+    implementation 'com.airbnb.android:lottie:3.0.0'
+}
