@@ -229,6 +229,14 @@ public class NotificationListenerService extends android.service.notification.No
                                 c = settings.getColorForPackage(sbn.getPackageName(), c);
                                 settings.setColorForPackage(sbn.getPackageName(), c, true);
 
+                                // user has set notification to full black, skip
+                                if ((c & 0x00FFFFFF) == 0) {
+                                    continue;
+                                }
+
+                                // Make sure we have alpha (again)
+                                c = c | 0xFF000000;
+
                                 // Log and save
                                 Integer color = c;
                                 log("%s --> #%08X / #%08X --> #%08X", sbn.getPackageName(), chan.getLightColor(), not.color, c);
