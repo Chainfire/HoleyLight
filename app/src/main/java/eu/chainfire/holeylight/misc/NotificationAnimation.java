@@ -238,8 +238,8 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                 }
                 lottieAnimationView.setRotation(rotation * -90);
 
-                // we're only going to allow straight up landscape
-                lottieAnimationView.setVisibility(rotation == 0 ? View.VISIBLE : View.INVISIBLE);
+                // we're only going to allow portrait and reverse-portrait
+                lottieAnimationView.setVisibility((rotation % 2) == 0 ? View.VISIBLE : View.INVISIBLE);
             } else if (params instanceof ViewGroup.MarginLayoutParams) {
                 ((ViewGroup.MarginLayoutParams)params).setMargins((int)left, (int)top, 0, 0);
             }
