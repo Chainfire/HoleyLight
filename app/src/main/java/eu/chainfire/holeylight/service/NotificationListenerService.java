@@ -203,7 +203,7 @@ public class NotificationListenerService extends android.service.notification.No
                                 if ((c & 0xFFFFFF) == 0) c = 0xFFFFFF;
 
                                 // There's a lot of white notifications, try using the notification accent color instead
-                                if (((c & 0xFFFFFF) == 0xFFFFFF) && ((not.color & 0xFFFFFF) > 0)) {
+                                if (((c & 0xFFFFFF) == 0xFFFFFF) && ((not.color & 0xFFFFFF) > 0) && !sbn.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
 
                                     // Set dominant channel to max brightness
                                     int r = Color.red(not.color);

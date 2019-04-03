@@ -9,6 +9,9 @@
     <string name="permission_associate"><![CDATA[In the next dialog, please link <b>Holey Light</b> with <b>any</b> device. This is required to be able to access notifications colors. It does not seem to matter which device you choose.<br><br>Please <b>turn on Bluetooth</b> before continuing; you can turn it off again afterwards.]]></string>
     <string name="permission_notifications"><![CDATA[In the next screen, please allow <b>Holey Light</b> notification access. This is required to be able to detect notifications.]]></string>
 
+    <string name="notification_test_title">Holey Light: Test</string>
+    <string name="notification_test_description">Test notification, white LED</string>
+
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>
 
