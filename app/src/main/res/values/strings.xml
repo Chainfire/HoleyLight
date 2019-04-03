@@ -37,6 +37,8 @@
     <string name="settings_category_animation">Animation</string>
     <string name="settings_animation_tune_title">Tune</string>
     <string name="settings_animation_tune_description">Fine-tune size, position, and speed</string>
+    <string name="settings_animation_colors_title">Colors</string>
+    <string name="settings_animation_colors_description">Adjust per-package notification colors</string>
 
     <string name="settings_category_chainfire">Chainfire</string>
     <string name="settings_playstore_title">All my apps</string>

@@ -137,6 +137,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             startActivity(new Intent(getActivity(), TuneActivity.class));
             return false;
         });
+        pref(catAnimation, R.string.settings_animation_colors_title, R.string.settings_animation_colors_description, null, true, preference -> {
+            startActivity(new Intent(getActivity(), ColorActivity.class));
+            return false;
+        });
 
         PreferenceCategory catChainfire = category(root, R.string.settings_category_chainfire);
         pref(catChainfire, R.string.settings_playstore_title, R.string.settings_playstore_description, null, true, preference -> {

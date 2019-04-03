@@ -187,6 +187,7 @@ public class NotificationListenerService extends android.service.notification.No
 
     private void handleLEDNotifications() {
         List<Integer> colors = new ArrayList<>();
+        List<String> pkgs = new ArrayList<>();
 
         StatusBarNotification[] sbns = getActiveNotifications();
         for (StatusBarNotification sbn : sbns) {
@@ -224,11 +225,18 @@ public class NotificationListenerService extends android.service.notification.No
                                 // Make sure we have alpha
                                 c = c | 0xFF000000;
 
+                                // Save to prefs, or get overriden value from prefs
+                                c = settings.getColorForPackage(sbn.getPackageName(), c);
+                                settings.setColorForPackage(sbn.getPackageName(), c, true);
+
                                 // Log and save
                                 Integer color = c;
                                 log("%s --> #%08X / #%08X --> #%08X", sbn.getPackageName(), chan.getLightColor(), not.color, c);
                                 if (!colors.contains(color)) {
                                     colors.add(color);
+                                }
+                                if (!pkgs.contains(sbn.getPackageName())) {
+                                    pkgs.add(sbn.getPackageName());
                                 }
                             }
                         }

@@ -40,6 +40,7 @@ public class TuneActivity extends AppCompatActivity implements Settings.OnSettin
         settings = Settings.getInstance(this);
         animation = new NotificationAnimation(this,null, null);
 
+        getSupportActionBar().setTitle(R.string.settings_animation_tune_title);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 

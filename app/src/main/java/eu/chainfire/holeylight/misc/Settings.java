@@ -24,7 +24,10 @@ import android.content.SharedPreferences;
 import android.graphics.Rect;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import androidx.preference.PreferenceManager;
 
@@ -52,6 +55,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     private static final String DP_SHIFT_VERTICAL = "dp_shift_vertical";
     private static final String DP_SHIFT_HORIZONTAL = "dp_shift_horizontal";
     private static final String SPEED_FACTOR = "speed_factor";
+
+    private static final String PACKAGE_COLOR = "package_color:";
+    private static final String PACKAGE_COLOR_FMT = PACKAGE_COLOR + "%s";
 
     private static Settings instance;
     public static Settings getInstance(Context context) {
@@ -122,6 +128,11 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
             notifyListeners();
             editor = null;
         }
+    }
+
+    public synchronized void cancel() {
+        ref = 0;
+        editor = null;
     }
 
     public Rect getCutoutAreaRect() {
@@ -232,5 +243,34 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public boolean isEnabledWhileScreenOffBattery() {
         return isEnabled() && false;
+    }
+
+    public int getColorForPackage(String packageName, int defaultValue) {
+        return prefs.getInt(String.format(Locale.ENGLISH, PACKAGE_COLOR_FMT, packageName), defaultValue);
+    }
+
+    public void setColorForPackage(String packageName, int color, boolean fromListener) {
+        String key = String.format(Locale.ENGLISH, PACKAGE_COLOR_FMT, packageName);
+        if (!prefs.contains(key) || (prefs.getInt(key, -1) != color)) {
+            edit();
+            try {
+                editor.putInt(key, color);
+            } finally {
+                save(!fromListener);
+            }
+        }
+    }
+
+    public Map<String, Integer> getPackagesAndColors() {
+        Map<String, Integer> ret = new HashMap<>();
+        Map<String, ?> all = prefs.getAll();
+        for (String key : all.keySet()) {
+            if (key.startsWith(PACKAGE_COLOR)) {
+                String pkg = key.substring(PACKAGE_COLOR.length());
+                Integer color = prefs.getInt(key, 0);
+                ret.put(pkg, color);
+            }
+        }
+        return ret;
     }
 }

@@ -32,6 +32,7 @@ import eu.chainfire.holeylight.R;
 public class TestNotification {
     static final int NOTIFICATION_ID_MAIN = 1001;
     static final int NOTIFICATION_ID_TUNE = 1002;
+    static final int NOTIFICATION_ID_COLOR = 1003;
 
     static void show(Context context, int id) {
         NotificationManagerCompat.from(context).deleteNotificationChannel(BuildConfig.APPLICATION_ID + ":test");
