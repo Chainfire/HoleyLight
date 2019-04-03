@@ -19,6 +19,7 @@
 package eu.chainfire.holeylight.ui;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -38,6 +39,8 @@ public class TuneActivity extends AppCompatActivity implements Settings.OnSettin
 
         settings = Settings.getInstance(this);
         animation = new NotificationAnimation(this,null, null);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
@@ -90,5 +93,14 @@ public class TuneActivity extends AppCompatActivity implements Settings.OnSettin
         ((TextView)findViewById(R.id.tvShiftVertical)).setText(getString(R.string.tune_shift_vertical, animation.getDpShiftVertical()));
         ((TextView)findViewById(R.id.tvShiftHorizontal)).setText(getString(R.string.tune_shift_horizontal, animation.getDpShiftHorizontal()));
         ((TextView)findViewById(R.id.tvSpeed)).setText(getString(R.string.tune_speed, animation.getSpeedFactor()));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
