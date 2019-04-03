@@ -13,6 +13,7 @@
     <string name="notification_test_description">Test notification, white LED</string>
 
     <string name="error">Error</string>
+    <string name="error_hide_notch"><![CDATA[<b>Holey Light</b> cannot function while the notch is hidden. Uncheck <b>Settings</b> - <b>Display</b> - <b>Full screen apps</b> - <b>Hide front camera</b>.]]></string>
 
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>

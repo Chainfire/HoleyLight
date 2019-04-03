@@ -76,7 +76,14 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
     }
 
     private void checkPermissions() {
-        if (!android.provider.Settings.canDrawOverlays(this)) {
+        if (android.provider.Settings.Secure.getInt(getContentResolver(), "display_cutout_hide_notch", 0) == 1) {
+            (new AlertDialog.Builder(this))
+                    .setTitle(R.string.error)
+                    .setMessage(Html.fromHtml(getString(R.string.error_hide_notch)))
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setOnDismissListener(dialog -> MainActivity.this.finish())
+                    .show();
+        } else if (!android.provider.Settings.canDrawOverlays(this)) {
             (new AlertDialog.Builder(this))
                     .setTitle(getString(R.string.permission_required) + " 1/3")
                     .setMessage(Html.fromHtml(getString(R.string.permission_overlay)))
