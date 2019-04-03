@@ -22,10 +22,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Rect;
-import androidx.preference.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.preference.PreferenceManager;
 
 @SuppressWarnings({"WeakerAccess", "unused", "UnusedReturnValue"})
 public class Settings implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -50,6 +51,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     private static final String DP_ADD_SCALE_HORIZONTAL = "dp_add_scale_horizontal";
     private static final String DP_SHIFT_VERTICAL = "dp_shift_vertical";
     private static final String DP_SHIFT_HORIZONTAL = "dp_shift_horizontal";
+    private static final String SPEED_FACTOR = "speed_factor";
 
     private static Settings instance;
     public static Settings getInstance(Context context) {
@@ -191,6 +193,21 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         edit();
         try {
             editor.putInt(DP_SHIFT_HORIZONTAL, value);
+        } finally {
+            save(true);
+        }
+    }
+
+    public float getSpeedFactor() {
+        return prefs.getFloat(SPEED_FACTOR, 1.0f);
+    }
+
+    public void setSpeedFactor(float value) {
+        value = Math.min(Math.max(value, 0.1f), 2.0f);
+
+        edit();
+        try {
+            editor.putFloat(SPEED_FACTOR, value);
         } finally {
             save(true);
         }

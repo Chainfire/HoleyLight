@@ -255,6 +255,8 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
             lottieAnimationView.setScaleX(scaledWidth / width);
             lottieAnimationView.setScaleY(scaledHeight / height);
 
+            lottieAnimationView.setSpeed(getSpeedFactor());
+
             if (lottieAnimationView.getComposition() == null) {
                 lottieAnimationView.setComposition(lottieComposition);
             }
@@ -329,5 +331,9 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
     public int getDpShiftHorizontal() {
         return settings.getDpShiftHorizontal(dpShiftHorizontal);
+    }
+
+    public float getSpeedFactor() {
+        return settings.getSpeedFactor();
     }
 }

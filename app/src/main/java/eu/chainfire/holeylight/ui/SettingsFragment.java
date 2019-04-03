@@ -30,7 +30,6 @@ import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
-
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.misc.Settings;
 
@@ -132,6 +131,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         PreferenceCategory catAdvice = category(root, R.string.settings_category_advice);
         prefAdviceAOD = pref(catAdvice, R.string.settings_advice_aod_title, 0, null, true, null);
         prefAdviceLock = pref(catAdvice, R.string.settings_advice_lock_title, 0, null, true, null);
+
+        PreferenceCategory catAnimation = category(root, R.string.settings_category_animation);
+        pref(catAnimation, R.string.settings_animation_tune_title, R.string.settings_animation_tune_description, null, true, preference -> {
+            startActivity(new Intent(getActivity(), TuneActivity.class));
+            return false;
+        });
 
         PreferenceCategory catChainfire = category(root, R.string.settings_category_chainfire);
         pref(catChainfire, R.string.settings_playstore_title, R.string.settings_playstore_description, null, true, preference -> {

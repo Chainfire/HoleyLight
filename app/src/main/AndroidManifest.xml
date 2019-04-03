@@ -33,7 +33,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.DebugActivity"
+            android:name=".ui.TuneActivity"
             android:exported="false"
             android:screenOrientation="portrait">
         </activity>
