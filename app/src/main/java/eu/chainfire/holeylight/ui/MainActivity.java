@@ -110,7 +110,14 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
                                 }
                             }
 
-                            @Override public void onFailure(CharSequence error) { }
+                            @Override
+                            public void onFailure(CharSequence error) {
+                                (new AlertDialog.Builder(MainActivity.this))
+                                        .setTitle(getString(R.string.error))
+                                        .setMessage(error)
+                                        .setPositiveButton(android.R.string.ok, null)
+                                        .show();
+                            }
                         }, handler);
                     })
                     .show();

@@ -12,6 +12,8 @@
     <string name="notification_test_title">Holey Light: Test</string>
     <string name="notification_test_description">Test notification, white LED</string>
 
+    <string name="error">Error</string>
+
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>
 
