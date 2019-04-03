@@ -79,35 +79,30 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         this.lottieAnimationView = lottie;
 
         String device = Build.DEVICE;
-        switch (device) {
-            case "beyond0":  // s10e
-                json = jsonBeyond0;
-                dpAddScaleBase = 4;
-                dpAddScaleHorizontal = 0;
-                dpShiftVertical = 0;
-                dpShiftHorizontal = 0;
-                break;
-            case "beyond1":  // s10
-                json = jsonBeyond1;
-                dpAddScaleBase = 4;
-                dpAddScaleHorizontal = 0;
-                dpShiftVertical = 0;
-                dpShiftHorizontal = 0;
-                break;
-            case "beyond2":  // s10+
-                json = jsonBeyond2;
-                dpAddScaleBase = 4;
-                dpAddScaleHorizontal = 1;
-                dpShiftVertical = 0;
-                dpShiftHorizontal = -1;
-                break;
-            default:
-                json = null;
-                dpAddScaleBase = 0;
-                dpAddScaleHorizontal = 0;
-                dpShiftVertical = 0;
-                dpShiftHorizontal = 0;
-                break;
+        if (device.startsWith("beyond0")) { //s10e
+            json = jsonBeyond0;
+            dpAddScaleBase = 4;
+            dpAddScaleHorizontal = 0;
+            dpShiftVertical = 0;
+            dpShiftHorizontal = 0;
+        } else if (device.startsWith("beyond1")) { // s10
+            json = jsonBeyond1;
+            dpAddScaleBase = 4;
+            dpAddScaleHorizontal = 0;
+            dpShiftVertical = 0;
+            dpShiftHorizontal = 0;
+        } else if (device.startsWith("beyond2")) { // s10+
+            json = jsonBeyond2;
+            dpAddScaleBase = 4;
+            dpAddScaleHorizontal = 1;
+            dpShiftVertical = 0;
+            dpShiftHorizontal = -1;
+        } else {
+            json = null;
+            dpAddScaleBase = 0;
+            dpAddScaleHorizontal = 0;
+            dpShiftVertical = 0;
+            dpShiftHorizontal = 0;
         }
 
         if (!isValid()) return;
@@ -168,6 +163,10 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private synchronized boolean isValid() {
         return (json != null) && (lottieAnimationView != null);
+    }
+
+    public synchronized boolean isDeviceSupported() {
+        return (json != null);
     }
 
     @Override

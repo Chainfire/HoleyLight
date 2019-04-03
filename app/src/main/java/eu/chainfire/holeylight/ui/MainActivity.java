@@ -24,6 +24,7 @@ import android.companion.CompanionDeviceManager;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
@@ -38,6 +39,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.NotificationManagerCompat;
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
+import eu.chainfire.holeylight.misc.NotificationAnimation;
 import eu.chainfire.holeylight.misc.Settings;
 
 public class MainActivity extends AppCompatActivity implements Settings.OnSettingsChangedListener {
@@ -76,7 +78,14 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
     }
 
     private void checkPermissions() {
-        if (android.provider.Settings.Secure.getInt(getContentResolver(), "display_cutout_hide_notch", 0) == 1) {
+        if (!(new NotificationAnimation(this, null, null)).isDeviceSupported()) {
+            (new AlertDialog.Builder(this))
+                    .setTitle(R.string.error)
+                    .setMessage(Html.fromHtml(getString(R.string.error_unsupported_device, Build.DEVICE)))
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setOnDismissListener(dialog -> MainActivity.this.finish())
+                    .show();
+        } else if (android.provider.Settings.Secure.getInt(getContentResolver(), "display_cutout_hide_notch", 0) == 1) {
             (new AlertDialog.Builder(this))
                     .setTitle(R.string.error)
                     .setMessage(Html.fromHtml(getString(R.string.error_hide_notch)))
