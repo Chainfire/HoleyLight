@@ -128,10 +128,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         prefScreenOffCharging = check(catOperation, R.string.settings_screen_off_charging_title, R.string.settings_screen_off_charging_description, Settings.ENABLED_SCREEN_OFF_CHARGING, settings.isEnabledWhileScreenOffCharging(), true);
         prefScreenOffBattery = check(catOperation, R.string.settings_screen_off_battery_title, R.string.settings_screen_off_battery_description, Settings.ENABLED_SCREEN_OFF_BATTERY, settings.isEnabledWhileScreenOffBattery(), false);
 
-        PreferenceCategory catAdvice = category(root, R.string.settings_category_advice);
-        prefAdviceAOD = pref(catAdvice, R.string.settings_advice_aod_title, 0, null, true, null);
-        prefAdviceLock = pref(catAdvice, R.string.settings_advice_lock_title, 0, null, true, null);
-
         PreferenceCategory catAnimation = category(root, R.string.settings_category_animation);
         pref(catAnimation, R.string.settings_animation_tune_title, R.string.settings_animation_tune_description, null, true, preference -> {
             startActivity(new Intent(getActivity(), TuneActivity.class));
@@ -163,6 +159,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             }
             return false;
         });
+
+        PreferenceCategory catAdvice = category(root, R.string.settings_category_advice);
+        prefAdviceAOD = pref(catAdvice, R.string.settings_advice_aod_title, 0, null, true, null);
+        prefAdviceLock = pref(catAdvice, R.string.settings_advice_lock_title, 0, null, true, null);
 
         updatePrefs(null);
         prefs.registerOnSharedPreferenceChangeListener(this);
