@@ -79,7 +79,7 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
             switch (intent.getAction()) {
                 case Intent.ACTION_SCREEN_ON:
                     if (!haveNotifications && !notificationAnimation.isPlaying()) {
-                        // We timed out the screen earlier, and user turned it back on again
+                        // We timed out the screen earlier, and user turned it back on again.
                         finish();
                     }
                     break;
@@ -94,6 +94,7 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
                     break;
                 case Intent.ACTION_POWER_DISCONNECTED:
                     if (!settings.isEnabledWhileScreenOffBattery()) {
+                        // Turn off
                         finish();
                     }
                     break;
@@ -280,12 +281,14 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
 
     @Override
     protected void onUserLeaveHint() {
+        // Usually (but not always) Home button
         super.onUserLeaveHint();
         finish();
     }
 
     @Override
     public void finish() {
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BuildConfig.APPLICATION_ID + ".onLockscreen"));
         handler.removeCallbacks(repeatedWhileVisible);
         unregister();
         super.finish();

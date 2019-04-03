@@ -41,10 +41,16 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     private static final boolean ENABLED_MASTER_DEFAULT = true;
 
     public static final String ENABLED_SCREEN_OFF_CHARGING = "enabled_screen_off_charging";
-    private static final boolean ENABLED_SCREEN_OFF_CHARGING_DEFAULT = false;
+    private static final boolean ENABLED_SCREEN_OFF_CHARGING_DEFAULT = true;
 
     public static final String ENABLED_SCREEN_OFF_BATTERY = "enabled_screen_off_battery";
     private static final boolean ENABLED_SCREEN_OFF_BATTERY_DEFAULT = false;
+
+    public static final String SEEN_ON_LOCKSCREEN = "seen_on_lockscreen";
+    private static final boolean SEEN_ON_LOCKSCREEN_DEFAULT = false;
+
+    public static final String SEEN_ON_USER_PRESENT = "seen_on_user_present";
+    private static final boolean SEEN_ON_USER_PRESENT_DEFAULT = true;
     
     private static final String CUTOUT_AREA_LEFT = "cutout_area_left";
     private static final String CUTOUT_AREA_TOP = "cutout_area_top";
@@ -237,6 +243,10 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
+    public boolean isEnabledWhileScreenOffAny() {
+        return isEnabledWhileScreenOffCharging() || isEnabledWhileScreenOffBattery();
+    }
+
     public boolean isEnabledWhileScreenOffCharging() {
         return isEnabled() && prefs.getBoolean(ENABLED_SCREEN_OFF_CHARGING, ENABLED_SCREEN_OFF_CHARGING_DEFAULT);
     }
@@ -272,5 +282,13 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
             }
         }
         return ret;
+    }
+
+    public boolean isSeenOnLockscreen(boolean effective) {
+        return (!effective || isEnabledWhileScreenOffAny()) && prefs.getBoolean(SEEN_ON_LOCKSCREEN, SEEN_ON_LOCKSCREEN_DEFAULT);
+    }
+
+    public boolean isSeenOnUserPresent(boolean effective) {
+        return (!effective || isEnabledWhileScreenOffAny()) && prefs.getBoolean(SEEN_ON_USER_PRESENT, SEEN_ON_USER_PRESENT_DEFAULT);
     }
 }

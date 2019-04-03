@@ -21,11 +21,17 @@
 
     <string name="settings_category_operation">Operation</string>
     <string name="settings_screen_on_title">Screen on</string>
-    <string name="settings_screen_on_description">Show light while the phone is in normal use</string>
-    <string name="settings_screen_off_charging_title">Screen off (Charging)</string>
-    <string name="settings_screen_off_charging_description">Experimental feature to show light while the screen is turned off</string>
-    <string name="settings_screen_off_battery_title">Screen off (Battery)</string>
+    <string name="settings_screen_on_description">Show notification light while the phone is in normal use</string>
+    <string name="settings_screen_off_charging_title">Charging: Screen off</string>
+    <string name="settings_screen_off_charging_description">Show notification light while the phone is off and charging</string>
+    <string name="settings_screen_off_battery_title">Battery: Screen off</string>
     <string name="settings_screen_off_battery_description">This feature is still under development and not available right now</string>
+
+    <string name="settings_category_seen_screen_off_to_on">Mark as seen (screen off --&gt; on)</string>
+    <string name="settings_seen_on_lockscreen_title">On lockscreen</string>
+    <string name="settings_seen_on_lockscreen_description">Each time the lockscreen is shown</string>
+    <string name="settings_seen_on_user_present_title">After unlock</string>
+    <string name="settings_seen_on_user_present_description">Each time the lockscreen is unlocked</string>
 
     <string name="settings_category_advice">Advisory</string>
     <string name="settings_advice_aod_title">Always On Display</string>

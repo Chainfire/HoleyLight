@@ -48,6 +48,7 @@ import eu.chainfire.holeylight.ui.LockscreenActivity;
 public class NotificationListenerService extends android.service.notification.NotificationListenerService implements Settings.OnSettingsChangedListener {
     private Settings settings = null;
     private Overlay overlay = null;
+    private NotificationTracker tracker = null;
     private int[] currentColors = new int[0];
     private boolean enabled = true;
 
@@ -86,10 +87,25 @@ public class NotificationListenerService extends android.service.notification.No
                         startActivity(i);
                     }
                 }
+            } else if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {
+                onUserPresent();
             }
         }
     };
     private IntentFilter intentFilter = null;
+
+    private boolean localBroadcastReceiverRegistered = false;
+    private BroadcastReceiver localBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction() == null) return;
+
+            if (intent.getAction().equals(BuildConfig.APPLICATION_ID + ".onLockscreen")) {
+                onLockscreen();
+            }
+        }
+    };
+    private IntentFilter localIntentFilter = null;
 
     private void log(String fmt, Object... args) {
         Log.d("HoleyLight/Listener", String.format(Locale.ENGLISH, fmt, args));
@@ -102,12 +118,17 @@ public class NotificationListenerService extends android.service.notification.No
         enabled = settings.isEnabled();
         overlay = Overlay.getInstance(this);
 
+        tracker = new NotificationTracker();
+
         intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
         intentFilter.addAction(Intent.ACTION_USER_PRESENT);
         intentFilter.addAction(Intent.ACTION_POWER_CONNECTED);
         intentFilter.setPriority(998);
+
+        localIntentFilter = new IntentFilter();
+        localIntentFilter.addAction(BuildConfig.APPLICATION_ID + ".onLockscreen");
 
         settings.registerOnSettingsChangedListener(this);
     }
@@ -131,15 +152,19 @@ public class NotificationListenerService extends android.service.notification.No
     public void onListenerConnected() {
         super.onListenerConnected();
         log("onListenerConnected");
+        tracker.clear();
         registerReceiver(broadcastReceiver, intentFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(localBroadcastReceiver, localIntentFilter);
         handleLEDNotifications();
     }
 
     @Override
     public void onListenerDisconnected() {
         log("onListenerDisconnected");
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(localBroadcastReceiver);
         unregisterReceiver(broadcastReceiver);
         overlay.hide(true);
+        tracker.clear();
         super.onListenerDisconnected();
     }
 
@@ -189,7 +214,7 @@ public class NotificationListenerService extends android.service.notification.No
         List<Integer> colors = new ArrayList<>();
         List<String> pkgs = new ArrayList<>();
 
-        StatusBarNotification[] sbns = getActiveNotifications();
+        StatusBarNotification[] sbns = tracker.prune(getActiveNotifications());
         for (StatusBarNotification sbn : sbns) {
             try {
                 Notification not = sbn.getNotification();
@@ -282,8 +307,25 @@ public class NotificationListenerService extends android.service.notification.No
         } else {
             overlay.hide(!enabled);
         }
+        //TODO do we need a (short) wakelock here?
         Intent intent = new Intent(BuildConfig.APPLICATION_ID + ".colors");
         intent.putExtra(BuildConfig.APPLICATION_ID + ".colors", currentColors);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void onLockscreen() {
+        log("onLockscreen");
+        if (settings.isSeenOnLockscreen(true)) {
+            tracker.markAllAsSeen();
+            handleLEDNotifications();
+        }
+    }
+
+    private void onUserPresent() {
+        log("onUserPresent");
+        if (settings.isSeenOnUserPresent(true)) {
+            tracker.markAllAsSeen();
+            handleLEDNotifications();
+        }
     }
 }

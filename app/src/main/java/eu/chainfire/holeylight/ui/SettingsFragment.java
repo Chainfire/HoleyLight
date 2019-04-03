@@ -41,6 +41,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefScreenOn = null;
     private CheckBoxPreference prefScreenOffCharging = null;
     private CheckBoxPreference prefScreenOffBattery = null;
+    private CheckBoxPreference prefSeenOnLockscreen = null;
+    private CheckBoxPreference prefSeenOnUserPresent = null;
     private Preference prefAdviceAOD = null;
     private Preference prefAdviceLock = null;
 
@@ -128,6 +130,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         prefScreenOffCharging = check(catOperation, R.string.settings_screen_off_charging_title, R.string.settings_screen_off_charging_description, Settings.ENABLED_SCREEN_OFF_CHARGING, settings.isEnabledWhileScreenOffCharging(), true);
         prefScreenOffBattery = check(catOperation, R.string.settings_screen_off_battery_title, R.string.settings_screen_off_battery_description, Settings.ENABLED_SCREEN_OFF_BATTERY, settings.isEnabledWhileScreenOffBattery(), false);
 
+        PreferenceCategory catMarkAsSeen = category(root, R.string.settings_category_seen_screen_off_to_on);
+        prefSeenOnLockscreen = check(catMarkAsSeen, R.string.settings_seen_on_lockscreen_title, R.string.settings_seen_on_lockscreen_description, Settings.SEEN_ON_LOCKSCREEN, settings.isSeenOnLockscreen(false), true);
+        prefSeenOnUserPresent = check(catMarkAsSeen, R.string.settings_seen_on_user_present_title, R.string.settings_seen_on_user_present_description, Settings.SEEN_ON_USER_PRESENT, settings.isSeenOnUserPresent(false), true);
+
         PreferenceCategory catAnimation = category(root, R.string.settings_category_animation);
         pref(catAnimation, R.string.settings_animation_tune_title, R.string.settings_animation_tune_description, null, true, preference -> {
             startActivity(new Intent(getActivity(), TuneActivity.class));
@@ -213,6 +219,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             prefScreenOn.setChecked(settings.isEnabled()); // for sync with master switch
             prefScreenOffCharging.setEnabled(settings.isEnabled());
             prefScreenOffBattery.setEnabled(settings.isEnabledWhileScreenOffCharging() && false);
+            prefSeenOnLockscreen.setEnabled(settings.isEnabledWhileScreenOffAny());
+            prefSeenOnUserPresent.setEnabled(settings.isEnabledWhileScreenOffAny());
         }
     }
 }
