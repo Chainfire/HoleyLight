@@ -4,10 +4,10 @@
     <string name="app_website_url">https://forum.xda-developers.com/galaxy-s10/themes/app-holey-light-t3917675</string>
 
     <string name="permission_required">Permissions needed</string>
-    <string name="permission_overlay">On the next screen, please allow Holey Light to appear on top. This is required to show the notification animation.</string>
-    <string name="permission_battery">In the next dialog, please allow Holey Light to stop optimizing battery usage. This is required to keep the notification animation running.</string>
-    <string name="permission_associate">In the next dialog, please link Holey Light with a device. This is required to work around an issue in Android regarding notifications. It does not seem to matter which device you choose.</string>
-    <string name="permission_notifications">In the next screen, please allow Holey Light notification access. This is required to be able to detect notifications.</string>
+    <string name="permission_overlay"><![CDATA[On the next screen, please allow <b>Holey Light</b> to appear on top. This is required to show the notification animation.]]></string>
+    <string name="permission_battery"><![CDATA[In the next dialog, please allow <b>Holey Light</b> to stop optimizing battery usage. This is required to keep the notification animation running.]]></string>
+    <string name="permission_associate"><![CDATA[In the next dialog, please link <b>Holey Light</b> with <b>any</b> device. This is required to be able to access notifications colors. It does not seem to matter which device you choose.<br><br>Please <b>turn on Bluetooth</b> before continuing; you can turn it off again afterwards.]]></string>
+    <string name="permission_notifications"><![CDATA[In the next screen, please allow <b>Holey Light</b> notification access. This is required to be able to detect notifications.]]></string>
 
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>

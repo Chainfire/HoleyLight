@@ -35,6 +35,7 @@ import android.content.IntentSender;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -74,11 +75,12 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
         }
     }
 
+    private boolean startedDebug = false;
     private void checkPermissions() {
         if (!android.provider.Settings.canDrawOverlays(this)) {
             (new AlertDialog.Builder(this))
-                    .setTitle(getString(R.string.permission_required) + " 1/4")
-                    .setMessage(R.string.permission_overlay)
+                    .setTitle(getString(R.string.permission_required) + " 1/3")
+                    .setMessage(Html.fromHtml(getString(R.string.permission_overlay)))
                     .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                         Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
                         intent.setData(Uri.parse("package:" + BuildConfig.APPLICATION_ID));
@@ -87,8 +89,8 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
                     .show();
         } else if (((CompanionDeviceManager)getSystemService(COMPANION_DEVICE_SERVICE)).getAssociations().size() == 0) {
             (new AlertDialog.Builder(this))
-                    .setTitle(getString(R.string.permission_required) + " 2/4")
-                    .setMessage(R.string.permission_associate)
+                    .setTitle(getString(R.string.permission_required) + " 2/3")
+                    .setMessage(Html.fromHtml(getString(R.string.permission_associate)))
                     .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                         CompanionDeviceManager companionDeviceManager = (CompanionDeviceManager)getSystemService(COMPANION_DEVICE_SERVICE);
                         companionDeviceManager.associate((new AssociationRequest.Builder()).build(), new CompanionDeviceManager.Callback() {
@@ -107,8 +109,8 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
                     .show();
         } else if (!NotificationManagerCompat.getEnabledListenerPackages(this).contains(getPackageName())) {
             (new AlertDialog.Builder(this))
-                    .setTitle(getString(R.string.permission_required) + " 3/4")
-                    .setMessage(R.string.permission_notifications)
+                    .setTitle(getString(R.string.permission_required) + " 3/3")
+                    .setMessage(Html.fromHtml(getString(R.string.permission_notifications)))
                     .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                         Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
                         startActivity(intent);
@@ -118,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
         } else if (!((PowerManager)getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)) {
             (new AlertDialog.Builder(this))
                     .setTitle(getString(R.string.permission_required) + " 4/4")
-                    .setMessage(R.string.permission_battery)
+                    .setMessage(Html.fromHtml(getString(R.string.permission_battery)))
                     .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                         checkPermissionsOnResume = true;
                         Intent intent = new Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
