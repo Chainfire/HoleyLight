@@ -18,13 +18,6 @@
 
 package eu.chainfire.holeylight.ui;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import eu.chainfire.holeylight.BuildConfig;
-import eu.chainfire.holeylight.R;
-import eu.chainfire.holeylight.misc.NotificationAnimation;
-import eu.chainfire.holeylight.misc.Settings;
-
 import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -43,6 +36,13 @@ import android.view.WindowManager;
 import com.airbnb.lottie.LottieAnimationView;
 
 import java.util.Locale;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import eu.chainfire.holeylight.BuildConfig;
+import eu.chainfire.holeylight.R;
+import eu.chainfire.holeylight.misc.NotificationAnimation;
+import eu.chainfire.holeylight.misc.Settings;
 
 public class LockscreenActivity extends AppCompatActivity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
     private static long visible = 0L;
@@ -85,11 +85,16 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
                     break;
                 case Intent.ACTION_SCREEN_OFF:
                     //TODO battery// if ((proximityWakeLock != null) && proximityWakeLock.isHeld()) {
+                    if (!screenWakeLock.isHeld()) {
+                        // Wakelock expired
+                        finish();
+                    } else {
                         // The power button was pressed while this lockscreen was displaying, instead of
                         // turning off, turn on and show the real lockscreen.
                         finish();
                         PowerManager.WakeLock wakelock = powerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, BuildConfig.APPLICATION_ID + ":Lockscreen/Exit");
                         wakelock.acquire(1000);
+                    }
                     //}
                     break;
                 case Intent.ACTION_POWER_DISCONNECTED:

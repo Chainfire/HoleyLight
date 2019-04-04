@@ -23,7 +23,7 @@
     <string name="help_hide_overlay_notification_description"><![CDATA[Help you hide the <b>Holey Light is displaying over other apps</b> notification]]></string>
     <string name="help_hide_overlay_notification_message"><![CDATA[On the next screen, make sure <b>Show notifications</b> (at the top only) is unchecked]]></string>
 
-    <string name="settings_category_operation">Operation</string>
+    <string name="settings_category_operation_title">Operation</string>
     <string name="settings_screen_on_title">Screen on</string>
     <string name="settings_screen_on_description">Show notification light while the phone is in normal use</string>
     <string name="settings_screen_off_charging_title">Charging: Screen off</string>
@@ -31,26 +31,37 @@
     <string name="settings_screen_off_battery_title">Battery: Screen off</string>
     <string name="settings_screen_off_battery_description">This feature is still under development and not available right now</string>
 
-    <string name="settings_category_seen_screen_off_to_on">Mark as seen (screen off --&gt; on)</string>
+    <string name="settings_category_seen_pickup_title">Mark as seen: Pickup</string>
+    <string name="settings_category_seen_pickup_description">Stationary for &gt;10s before moving</string>
+    <string name="settings_seen_pickup_screen_on_charging_title">Charging: Screen on</string>
+    <string name="settings_seen_pickup_screen_on_charging_description">Makes sense when you usually charge your phone where you can see it</string>
+    <string name="settings_seen_pickup_screen_off_charging_title">Charging: Screen off</string>
+    <string name="settings_seen_pickup_screen_off_charging_description">Makes sense when you usually charge your phone where you can see it</string>
+    <string name="settings_seen_pickup_screen_on_battery_title">Battery: Screen on</string>
+    <string name="settings_seen_pickup_screen_on_battery_description">Consumes a little additional power</string>
+    <string name="settings_seen_pickup_screen_off_battery_title">Battery: Screen off</string>
+    <string name="settings_seen_pickup_screen_off_battery_description">Consumes significant additional power</string>
+
+    <string name="settings_category_seen_lockscreen_title">Mark as seen: Lockscreen</string>
     <string name="settings_seen_on_lockscreen_title">On lockscreen</string>
     <string name="settings_seen_on_lockscreen_description">Each time the lockscreen is shown</string>
     <string name="settings_seen_on_user_present_title">After unlock</string>
     <string name="settings_seen_on_user_present_description">Each time the lockscreen is unlocked</string>
 
-    <string name="settings_category_advice">Advisory</string>
+    <string name="settings_category_advice_title">Advisory</string>
     <string name="settings_advice_aod_title">Always On Display</string>
     <string name="settings_advice_aod_description">AOD is advised to be disabled for consistent operation. Current setting:\n[ %s ]</string>
     <string name="settings_advice_lock_title">Lock Automatically</string>
     <string name="settings_advice_lock_description">It is advised to lock the device immediately (0 seconds) after screen off. Current setting:\n[ %d seconds ]</string>
     <string name="settings_advice_irrelevant">No advice applies for the current configuration</string>
 
-    <string name="settings_category_animation">Animation</string>
+    <string name="settings_category_animation_title">Animation</string>
     <string name="settings_animation_tune_title">Tune</string>
     <string name="settings_animation_tune_description">Fine-tune size, position, and speed</string>
     <string name="settings_animation_colors_title">Colors</string>
     <string name="settings_animation_colors_description">Adjust per-package notification colors</string>
 
-    <string name="settings_category_chainfire">Chainfire</string>
+    <string name="settings_category_chainfire_title">Chainfire</string>
     <string name="settings_playstore_title">All my apps</string>
     <string name="settings_playstore_description">View all my apps available on Google Play</string>
     <string name="settings_follow_twitter_title">Follow me on Twitter</string>

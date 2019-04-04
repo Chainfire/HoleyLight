@@ -46,6 +46,18 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final String ENABLED_SCREEN_OFF_BATTERY = "enabled_screen_off_battery";
     private static final boolean ENABLED_SCREEN_OFF_BATTERY_DEFAULT = false;
 
+    public static final String SEEN_PICKUP_SCREEN_ON_CHARGING = "seen_pickup_screen_on_charging";
+    private static final boolean SEEN_PICKUP_SCREEN_ON_CHARGING_DEFAULT = true;
+
+    public static final String SEEN_PICKUP_SCREEN_OFF_CHARGING = "seen_pickup_screen_off_charging";
+    private static final boolean SEEN_PICKUP_SCREEN_OFF_CHARGING_DEFAULT = false;
+
+    public static final String SEEN_PICKUP_SCREEN_ON_BATTERY = "seen_pickup_screen_on_battery";
+    private static final boolean SEEN_PICKUP_SCREEN_ON_BATTERY_DEFAULT = false;
+
+    public static final String SEEN_PICKUP_SCREEN_OFF_BATTERY = "seen_pickup_screen_off_battery";
+    private static final boolean SEEN_PICKUP_SCREEN_OFF_BATTERY_DEFAULT = false;
+
     public static final String SEEN_ON_LOCKSCREEN = "seen_on_lockscreen";
     private static final boolean SEEN_ON_LOCKSCREEN_DEFAULT = false;
 
@@ -282,6 +294,22 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
             }
         }
         return ret;
+    }
+
+    public boolean isSeenPickupScreenOnCharging(boolean effective) {
+        return (!effective || isEnabled()) && prefs.getBoolean(SEEN_PICKUP_SCREEN_ON_CHARGING, SEEN_PICKUP_SCREEN_ON_CHARGING_DEFAULT);
+    }
+
+    public boolean isSeenPickupScreenOffCharging(boolean effective) {
+        return (!effective || isEnabledWhileScreenOffCharging()) && prefs.getBoolean(SEEN_PICKUP_SCREEN_OFF_CHARGING, SEEN_PICKUP_SCREEN_OFF_CHARGING_DEFAULT);
+    }
+
+    public boolean isSeenPickupScreenOnBattery(boolean effective) {
+        return (!effective || isEnabled()) && prefs.getBoolean(SEEN_PICKUP_SCREEN_ON_BATTERY, SEEN_PICKUP_SCREEN_ON_BATTERY_DEFAULT);
+    }
+
+    public boolean isSeenPickupScreenOffBattery(boolean effective) {
+        return (!effective || isEnabledWhileScreenOffBattery()) && prefs.getBoolean(SEEN_PICKUP_SCREEN_OFF_BATTERY, SEEN_PICKUP_SCREEN_OFF_BATTERY_DEFAULT);
     }
 
     public boolean isSeenOnLockscreen(boolean effective) {

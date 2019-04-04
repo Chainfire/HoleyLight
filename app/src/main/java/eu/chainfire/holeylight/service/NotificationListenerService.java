@@ -18,6 +18,7 @@
 
 package eu.chainfire.holeylight.service;
 
+import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationChannelGroup;
@@ -42,6 +43,7 @@ import java.util.Locale;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.misc.Battery;
+import eu.chainfire.holeylight.misc.MotionSensor;
 import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.ui.LockscreenActivity;
 
@@ -49,11 +51,17 @@ public class NotificationListenerService extends android.service.notification.No
     private Settings settings = null;
     private Overlay overlay = null;
     private NotificationTracker tracker = null;
+    private MotionSensor motionSensor = null;
+    private KeyguardManager keyguardManager = null;
     private int[] currentColors = new int[0];
     private boolean enabled = true;
+    private Display display = null;
+    private boolean isUserPresent = false;
+    private MotionSensor.MotionState lastMotionState = MotionSensor.MotionState.UNKNOWN;
+    private long stationary_for_ms = 0;
 
     private boolean isDisplayOn(boolean ifDoze) {
-        int state = ((DisplayManager)getSystemService(DISPLAY_SERVICE)).getDisplay(0).getState();
+        int state = display.getState();
         if (state == Display.STATE_OFF) return false;
         if (state == Display.STATE_DOZE) return ifDoze;
         if (state == Display.STATE_DOZE_SUSPEND) return ifDoze;
@@ -72,6 +80,10 @@ public class NotificationListenerService extends android.service.notification.No
                     intent.getAction().equals(Intent.ACTION_SCREEN_OFF) ||
                     (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED) && !isDisplayOn(false))
             ) {
+                if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                    isUserPresent = false;
+                }
+
                 if (settings.isEnabledWhileScreenOffCharging() && Battery.isCharging(NotificationListenerService.this)) {
                     // this is a really bad way to detect we didn't just press the power button while
                     // our LockscreenActivity was in the foreground
@@ -88,13 +100,13 @@ public class NotificationListenerService extends android.service.notification.No
                     }
                 }
             } else if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {
+                isUserPresent = true;
                 onUserPresent();
             }
         }
     };
     private IntentFilter intentFilter = null;
 
-    private boolean localBroadcastReceiverRegistered = false;
     private BroadcastReceiver localBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -117,6 +129,10 @@ public class NotificationListenerService extends android.service.notification.No
         settings = Settings.getInstance(this);
         enabled = settings.isEnabled();
         overlay = Overlay.getInstance(this);
+        motionSensor = MotionSensor.getInstance(this);
+        keyguardManager = (KeyguardManager)getSystemService(KEYGUARD_SERVICE);
+
+        display = ((DisplayManager)getSystemService(DISPLAY_SERVICE)).getDisplay(0);
 
         tracker = new NotificationTracker();
 
@@ -153,14 +169,17 @@ public class NotificationListenerService extends android.service.notification.No
         super.onListenerConnected();
         log("onListenerConnected");
         tracker.clear();
+        isUserPresent = isDisplayOn(false) && !keyguardManager.isKeyguardLocked();
         registerReceiver(broadcastReceiver, intentFilter);
         LocalBroadcastManager.getInstance(this).registerReceiver(localBroadcastReceiver, localIntentFilter);
         handleLEDNotifications();
+        startMotionSensor();
     }
 
     @Override
     public void onListenerDisconnected() {
         log("onListenerDisconnected");
+        stopMotionSensor();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(localBroadcastReceiver);
         unregisterReceiver(broadcastReceiver);
         overlay.hide(true);
@@ -311,6 +330,7 @@ public class NotificationListenerService extends android.service.notification.No
         Intent intent = new Intent(BuildConfig.APPLICATION_ID + ".colors");
         intent.putExtra(BuildConfig.APPLICATION_ID + ".colors", currentColors);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        startMotionSensor();
     }
 
     private void onLockscreen() {
@@ -327,5 +347,54 @@ public class NotificationListenerService extends android.service.notification.No
             tracker.markAllAsSeen();
             handleLEDNotifications();
         }
+        startMotionSensor();
+    }
+
+    private boolean canMarkAsReadFromPickup() {
+        boolean charging = Battery.isCharging(this);
+        return
+            ((isUserPresent) && (
+                    (charging && settings.isSeenPickupScreenOnCharging(true)) ||
+                    (!charging && settings.isSeenPickupScreenOnBattery(true))
+            )) || ((!isUserPresent) && (
+                    (charging && settings.isSeenPickupScreenOffCharging(true)) ||
+                    (!charging && settings.isSeenPickupScreenOffBattery(true))
+            ));
+    }
+
+    private MotionSensor.OnMotionStateListener onMotionStateListener = (motionState, for_millis) -> {
+        if (motionState != lastMotionState) {
+            log("onMovement --> " + motionState);
+            lastMotionState = motionState;
+        }
+
+        if (motionState == MotionSensor.MotionState.STATIONARY) {
+            stationary_for_ms = for_millis;
+        } else {
+            if ((stationary_for_ms >= 10000) && (motionState == MotionSensor.MotionState.MOVING)) {
+                if (canMarkAsReadFromPickup()) {
+                    log("onMovement: pickup");
+                    //TODO screen must actually be visible AND not temp-off due to proximity here
+                    tracker.markAllAsSeen();
+                    handleLEDNotifications();
+                }
+            }
+            stationary_for_ms = 0;
+        }
+        return wantMotionSensor();
+    };
+
+    private void startMotionSensor() {
+        if (wantMotionSensor()) {
+            motionSensor.start(onMotionStateListener);
+        }
+    }
+
+    private void stopMotionSensor() {
+        motionSensor.stop(onMotionStateListener);
+    }
+
+    private boolean wantMotionSensor() {
+        return (enabled && (currentColors.length > 0) && canMarkAsReadFromPickup());
     }
 }

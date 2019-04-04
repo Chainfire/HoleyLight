@@ -44,6 +44,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefScreenOn = null;
     private CheckBoxPreference prefScreenOffCharging = null;
     private CheckBoxPreference prefScreenOffBattery = null;
+    private CheckBoxPreference prefSeenPickupScreenOnCharging = null;
+    private CheckBoxPreference prefSeenPickupScreenOffCharging = null;
+    private CheckBoxPreference prefSeenPickupScreenOnBattery = null;
+    private CheckBoxPreference prefSeenPickupScreenOffBattery = null;
     private CheckBoxPreference prefSeenOnLockscreen = null;
     private CheckBoxPreference prefSeenOnUserPresent = null;
     private Preference prefAdviceAOD = null;
@@ -71,10 +75,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     }
 
     @SuppressWarnings("ConstantConditions")
-    public PreferenceCategory category(PreferenceScreen root, int caption) {
+    public PreferenceCategory category(PreferenceScreen root, int caption, int summary) {
         PreferenceCategory retval = new PreferenceCategory(getContext());
         retval.setIconSpaceReserved(false);
         if (caption > 0) retval.setTitle(caption);
+        if (summary > 0) retval.setSummary(summary);
         root.addPreference(retval);
         return retval;
     }
@@ -145,16 +150,24 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         hideNot.setSummary(Html.fromHtml(getString(R.string.help_hide_overlay_notification_description)));
         root.addPreference(hideNot);
 
-        PreferenceCategory catOperation = category(root, R.string.settings_category_operation);
+        PreferenceCategory catOperation = category(root, R.string.settings_category_operation_title, 0);
         prefScreenOn = check(catOperation, R.string.settings_screen_on_title, R.string.settings_screen_on_description, Settings.ENABLED_MASTER, settings.isEnabled(), true);
         prefScreenOffCharging = check(catOperation, R.string.settings_screen_off_charging_title, R.string.settings_screen_off_charging_description, Settings.ENABLED_SCREEN_OFF_CHARGING, settings.isEnabledWhileScreenOffCharging(), true);
         prefScreenOffBattery = check(catOperation, R.string.settings_screen_off_battery_title, R.string.settings_screen_off_battery_description, Settings.ENABLED_SCREEN_OFF_BATTERY, settings.isEnabledWhileScreenOffBattery(), false);
 
-        PreferenceCategory catMarkAsSeen = category(root, R.string.settings_category_seen_screen_off_to_on);
+        PreferenceCategory catMarkAsSeen;
+
+        catMarkAsSeen = category(root, R.string.settings_category_seen_pickup_title, R.string.settings_category_seen_pickup_description);
+        prefSeenPickupScreenOnCharging = check(catMarkAsSeen, R.string.settings_seen_pickup_screen_on_charging_title, R.string.settings_seen_pickup_screen_on_charging_description, Settings.SEEN_PICKUP_SCREEN_ON_CHARGING, settings.isSeenPickupScreenOnCharging(false), true);
+        prefSeenPickupScreenOffCharging = check(catMarkAsSeen, R.string.settings_seen_pickup_screen_off_charging_title, R.string.settings_seen_pickup_screen_off_charging_description, Settings.SEEN_PICKUP_SCREEN_OFF_CHARGING, settings.isSeenPickupScreenOffCharging(false), true);
+        prefSeenPickupScreenOnBattery = check(catMarkAsSeen, R.string.settings_seen_pickup_screen_on_battery_title, R.string.settings_seen_pickup_screen_on_battery_description, Settings.SEEN_PICKUP_SCREEN_ON_BATTERY, settings.isSeenPickupScreenOnBattery(false), true);
+        prefSeenPickupScreenOffBattery = check(catMarkAsSeen, R.string.settings_seen_pickup_screen_off_battery_title, R.string.settings_seen_pickup_screen_off_battery_description, Settings.SEEN_PICKUP_SCREEN_OFF_BATTERY, settings.isSeenPickupScreenOffBattery(false), true);
+
+        catMarkAsSeen = category(root, R.string.settings_category_seen_lockscreen_title, 0);
         prefSeenOnLockscreen = check(catMarkAsSeen, R.string.settings_seen_on_lockscreen_title, R.string.settings_seen_on_lockscreen_description, Settings.SEEN_ON_LOCKSCREEN, settings.isSeenOnLockscreen(false), true);
         prefSeenOnUserPresent = check(catMarkAsSeen, R.string.settings_seen_on_user_present_title, R.string.settings_seen_on_user_present_description, Settings.SEEN_ON_USER_PRESENT, settings.isSeenOnUserPresent(false), true);
 
-        PreferenceCategory catAnimation = category(root, R.string.settings_category_animation);
+        PreferenceCategory catAnimation = category(root, R.string.settings_category_animation_title, 0);
         pref(catAnimation, R.string.settings_animation_tune_title, R.string.settings_animation_tune_description, null, true, preference -> {
             startActivity(new Intent(getActivity(), TuneActivity.class));
             return false;
@@ -164,7 +177,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return false;
         });
 
-        PreferenceCategory catChainfire = category(root, R.string.settings_category_chainfire);
+        PreferenceCategory catChainfire = category(root, R.string.settings_category_chainfire_title, 0);
         pref(catChainfire, R.string.settings_playstore_title, R.string.settings_playstore_description, null, true, preference -> {
             try {
                 Intent i = new Intent(Intent.ACTION_VIEW);
@@ -186,7 +199,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return false;
         });
 
-        PreferenceCategory catAdvice = category(root, R.string.settings_category_advice);
+        PreferenceCategory catAdvice = category(root, R.string.settings_category_advice_title, 0);
         prefAdviceAOD = pref(catAdvice, R.string.settings_advice_aod_title, 0, null, true, null);
         prefAdviceLock = pref(catAdvice, R.string.settings_advice_lock_title, 0, null, true, null);
 
@@ -239,6 +252,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             prefScreenOn.setChecked(settings.isEnabled()); // for sync with master switch
             prefScreenOffCharging.setEnabled(settings.isEnabled());
             prefScreenOffBattery.setEnabled(settings.isEnabledWhileScreenOffCharging() && false);
+            prefSeenPickupScreenOnCharging.setEnabled(settings.isEnabled());
+            prefSeenPickupScreenOffCharging.setEnabled(settings.isEnabledWhileScreenOffCharging());
+            prefSeenPickupScreenOnBattery.setEnabled(settings.isEnabled());
+            prefSeenPickupScreenOffBattery.setEnabled(settings.isEnabledWhileScreenOffBattery());
             prefSeenOnLockscreen.setEnabled(settings.isEnabledWhileScreenOffAny());
             prefSeenOnUserPresent.setEnabled(settings.isEnabledWhileScreenOffAny());
         }
