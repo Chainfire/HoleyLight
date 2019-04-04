@@ -49,7 +49,7 @@ public class TestNotification {
                 .setOngoing(true)
                 .setOnlyAlertOnce(true)
                 .setNumber(0)
-                .setSmallIcon(R.drawable.ic_launcher_vector)
+                .setSmallIcon(R.drawable.ic_notify_jh)
                 .build();
 
         NotificationManagerCompat.from(context).notify(id, notificationTest);
