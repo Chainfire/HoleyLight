@@ -20,17 +20,24 @@ package eu.chainfire.holeylight.service;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.PixelFormat;
+import android.hardware.display.DisplayManager;
+import android.os.Handler;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.WindowManager;
 
 import com.airbnb.lottie.LottieAnimationView;
 
 import eu.chainfire.holeylight.misc.NotificationAnimation;
+
+import static android.content.Context.DISPLAY_SERVICE;
+import static android.content.Context.KEYGUARD_SERVICE;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class Overlay {
@@ -50,21 +57,42 @@ public class Overlay {
             if (intent.getAction() == null) return;
 
             if (intent.getAction().equals(Intent.ACTION_CONFIGURATION_CHANGED)) {
-                updateParams();
+                if (added) {
+                    updateParams();
+                }
+            } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+                evaluate();
+            } else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                evaluate();
+            } else if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {
+                evaluate();
             }
         }
     };
-    private IntentFilter intentFilter = new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED);
+    private IntentFilter intentFilter = new IntentFilter();
     
     private final WindowManager windowManager;
     private final LottieAnimationView lottieAnimationView;
     private final NotificationAnimation animation;
+    private final KeyguardManager keyguardManager;
+    private final Display display;
+    private final Handler handler;
 
+    private int[] colors = new int[0];
+    private boolean wanted = false;
+    private boolean kill = false;
+    private boolean visible = false;
+    private boolean lastState = false;
+    private int[] lastColors = new int[0];
     private boolean added = false;
 
     private Overlay(Context context) {
         windowManager = (WindowManager)context.getSystemService(Activity.WINDOW_SERVICE);
         lottieAnimationView = new LottieAnimationView(context);
+        keyguardManager = (KeyguardManager)context.getSystemService(KEYGUARD_SERVICE);
+        display = ((DisplayManager)context.getSystemService(DISPLAY_SERVICE)).getDisplay(0);
+        handler = new Handler();
+
         initParams();
         animation = new NotificationAnimation(context, lottieAnimationView, new NotificationAnimation.OnNotificationAnimationListener() {
             @Override
@@ -79,6 +107,19 @@ public class Overlay {
                 removeOverlay();
             }
         });
+
+        intentFilter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
+        intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        intentFilter.addAction(Intent.ACTION_SCREEN_ON);
+        intentFilter.addAction(Intent.ACTION_USER_PRESENT);
+
+        lottieAnimationView.getContext().registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        lottieAnimationView.getContext().unregisterReceiver(broadcastReceiver);
+        super.finalize();
     }
 
     @SuppressLint("RtlHardcoded")
@@ -112,7 +153,6 @@ public class Overlay {
             updateParams();
             added = true; // had a case of a weird exception that caused this to run in a loop if placed after addView
             windowManager.addView(lottieAnimationView, lottieAnimationView.getLayoutParams());
-            lottieAnimationView.getContext().registerReceiver(broadcastReceiver, intentFilter);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -131,20 +171,67 @@ public class Overlay {
         if (!added) return;
         try {
             windowManager.removeView(lottieAnimationView);
-            lottieAnimationView.getContext().unregisterReceiver(broadcastReceiver);
             added = false;
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    private boolean colorsChanged() {
+        if ((lastColors == null) != (colors == null)) return true;
+        if (lastColors.length != colors.length) return true;
+        if (lastColors.length == 0) return false;
+        for (int i = 0; i < lastColors.length; i++) {
+            if (lastColors[i] != colors[i]) return true;
+        }
+        return false;
+    }
+
+    private Runnable evaluateLoop = new Runnable() {
+        @Override
+        public void run() {
+            evaluate();
+            if (wanted) handler.postDelayed(this, 1000);
+        }
+    };
+
+    private void evaluate() {
+        visible = (display.getState() == Display.STATE_ON) && (!keyguardManager.isKeyguardLocked());
+        if (wanted && visible && (colors.length > 0)) {
+            if (!lastState || colorsChanged()) {
+                createOverlay();
+                animation.play(colors, false);
+                lastColors = colors;
+                lastState = true;
+            }
+        } else {
+            if (lastState) {
+                if (animation.isPlaying()) {
+                    boolean immediately = !visible || kill;
+                    animation.stop(immediately);
+                    if (immediately) removeOverlay();
+                }
+                lastState = false;
+            }
+        }
+    }
+
     public void show(int[] colors) {
-        createOverlay();
-        animation.play(colors, false);
+        handler.removeCallbacks(evaluateLoop);
+        this.colors = colors;
+        if ((colors == null) || (colors.length == 0)) {
+            wanted = false;
+        } else {
+            wanted = true;
+            handler.postDelayed(evaluateLoop, 1000);
+        }
+        evaluate();
     }
 
     public void hide(boolean immediately) {
-        animation.stop(immediately);
-        if (immediately) removeOverlay();
+        handler.removeCallbacks(evaluateLoop);
+        wanted = false;
+        kill = immediately;
+        evaluate();
     }
 }
