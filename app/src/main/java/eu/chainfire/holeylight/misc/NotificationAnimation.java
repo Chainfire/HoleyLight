@@ -35,6 +35,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieComposition;
 import com.airbnb.lottie.LottieCompositionFactory;
 import com.airbnb.lottie.LottieProperty;
+import com.airbnb.lottie.RenderMode;
 import com.airbnb.lottie.model.KeyPath;
 import com.airbnb.lottie.value.LottieValueCallback;
 
@@ -106,6 +107,10 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         }
 
         if (!isValid()) return;
+
+        lottieAnimationView.enableMergePathsForKitKatAndAbove(true);
+        lottieAnimationView.setRenderMode(RenderMode.HARDWARE);
+        lottieAnimationView.setRepeatCount(0);
 
         LottieCompositionFactory.fromJsonString(json, null).addListener(result -> {
             lottieComposition = result;
