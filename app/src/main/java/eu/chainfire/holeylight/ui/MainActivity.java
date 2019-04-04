@@ -167,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
     protected void onStart() {
         super.onStart();
         checkPermissions();
+        TestNotification.hide(this, TestNotification.NOTIFICATION_ID_HIDE_NOTIFICATION);
         TestNotification.show(this, TestNotification.NOTIFICATION_ID_MAIN);
     }
 

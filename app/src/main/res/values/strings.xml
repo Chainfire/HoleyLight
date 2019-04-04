@@ -19,6 +19,10 @@
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>
 
+    <string name="help_hide_overlay_notification_title">Hide Holey Light notification</string>
+    <string name="help_hide_overlay_notification_description"><![CDATA[Help you hide the <b>Holey Light is displaying over other apps</b> notification]]></string>
+    <string name="help_hide_overlay_notification_message"><![CDATA[On the next screen, make sure <b>Show notifications</b> (at the top only) is unchecked]]></string>
+
     <string name="settings_category_operation">Operation</string>
     <string name="settings_screen_on_title">Screen on</string>
     <string name="settings_screen_on_description">Show notification light while the phone is in normal use</string>

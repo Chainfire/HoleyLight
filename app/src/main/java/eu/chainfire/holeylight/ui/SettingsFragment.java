@@ -18,11 +18,13 @@
 
 package eu.chainfire.holeylight.ui;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
 
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.Preference;
@@ -30,6 +32,7 @@ import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
+import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.misc.Settings;
 
@@ -124,6 +127,23 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         });
         copyright.setTitle(title);
         root.addPreference(copyright);
+
+        Preference hideNot = pref(null, R.string.help_hide_overlay_notification_title, 0, null, true, preference -> {
+            (new AlertDialog.Builder(getActivity()))
+                    .setMessage(Html.fromHtml(getString(R.string.help_hide_overlay_notification_message)))
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            TestNotification.show(getActivity(), TestNotification.NOTIFICATION_ID_HIDE_NOTIFICATION);
+                            Intent settingsIntent = new Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, "android")
+                                    .putExtra(android.provider.Settings.EXTRA_CHANNEL_ID, "com.android.server.wm.AlertWindowNotification - " + BuildConfig.APPLICATION_ID);
+                            startActivity(settingsIntent);
+                    })
+                    .show();
+            return false;
+        });
+        hideNot.setSummary(Html.fromHtml(getString(R.string.help_hide_overlay_notification_description)));
+        root.addPreference(hideNot);
 
         PreferenceCategory catOperation = category(root, R.string.settings_category_operation);
         prefScreenOn = check(catOperation, R.string.settings_screen_on_title, R.string.settings_screen_on_description, Settings.ENABLED_MASTER, settings.isEnabled(), true);
