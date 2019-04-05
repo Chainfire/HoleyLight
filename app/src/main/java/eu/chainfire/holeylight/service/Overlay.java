@@ -113,12 +113,12 @@ public class Overlay {
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_USER_PRESENT);
 
-        lottieAnimationView.getContext().registerReceiver(broadcastReceiver, intentFilter);
+        lottieAnimationView.getContext().getApplicationContext().registerReceiver(broadcastReceiver, intentFilter);
     }
 
     @Override
     protected void finalize() throws Throwable {
-        lottieAnimationView.getContext().unregisterReceiver(broadcastReceiver);
+        lottieAnimationView.getContext().getApplicationContext().unregisterReceiver(broadcastReceiver);
         super.finalize();
     }
 
