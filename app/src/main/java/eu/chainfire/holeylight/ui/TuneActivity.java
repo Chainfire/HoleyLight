@@ -25,7 +25,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import eu.chainfire.holeylight.R;
-import eu.chainfire.holeylight.misc.NotificationAnimation;
+import eu.chainfire.holeylight.animation.NotificationAnimation;
 import eu.chainfire.holeylight.misc.Settings;
 
 public class TuneActivity extends AppCompatActivity implements Settings.OnSettingsChangedListener {

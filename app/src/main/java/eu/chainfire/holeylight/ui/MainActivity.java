@@ -41,7 +41,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.NotificationManagerCompat;
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
-import eu.chainfire.holeylight.misc.NotificationAnimation;
+import eu.chainfire.holeylight.animation.NotificationAnimation;
 import eu.chainfire.holeylight.misc.Settings;
 
 public class MainActivity extends AppCompatActivity implements Settings.OnSettingsChangedListener {

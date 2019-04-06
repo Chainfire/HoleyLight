@@ -42,6 +42,7 @@ import java.util.Locale;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import eu.chainfire.holeylight.BuildConfig;
+import eu.chainfire.holeylight.animation.Overlay;
 import eu.chainfire.holeylight.misc.Battery;
 import eu.chainfire.holeylight.misc.MotionSensor;
 import eu.chainfire.holeylight.misc.Settings;

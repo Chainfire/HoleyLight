@@ -16,7 +16,7 @@
  *
  */
 
-package eu.chainfire.holeylight.service;
+package eu.chainfire.holeylight.animation;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -33,8 +33,6 @@ import android.view.Gravity;
 import android.view.WindowManager;
 
 import com.airbnb.lottie.LottieAnimationView;
-
-import eu.chainfire.holeylight.misc.NotificationAnimation;
 
 import static android.content.Context.DISPLAY_SERVICE;
 import static android.content.Context.KEYGUARD_SERVICE;

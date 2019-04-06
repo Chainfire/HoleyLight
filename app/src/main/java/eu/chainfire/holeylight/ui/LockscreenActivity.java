@@ -41,7 +41,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
-import eu.chainfire.holeylight.misc.NotificationAnimation;
+import eu.chainfire.holeylight.animation.NotificationAnimation;
 import eu.chainfire.holeylight.misc.Settings;
 
 public class LockscreenActivity extends AppCompatActivity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {

@@ -16,7 +16,7 @@
  *
  */
 
-package eu.chainfire.holeylight.misc;
+package eu.chainfire.holeylight.animation;
 
 import android.animation.Animator;
 import android.content.Context;
@@ -40,6 +40,8 @@ import com.airbnb.lottie.model.KeyPath;
 import com.airbnb.lottie.value.LottieValueCallback;
 
 import androidx.core.view.WindowInsetsCompat;
+import eu.chainfire.holeylight.misc.CameraCutout;
+import eu.chainfire.holeylight.misc.Settings;
 
 @SuppressWarnings("unused")
 public class NotificationAnimation implements Settings.OnSettingsChangedListener {

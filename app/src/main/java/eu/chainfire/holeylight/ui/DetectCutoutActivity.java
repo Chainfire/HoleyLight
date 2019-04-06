@@ -18,12 +18,12 @@
 
 package eu.chainfire.holeylight.ui;
 
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import eu.chainfire.holeylight.R;
-import eu.chainfire.holeylight.misc.NotificationAnimation;
-
-import android.os.Bundle;
+import eu.chainfire.holeylight.animation.NotificationAnimation;
 
 public class DetectCutoutActivity extends AppCompatActivity {
     private NotificationAnimation animation;
