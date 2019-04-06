@@ -114,7 +114,7 @@ public class MotionSensor {
                     if ((energy >= THRESHOLD_ENERGY) || (angle >= THRESHOLD_ANGLE)) {
                         nextState = MotionState.MOVING;
                     }
-                    if (nextState != motionState) {
+                    if ((nextState != motionState) || (motionStateStart == 0)) {
                         motionState = nextState;
                         motionStateStart = now;
                     }
@@ -170,6 +170,10 @@ public class MotionSensor {
             }
         }
 
+    }
+
+    public void resetDuration() {
+        motionStateStart = 0;
     }
 
     public void stopAll() {

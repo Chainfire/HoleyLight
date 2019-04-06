@@ -316,6 +316,7 @@ public class NotificationListenerService extends android.service.notification.No
         }
         if (changes) {
             currentColors = sorted;
+            motionSensor.resetDuration();
             apply();
         }
     }
