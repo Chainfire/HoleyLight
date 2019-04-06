@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.LockscreenActivity">
     
-    <com.airbnb.lottie.LottieAnimationView
+    <eu.chainfire.holeylight.animation.SpritePlayer
         android:id="@+id/lottie"
         android:layout_width="0px"
         android:layout_height="0px"

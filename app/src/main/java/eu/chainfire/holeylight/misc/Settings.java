@@ -237,7 +237,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void setSpeedFactor(float value) {
-        value = Math.min(Math.max(value, 0.1f), 2.0f);
+        value = Math.min(Math.max(value, 0.5f), 2.0f);
 
         edit();
         try {

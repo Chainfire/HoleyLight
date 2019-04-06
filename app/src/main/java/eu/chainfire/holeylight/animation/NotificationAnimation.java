@@ -18,12 +18,9 @@
 
 package eu.chainfire.holeylight.animation;
 
-import android.animation.Animator;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.TypedValue;
@@ -31,13 +28,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
-import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieComposition;
 import com.airbnb.lottie.LottieCompositionFactory;
-import com.airbnb.lottie.LottieProperty;
-import com.airbnb.lottie.RenderMode;
-import com.airbnb.lottie.model.KeyPath;
-import com.airbnb.lottie.value.LottieValueCallback;
 
 import androidx.core.view.WindowInsetsCompat;
 import eu.chainfire.holeylight.misc.CameraCutout;
@@ -45,9 +37,12 @@ import eu.chainfire.holeylight.misc.Settings;
 
 @SuppressWarnings("unused")
 public class NotificationAnimation implements Settings.OnSettingsChangedListener {
+    private static CameraCutout.Cutout OVERRIDE_CUTOUT = null; //CameraCutout.CUTOUT_S10PLUS;
+    private static String OVERRIDE_DEVICE = null; //"beyond2";
+
     public interface OnNotificationAnimationListener {
-        void onDimensionsApplied(LottieAnimationView view);
-        void onAnimationComplete(LottieAnimationView view);
+        void onDimensionsApplied(SpritePlayer view);
+        boolean onAnimationComplete(SpritePlayer view);
     }
 
     // From SystemUI: assets/face_unlocking_cutout_ic_bX.json
@@ -58,7 +53,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private final OnNotificationAnimationListener onNotificationAnimationListener;
     private final Settings settings;
     private final CameraCutout cameraCutout;
-    private final LottieAnimationView lottieAnimationView;
+    private final SpritePlayer spritePlayer;
 
     private final String json;
     private final int dpAddScaleBase;
@@ -75,13 +70,13 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private volatile int[] colorsNext = null;
     private volatile boolean playNext = false;
 
-    public NotificationAnimation(Context context, LottieAnimationView lottie, OnNotificationAnimationListener onNotificationAnimationListener) {
+    public NotificationAnimation(Context context, SpritePlayer spritePlayer, OnNotificationAnimationListener onNotificationAnimationListener) {
         this.onNotificationAnimationListener = onNotificationAnimationListener;
         settings = Settings.getInstance(context);
         cameraCutout = new CameraCutout(context);
-        this.lottieAnimationView = lottie;
+        this.spritePlayer = spritePlayer;
 
-        String device = Build.DEVICE;
+        String device = OVERRIDE_DEVICE != null ? OVERRIDE_DEVICE : Build.DEVICE;
         if (device.startsWith("beyond0")) { //s10e
             json = jsonBeyond0;
             dpAddScaleBase = 4;
@@ -110,18 +105,16 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
         if (!isValid()) return;
 
-        lottieAnimationView.enableMergePathsForKitKatAndAbove(true);
-        lottieAnimationView.setRenderMode(RenderMode.HARDWARE);
-        lottieAnimationView.setRepeatCount(0);
-
         LottieCompositionFactory.fromJsonString(json, null).addListener(result -> {
             lottieComposition = result;
             applyDimensions();
         });
 
-        lottie.addAnimatorListener(new Animator.AnimatorListener() {
+        spritePlayer.setOnAnimationCompleteListener(new SpritePlayer.OnAnimationCompleteListener() {
             @Override
-            public void onAnimationEnd(Animator animation) {
+            public boolean onAnimationComplete() {
+                boolean again = false;
+
                 synchronized (NotificationAnimation.this) {
                     boolean newColors = false;
                     colorIndex++;
@@ -136,10 +129,10 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                     if (colors.length > 0) {
                         setColor(colors[colorIndex]);
                         if (play || newColors || (colorIndex > 0)) {
-                            lottie.playAnimation();
+                            again = true;
                         } else {
                             if (onNotificationAnimationListener != null) {
-                                onNotificationAnimationListener.onAnimationComplete(lottieAnimationView);
+                                again = onNotificationAnimationListener.onAnimationComplete(NotificationAnimation.this.spritePlayer);
                             }
                         }
                         if (newColors) {
@@ -147,15 +140,13 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                         }
                     } else {
                         if (onNotificationAnimationListener != null) {
-                            onNotificationAnimationListener.onAnimationComplete(lottieAnimationView);
+                            again = onNotificationAnimationListener.onAnimationComplete(NotificationAnimation.this.spritePlayer);
                         }
                     }
                 }
-            }
 
-            @Override public void onAnimationStart(Animator animation) {}
-            @Override public void onAnimationCancel(Animator animation) {}
-            @Override public void onAnimationRepeat(Animator animation) {}
+                return again;
+            }
         });
 
         settings.registerOnSettingsChangedListener(this);
@@ -169,7 +160,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private synchronized boolean isValid() {
-        return (json != null) && (lottieAnimationView != null);
+        return (json != null) && (spritePlayer != null);
     }
 
     public synchronized boolean isDeviceSupported() {
@@ -182,15 +173,12 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     }
 
     private synchronized void setColor(int color) {
-        lottieAnimationView.addValueCallback(
-            new KeyPath("**"),
-            LottieProperty.COLOR_FILTER,
-            new LottieValueCallback<>(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP))
-        );
+        spritePlayer.setColor(color);
     }
 
     public synchronized void updateFromInsets(WindowInsetsCompat insets) {
         cameraCutout.updateFromInsets(insets);
+        if (OVERRIDE_CUTOUT != null) cameraCutout.applyCutout(OVERRIDE_CUTOUT);
         if (cameraCutout.isValid()) {
             settings.setCutoutAreaRect(cameraCutout.getCutout().getArea());
         }
@@ -209,9 +197,9 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         }
 
         if (cameraCutout.isValid() && (lottieComposition != null)) {
-            int rotation = ((WindowManager)lottieAnimationView.getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
+            int rotation = ((WindowManager) spritePlayer.getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
 
-            float realDpToPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, lottieAnimationView.getContext().getResources().getDisplayMetrics());
+            float realDpToPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, spritePlayer.getContext().getResources().getDisplayMetrics());
 
             Point resolution = cameraCutout.getCurrentResolution();
 
@@ -227,7 +215,18 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
             float left = r.exactCenterX() - (width / 2.0f) + (getDpShiftHorizontal() * realDpToPx);
             float top = r.exactCenterY() - (height / 2.0f) + (getDpShiftVertical() * realDpToPx);
 
-            ViewGroup.LayoutParams params = lottieAnimationView.getLayoutParams();
+            // you'd assume as these animations come straight from Samsung's ROMs that they'd work perfectly
+            // out of the box, but oh no...
+            float addVertical = getDpAddScaleBase() * realDpToPx;
+            float addHorizontal = (addVertical * ((float)b.width() / (float)b.height())) + (getDpAddScaleHorizontal() * realDpToPx);
+            float scaledWidth = width + addHorizontal;
+            float scaledHeight = height + addVertical;
+            left -= (scaledWidth - width) / 2.0f;
+            top -= (scaledHeight - height) / 2.0f;
+            width = scaledWidth;
+            height = scaledHeight;
+
+            ViewGroup.LayoutParams params = spritePlayer.getLayoutParams();
             params.width = (int)width;
             params.height = (int)height;
             if (params instanceof WindowManager.LayoutParams) {
@@ -242,48 +241,36 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                 } else if (rotation == 3) {
                     // not possible to reach area to render
                 }
-                lottieAnimationView.setRotation(rotation * -90);
+                spritePlayer.setRotation(rotation * -90);
 
                 // we're only going to allow portrait and reverse-portrait
-                lottieAnimationView.setVisibility((rotation % 2) == 0 ? View.VISIBLE : View.INVISIBLE);
+                spritePlayer.setVisibility((rotation % 2) == 0 ? View.VISIBLE : View.INVISIBLE);
             } else if (params instanceof ViewGroup.MarginLayoutParams) {
                 ((ViewGroup.MarginLayoutParams)params).setMargins((int)left, (int)top, 0, 0);
             }
-            lottieAnimationView.setLayoutParams(params);
+            spritePlayer.setLayoutParams(params);
 
-            // not sure why we need this, but we do, and lottie doesn't support out-of-aspect scaling itself
-            // you'd assume as these animations come straight from Samsung's ROMs that they'd work perfectly
-            // out of the box, but oh no...
-            float addVertical = getDpAddScaleBase() * realDpToPx;
-            float addHorizontal = (addVertical * ((float)b.width() / (float)b.height())) + (getDpAddScaleHorizontal() * realDpToPx);
-            float scaledWidth = width + addHorizontal;
-            float scaledHeight = height + addVertical;
-            lottieAnimationView.setScaleX(scaledWidth / width);
-            lottieAnimationView.setScaleY(scaledHeight / height);
+            spritePlayer.setSpeed(getSpeedFactor());
 
-            lottieAnimationView.setSpeed(getSpeedFactor());
+            spritePlayer.setOnSpriteSheetNeededListener((w, h) -> SpriteSheet.fromLottieComposition(lottieComposition, w, h));
 
-            if (lottieAnimationView.getComposition() == null) {
-                lottieAnimationView.setComposition(lottieComposition);
-            }
-
-            if (!lottieAnimationView.isAnimating() && play) {
-                lottieAnimationView.playAnimation();
+            if (!spritePlayer.isAnimating() && play) {
+                spritePlayer.playAnimation();
             }
 
             if (onNotificationAnimationListener != null) {
-                onNotificationAnimationListener.onDimensionsApplied(lottieAnimationView);
+                onNotificationAnimationListener.onDimensionsApplied(spritePlayer);
             }
         }
     }
 
     public synchronized void play(boolean once) {
         play = !once;
-        if (!lottieAnimationView.isAnimating()) {
+        if (!spritePlayer.isAnimating()) {
             if (colors.length > 0) {
                 colorIndex = 0;
                 setColor(colors[colorIndex]);
-                lottieAnimationView.playAnimation();
+                spritePlayer.playAnimation();
             }
         }
     }
@@ -294,7 +281,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
             stop(true);
             return;
         }
-        if (lottieAnimationView.isAnimating()) {
+        if (spritePlayer.isAnimating()) {
             this.colorsNext = colors;
             this.playNext = !once;
         } else {
@@ -302,7 +289,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
             play = !once;
             colorIndex = 0;
             setColor(colors[colorIndex]);
-            lottieAnimationView.playAnimation();
+            spritePlayer.playAnimation();
         }
     }
 
@@ -310,17 +297,17 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         play = false;
         if (isPlaying()) {
             if (immediately) {
-                lottieAnimationView.cancelAnimation();
+                spritePlayer.cancelAnimation();
             }
         } else {
             if (onNotificationAnimationListener != null) {
-                onNotificationAnimationListener.onAnimationComplete(lottieAnimationView);
+                onNotificationAnimationListener.onAnimationComplete(spritePlayer);
             }
         }
     }
 
     public synchronized boolean isPlaying() {
-        return play || lottieAnimationView.isAnimating();
+        return play || spritePlayer.isAnimating();
     }
 
     public int getDpAddScaleBase() {

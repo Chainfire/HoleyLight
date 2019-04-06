@@ -33,8 +33,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
-import com.airbnb.lottie.LottieAnimationView;
-
 import java.util.Locale;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,6 +40,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.NotificationAnimation;
+import eu.chainfire.holeylight.animation.SpritePlayer;
 import eu.chainfire.holeylight.misc.Settings;
 
 public class LockscreenActivity extends AppCompatActivity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
@@ -52,7 +51,7 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
 
     private Settings settings = null;
     private NotificationAnimation notificationAnimation;
-    private LottieAnimationView lottieAnimationView;
+    private SpritePlayer spritePlayer;
     private KeyguardManager keyguardManager;
     private PowerManager powerManager;
     private Handler handler;
@@ -159,11 +158,8 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
         keyguardManager = (KeyguardManager)getSystemService(KEYGUARD_SERVICE);
         powerManager = (PowerManager)getSystemService(POWER_SERVICE);
 
-        lottieAnimationView = findViewById(R.id.lottie);
-        notificationAnimation = new NotificationAnimation(this, lottieAnimationView, new NotificationAnimation.OnNotificationAnimationListener() {
-            @Override public void onAnimationComplete(LottieAnimationView view) { }
-            @Override public void onDimensionsApplied(LottieAnimationView view) { }
-        });
+        spritePlayer = findViewById(R.id.lottie);
+        notificationAnimation = new NotificationAnimation(this, spritePlayer, null);
         int[] colors = getIntent().getIntArrayExtra(BuildConfig.APPLICATION_ID + ".colors");
         haveNotifications = (colors != null) && (colors.length > 0);
         notificationAnimation.play(colors, false);
@@ -202,13 +198,13 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
                 // while we are not in an actually locked state, both the overlay and this screen
                 // would be visible simultaneously, with overlapping animations
                 if (!keyguardManager.isKeyguardLocked()) {
-                    if (lottieAnimationView.getVisibility() != View.INVISIBLE) {
-                        lottieAnimationView.setVisibility(View.INVISIBLE);
+                    if (spritePlayer.getVisibility() != View.INVISIBLE) {
+                        spritePlayer.setVisibility(View.INVISIBLE);
                     }
                     handler.postDelayed(this, 500);
                 } else {
-                    if (lottieAnimationView.getVisibility() == View.INVISIBLE) {
-                        lottieAnimationView.setVisibility(View.VISIBLE);
+                    if (spritePlayer.getVisibility() == View.INVISIBLE) {
+                        spritePlayer.setVisibility(View.VISIBLE);
                     }
                 }
             }

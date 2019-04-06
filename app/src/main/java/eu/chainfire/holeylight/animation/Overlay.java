@@ -32,8 +32,6 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.WindowManager;
 
-import com.airbnb.lottie.LottieAnimationView;
-
 import static android.content.Context.DISPLAY_SERVICE;
 import static android.content.Context.KEYGUARD_SERVICE;
 
@@ -70,7 +68,7 @@ public class Overlay {
     private IntentFilter intentFilter = new IntentFilter();
     
     private final WindowManager windowManager;
-    private final LottieAnimationView lottieAnimationView;
+    private final SpritePlayer spritePlayer;
     private final NotificationAnimation animation;
     private final KeyguardManager keyguardManager;
     private final Display display;
@@ -86,23 +84,24 @@ public class Overlay {
 
     private Overlay(Context context) {
         windowManager = (WindowManager)context.getSystemService(Activity.WINDOW_SERVICE);
-        lottieAnimationView = new LottieAnimationView(context);
+        spritePlayer = new SpritePlayer(context);
         keyguardManager = (KeyguardManager)context.getSystemService(KEYGUARD_SERVICE);
         display = ((DisplayManager)context.getSystemService(DISPLAY_SERVICE)).getDisplay(0);
         handler = new Handler();
 
         initParams();
-        animation = new NotificationAnimation(context, lottieAnimationView, new NotificationAnimation.OnNotificationAnimationListener() {
+        animation = new NotificationAnimation(context, spritePlayer, new NotificationAnimation.OnNotificationAnimationListener() {
             @Override
-            public void onDimensionsApplied(LottieAnimationView view) {
+            public void onDimensionsApplied(SpritePlayer view) {
                 if (added) {
-                    windowManager.updateViewLayout(lottieAnimationView, lottieAnimationView.getLayoutParams());
+                    windowManager.updateViewLayout(view, view.getLayoutParams());
                 }
             }
 
             @Override
-            public void onAnimationComplete(LottieAnimationView view) {
+            public boolean onAnimationComplete(SpritePlayer view) {
                 removeOverlay();
+                return false;
             }
         });
 
@@ -111,12 +110,12 @@ public class Overlay {
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_USER_PRESENT);
 
-        lottieAnimationView.getContext().getApplicationContext().registerReceiver(broadcastReceiver, intentFilter);
+        spritePlayer.getContext().getApplicationContext().registerReceiver(broadcastReceiver, intentFilter);
     }
 
     @Override
     protected void finalize() throws Throwable {
-        lottieAnimationView.getContext().getApplicationContext().unregisterReceiver(broadcastReceiver);
+        spritePlayer.getContext().getApplicationContext().unregisterReceiver(broadcastReceiver);
         super.finalize();
     }
 
@@ -138,7 +137,7 @@ public class Overlay {
                 , PixelFormat.TRANSLUCENT);
         params.gravity = Gravity.LEFT | Gravity.TOP;
         params.setTitle("HoleyLight");
-        lottieAnimationView.setLayoutParams(params);
+        spritePlayer.setLayoutParams(params);
     }
 
     private void updateParams() {
@@ -150,7 +149,7 @@ public class Overlay {
         try {
             updateParams();
             added = true; // had a case of a weird exception that caused this to run in a loop if placed after addView
-            windowManager.addView(lottieAnimationView, lottieAnimationView.getLayoutParams());
+            windowManager.addView(spritePlayer, spritePlayer.getLayoutParams());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -168,7 +167,7 @@ public class Overlay {
     private void removeOverlay() {
         if (!added) return;
         try {
-            windowManager.removeView(lottieAnimationView);
+            windowManager.removeView(spritePlayer);
             added = false;
         } catch (Exception e) {
             e.printStackTrace();
