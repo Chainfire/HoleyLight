@@ -138,10 +138,15 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         ref--;
         if (ref < 0) ref = 0;
         if (ref == 0) {
-            if (immediately) {
-                editor.commit();
-            } else {
-                editor.apply();
+            ref = 1; // prevent double notify
+            try {
+                if (immediately) {
+                    editor.commit();
+                } else {
+                    editor.apply();
+                }
+            } finally {
+                ref = 0;
             }
             notifyListeners();
             editor = null;
