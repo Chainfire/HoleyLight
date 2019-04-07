@@ -33,6 +33,8 @@ import androidx.preference.PreferenceManager;
 
 @SuppressWarnings({"WeakerAccess", "unused", "UnusedReturnValue"})
 public class Settings implements SharedPreferences.OnSharedPreferenceChangeListener {
+    public static boolean IS_SCREEN_OFF_BATTERY_ALLOWED = false;
+
     public interface OnSettingsChangedListener {
         void onSettingsChanged();
     }
@@ -269,7 +271,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public boolean isEnabledWhileScreenOffBattery() {
-        return isEnabled() && false;
+        return isEnabled() && prefs.getBoolean(ENABLED_SCREEN_OFF_BATTERY, ENABLED_SCREEN_OFF_BATTERY_DEFAULT) && IS_SCREEN_OFF_BATTERY_ALLOWED;
     }
 
     public int getColorForPackage(String packageName, int defaultValue) {

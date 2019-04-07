@@ -239,3 +239,4 @@ public class ColorActivity extends AppCompatActivity {
         }
     }
 }
+

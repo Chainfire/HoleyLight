@@ -80,13 +80,17 @@ public class NotificationListenerService extends android.service.notification.No
 
             if (
                     intent.getAction().equals(Intent.ACTION_SCREEN_OFF) ||
-                    (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED) && !isDisplayOn(false))
+                    (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED) && !isDisplayOn(false))  //TODO is proximity?
             ) {
                 if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
                     isUserPresent = false;
                 }
 
-                if (settings.isEnabledWhileScreenOffCharging() && Battery.isCharging(NotificationListenerService.this)) {
+                boolean charging = Battery.isCharging(NotificationListenerService.this);
+                if (
+                        (settings.isEnabledWhileScreenOffCharging() && charging) ||
+                        (settings.isEnabledWhileScreenOffBattery() && !charging)
+                 ) {
                     // this is a really bad way to detect we didn't just press the power button while
                     // our LockscreenActivity was in the foreground
                     if (SystemClock.elapsedRealtime() - LockscreenActivity.lastVisible() > 2500) {

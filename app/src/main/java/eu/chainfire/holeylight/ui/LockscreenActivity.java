@@ -41,6 +41,7 @@ import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.NotificationAnimation;
 import eu.chainfire.holeylight.animation.SpritePlayer;
+import eu.chainfire.holeylight.misc.Battery;
 import eu.chainfire.holeylight.misc.Settings;
 
 public class LockscreenActivity extends AppCompatActivity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
@@ -91,15 +92,28 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
                         // The power button was pressed while this lockscreen was displaying, instead of
                         // turning off, turn on and show the real lockscreen.
                         finish();
-                        PowerManager.WakeLock wakelock = powerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, BuildConfig.APPLICATION_ID + ":Lockscreen/Exit");
+                        PowerManager.WakeLock wakelock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, BuildConfig.APPLICATION_ID + ":Lockscreen/Exit");
                         wakelock.acquire(1000);
                     }
                     //}
                     break;
+                case Intent.ACTION_POWER_CONNECTED:
+                    if (!settings.isEnabledWhileScreenOffCharging()) {
+                        // Turn off
+                        finish();
+                    } else {
+                        if (proximityWakeLock.isHeld()) {
+                            proximityWakeLock.release();
+                        }
+                    }
                 case Intent.ACTION_POWER_DISCONNECTED:
                     if (!settings.isEnabledWhileScreenOffBattery()) {
                         // Turn off
                         finish();
+                    } else {
+                        if (!proximityWakeLock.isHeld()) {
+                            proximityWakeLock.acquire(15000);
+                        }
                     }
                     break;
             }
@@ -128,8 +142,9 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
     private void wakeup() {
         if (!partialWakeLock.isHeld()) partialWakeLock.acquire(2500);
         if (!screenWakeLock.isHeld()) screenWakeLock.acquire(2500);
-        //TODO battery only// if (!proximityWakeLock.isHeld()) proximityWakeLock.acquire(2500);
-        //TODO battery - check order of these.. proximity before others? also check other code
+        if (!Battery.isCharging(this)) {
+            if (!proximityWakeLock.isHeld()) proximityWakeLock.acquire(2500);
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -168,7 +183,7 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
         partialWakeLock.setReferenceCounted(false);
         partialWakeLock.acquire(2500);
 
-        screenWakeLock = powerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, BuildConfig.APPLICATION_ID + ":Lockscreen/Screen");
+        screenWakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, BuildConfig.APPLICATION_ID + ":Lockscreen/Screen");
         screenWakeLock.setReferenceCounted(false);
 
         proximityWakeLock = powerManager.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, BuildConfig.APPLICATION_ID + ":Lockscreen/Proximity");
@@ -185,6 +200,7 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        intentFilter.addAction(Intent.ACTION_POWER_CONNECTED);
         intentFilter.addAction(Intent.ACTION_POWER_DISCONNECTED);
         intentFilter.setPriority(999);
         registerReceiver(broadcastReceiver, intentFilter);
@@ -232,12 +248,13 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
             partialWakeLock.acquire(15000);
             if (haveNotifications || notificationAnimation.isPlaying()) {
                 screenWakeLock.acquire(15000);
-                //TODO battery only// proximityWakeLock.acquire(15000);
+                if (!Battery.isCharging(LockscreenActivity.this)) {
+                    proximityWakeLock.acquire(15000);
+                }
             } else {
                 if (screenWakeLock.isHeld()) screenWakeLock.release();
-                //TODO battery only// if (proximityWakeLock.isHeld()) proximityWakeLock.release();
+                if (proximityWakeLock.isHeld()) proximityWakeLock.release();
             }
-            //TODO check order of proximity
             handler.removeCallbacks(repeatedWhileVisible);
             handler.postDelayed(this, 10000);
         }

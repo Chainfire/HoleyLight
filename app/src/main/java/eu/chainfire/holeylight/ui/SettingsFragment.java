@@ -251,7 +251,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         if (prefScreenOn != null) {
             prefScreenOn.setChecked(settings.isEnabled()); // for sync with master switch
             prefScreenOffCharging.setEnabled(settings.isEnabled());
-            prefScreenOffBattery.setEnabled(settings.isEnabledWhileScreenOffCharging() && false);
+            prefScreenOffBattery.setEnabled(settings.isEnabledWhileScreenOffCharging() && Settings.IS_SCREEN_OFF_BATTERY_ALLOWED);
             prefSeenPickupScreenOnCharging.setEnabled(settings.isEnabled());
             prefSeenPickupScreenOffCharging.setEnabled(settings.isEnabledWhileScreenOffCharging());
             prefSeenPickupScreenOnBattery.setEnabled(settings.isEnabled());
