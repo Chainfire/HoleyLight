@@ -110,43 +110,40 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
             applyDimensions();
         });
 
-        spritePlayer.setOnAnimationCompleteListener(new SpritePlayer.OnAnimationCompleteListener() {
-            @Override
-            public boolean onAnimationComplete() {
-                boolean again = false;
+        spritePlayer.setOnAnimationCompleteListener(() -> {
+            boolean again = false;
 
-                synchronized (NotificationAnimation.this) {
-                    boolean newColors = false;
-                    colorIndex++;
-                    if (colorIndex >= colors.length) {
-                        colorIndex = 0;
-                        if (colorsNext != null) {
-                            colors = colorsNext;
-                            colorsNext = null;
-                            newColors = true;
-                        }
+            synchronized (NotificationAnimation.this) {
+                boolean newColors = false;
+                colorIndex++;
+                if (colorIndex >= colors.length) {
+                    colorIndex = 0;
+                    if (colorsNext != null) {
+                        colors = colorsNext;
+                        colorsNext = null;
+                        newColors = true;
                     }
-                    if (colors.length > 0) {
-                        setColor(colors[colorIndex]);
-                        if (play || newColors || (colorIndex > 0)) {
-                            again = true;
-                        } else {
-                            if (onNotificationAnimationListener != null) {
-                                again = onNotificationAnimationListener.onAnimationComplete(NotificationAnimation.this.spritePlayer);
-                            }
-                        }
-                        if (newColors) {
-                            play = playNext;
-                        }
+                }
+                if (colors.length > 0) {
+                    setColor(colors[colorIndex]);
+                    if (play || newColors || (colorIndex > 0)) {
+                        again = true;
                     } else {
                         if (onNotificationAnimationListener != null) {
                             again = onNotificationAnimationListener.onAnimationComplete(NotificationAnimation.this.spritePlayer);
                         }
                     }
+                    if (newColors) {
+                        play = playNext;
+                    }
+                } else {
+                    if (onNotificationAnimationListener != null) {
+                        again = onNotificationAnimationListener.onAnimationComplete(NotificationAnimation.this.spritePlayer);
+                    }
                 }
-
-                return again;
             }
+
+            return again;
         });
 
         settings.registerOnSettingsChangedListener(this);
@@ -185,7 +182,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         applyDimensions();
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
+    @SuppressWarnings({"StatementWithEmptyBody", "WeakerAccess"})
     public synchronized void applyDimensions() {
         // most of this could just be hardcoded, but whatever
 

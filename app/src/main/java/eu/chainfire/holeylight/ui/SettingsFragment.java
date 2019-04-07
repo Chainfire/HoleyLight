@@ -110,7 +110,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         return retval;
     }
 
-    @SuppressWarnings("ConstantConditions")
+    @SuppressWarnings({"ConstantConditions", "deprecation"})
     private PreferenceScreen createPreferenceHierarchy() {
         PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
         
@@ -256,6 +256,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         }
     }
 
+    @SuppressWarnings({ "unused", "ConstantConditions" })
     private void updatePrefs(String key) {
         if (prefAdviceAOD != null) {
             try {

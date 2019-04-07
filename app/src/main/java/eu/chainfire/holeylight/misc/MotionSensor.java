@@ -34,6 +34,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.annotation.NonNull;
+
+@SuppressWarnings({ "WeakerAccess", "unused", "UnusedReturnValue" })
 public class MotionSensor {
     private static MotionSensor instance = null;
     public static MotionSensor getInstance(Context context) {
@@ -59,7 +62,7 @@ public class MotionSensor {
     private static final int SAMPLING_INTERVAL_MILLIS = 40;
     private static final int ANGLE_AGE_MILLIS = 1000;
 
-    private Object lock = new Object();
+    private final Object lock = new Object();
     private Sensor accelSensor;
     private SensorManager sensorManager;
     private RunningSignalStats runningStats;
@@ -232,6 +235,7 @@ public class MotionSensor {
                 x * v.y - y * v.x);
         }
 
+        @NonNull
         @Override
         public String toString() {
             String msg = "";
@@ -313,7 +317,7 @@ public class MotionSensor {
 
         public Vector3 getRunningAverage() {
             if (sampleCount > 0) {
-              return runningSum.times((float)(1.0f / sampleCount));
+              return runningSum.times((1.0f / (float)sampleCount));
             }
             return null;
         }
@@ -330,6 +334,7 @@ public class MotionSensor {
             return lastReset;
         }
 
+        @NonNull
         @Override
         public String toString() {
             String msg = "";

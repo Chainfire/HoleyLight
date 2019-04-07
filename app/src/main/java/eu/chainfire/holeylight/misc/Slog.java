@@ -21,6 +21,7 @@ package eu.chainfire.holeylight.misc;
 import eu.chainfire.holeylight.BuildConfig;
 
 // Exists only for compatibility with AOSP-copied code
+@SuppressWarnings({ "WeakerAccess", "UnusedReturnValue", "unused" })
 public class Slog {
     public static int d(String tag, String msg) {
         if (BuildConfig.DEBUG) {

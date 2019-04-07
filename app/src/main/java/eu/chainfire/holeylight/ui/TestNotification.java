@@ -29,6 +29,7 @@ import androidx.core.app.NotificationManagerCompat;
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
 
+@SuppressWarnings("WeakerAccess")
 public class TestNotification {
     static final int NOTIFICATION_ID_MAIN = 1001;
     static final int NOTIFICATION_ID_TUNE = 1002;

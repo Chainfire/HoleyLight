@@ -55,25 +55,23 @@ public class Overlay {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() == null) return;
 
-            if (intent.getAction().equals(Intent.ACTION_CONFIGURATION_CHANGED)) {
-                if (added) {
-                    updateParams();
-                }
-            } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
-                evaluate();
-            } else if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {
-                evaluate();
-            } else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-                evaluate();
-            } else if (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED)) {
-                evaluate();
-            } else if (intent.getAction().equals(Intent.ACTION_POWER_DISCONNECTED)) {
-                evaluate();
+            switch (intent.getAction()) {
+                case Intent.ACTION_CONFIGURATION_CHANGED:
+                    if (added) {
+                        updateParams();
+                    }
+                    break;
+                case Intent.ACTION_SCREEN_ON:
+                case Intent.ACTION_USER_PRESENT:
+                case Intent.ACTION_SCREEN_OFF:
+                case Intent.ACTION_POWER_CONNECTED:
+                case Intent.ACTION_POWER_DISCONNECTED:
+                    evaluate();
+                    break;
             }
         }
     };
-    private IntentFilter intentFilter = new IntentFilter();
-    
+
     private final WindowManager windowManager;
     private final SpritePlayer spritePlayer;
     private final NotificationAnimation animation;
@@ -115,6 +113,7 @@ public class Overlay {
             }
         });
 
+        IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_USER_PRESENT);
@@ -188,6 +187,7 @@ public class Overlay {
 
     private boolean colorsChanged() {
         if ((lastColors == null) != (colors == null)) return true;
+        if (lastColors == null) return false;
         if (lastColors.length != colors.length) return true;
         if (lastColors.length == 0) return false;
         for (int i = 0; i < lastColors.length; i++) {
@@ -253,5 +253,9 @@ public class Overlay {
             this.inLockscreen = inLockscreen;
             evaluate();
         }
+    }
+
+    public boolean isVisible() {
+        return visible;
     }
 }

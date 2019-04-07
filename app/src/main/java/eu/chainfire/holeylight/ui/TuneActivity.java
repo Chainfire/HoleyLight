@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.NotificationAnimation;
@@ -40,8 +41,11 @@ public class TuneActivity extends AppCompatActivity implements Settings.OnSettin
         settings = Settings.getInstance(this);
         animation = new NotificationAnimation(this,null, null);
 
-        getSupportActionBar().setTitle(R.string.settings_animation_tune_title);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(R.string.settings_animation_tune_title);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override

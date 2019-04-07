@@ -31,13 +31,10 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.SystemClock;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Choreographer;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-
-import java.util.Locale;
 
 import androidx.annotation.NonNull;
 
@@ -71,15 +68,12 @@ public class SpritePlayer extends SurfaceView {
     private float speed = 1.0f;
     private boolean powerSaverMode = false;
 
-    private void log(String fmt, Object... args) {
-        Log.d("HoleyLight/SpritePlayer", String.format(Locale.ENGLISH, fmt, args));
-    }
-
     public SpritePlayer(Context context) {
         super(context);
         init();
     }
 
+    @SuppressWarnings("unused")
     public SpritePlayer(Context context, OnSpriteSheetNeededListener onSpriteSheetNeededListener) {
         super(context);
         init();
@@ -96,6 +90,7 @@ public class SpritePlayer extends SurfaceView {
         init();
     }
 
+    @SuppressWarnings("unused")
     public SpritePlayer(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init();
@@ -355,6 +350,7 @@ public class SpritePlayer extends SurfaceView {
         this.speed = speed;
     }
 
+    @SuppressWarnings("unused")
     public boolean isPowerSaverMode() {
         return powerSaverMode;
     }

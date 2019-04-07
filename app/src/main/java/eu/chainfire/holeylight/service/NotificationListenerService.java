@@ -62,6 +62,7 @@ public class NotificationListenerService extends android.service.notification.No
     private long stationary_for_ms = 0;
     private boolean connected = false;
 
+    @SuppressWarnings("all")
     private boolean isDisplayOn(boolean ifDoze) {
         int state = display.getState();
         if (state == Display.STATE_OFF) return false;

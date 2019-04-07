@@ -30,6 +30,7 @@ import com.airbnb.lottie.LottieDrawable;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings({ "WeakerAccess", "unused", "UnusedReturnValue" })
 public class SpriteSheet {
     public static SpriteSheet fromLottieComposition(LottieComposition lottieComposition, int width, int height, boolean powerSaver) {
         SpriteSheet ss;
@@ -84,7 +85,7 @@ public class SpriteSheet {
         }
     }
 
-    private static int SHEET_DIM = 1024;
+    private static final int SHEET_DIM = 1024;
 
     public class Sheet {
         private final Bitmap bitmap;

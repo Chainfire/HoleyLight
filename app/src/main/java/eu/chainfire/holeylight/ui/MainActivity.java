@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
         });
     }
 
+    @SuppressWarnings("deprecation")
     private void checkPermissions() {
         if (!(new NotificationAnimation(this, null, null)).isDeviceSupported()) {
             currentDialog = newAlert(true)
@@ -157,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
                     .setTitle(getString(R.string.permission_required) + " 4/4")
                     .setMessage(Html.fromHtml(getString(R.string.permission_battery)))
                     .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                        Intent intent = new Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                        @SuppressLint("BatteryLife") Intent intent = new Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
                         intent.setData(Uri.parse("package:" + BuildConfig.APPLICATION_ID));
                         startActivity(intent);
                     })
