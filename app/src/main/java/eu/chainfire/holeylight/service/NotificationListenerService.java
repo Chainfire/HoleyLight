@@ -60,6 +60,7 @@ public class NotificationListenerService extends android.service.notification.No
     private boolean isUserPresent = false;
     private MotionSensor.MotionState lastMotionState = MotionSensor.MotionState.UNKNOWN;
     private long stationary_for_ms = 0;
+    private boolean connected = false;
 
     private boolean isDisplayOn(boolean ifDoze) {
         int state = display.getState();
@@ -169,6 +170,7 @@ public class NotificationListenerService extends android.service.notification.No
     public void onListenerConnected() {
         super.onListenerConnected();
         log("onListenerConnected");
+        connected = true;
         tracker.clear();
         isUserPresent = isDisplayOn(false) && !keyguardManager.isKeyguardLocked();
         registerReceiver(broadcastReceiver, intentFilter);
@@ -180,6 +182,7 @@ public class NotificationListenerService extends android.service.notification.No
     @Override
     public void onListenerDisconnected() {
         log("onListenerDisconnected");
+        connected = false;
         stopMotionSensor();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(localBroadcastReceiver);
         unregisterReceiver(broadcastReceiver);
@@ -231,12 +234,14 @@ public class NotificationListenerService extends android.service.notification.No
     }
 
     private void handleLEDNotifications() {
+        if (!connected) return;
+
         List<Integer> colors = new ArrayList<>();
         List<String> pkgs = new ArrayList<>();
 
-        StatusBarNotification[] sbns = tracker.prune(getActiveNotifications());
-        for (StatusBarNotification sbn : sbns) {
-            try {
+        try {
+            StatusBarNotification[] sbns = tracker.prune(getActiveNotifications());
+            for (StatusBarNotification sbn : sbns) {
                 Notification not = sbn.getNotification();
                 if (not.getChannelId() != null) {
                     List<NotificationChannel> chans = getNotificationChannels(sbn.getPackageName(), Process.myUserHandle());
@@ -295,9 +300,9 @@ public class NotificationListenerService extends android.service.notification.No
                         }
                     }
                 }
-            } catch (SecurityException e) {
-                // CompanionDeviceManager.getAssociations().size() == 0
             }
+        } catch (SecurityException e) {
+            // CompanionDeviceManager.getAssociations().size() == 0
         }
 
         int[] sorted = new int[colors.size()];
