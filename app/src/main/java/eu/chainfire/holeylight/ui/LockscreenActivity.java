@@ -329,6 +329,8 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        if ((e1 == null) || (e2 == null)) return false;
+
         float distance = (float)Math.sqrt(Math.pow(e2.getX() - e1.getX(), 2) + Math.pow(e2.getY() - e1.getY(), 2));
         if (distance > (float)getWindow().getDecorView().getHeight() / 4.0f) {
             unlock();
@@ -346,7 +348,7 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
             finish();
             return true;
         }
-        return false;
+        return true;
     }
 
     @Override
