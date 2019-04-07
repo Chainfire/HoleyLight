@@ -365,7 +365,7 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
             finish();
             return true;
         }
-        return true;
+        return false;
     }
 
     @Override
