@@ -39,6 +39,16 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         void onSettingsChanged();
     }
 
+    private static final int SHIFT_CHARGING = 0;
+    private static final int SHIFT_BATTERY = 2;
+    private static final int SHIFT_SCREEN_ON = 0;
+    private static final int SHIFT_SCREEN_OFF = 1;
+
+    public static final int CHARGING_SCREEN_ON = SHIFT_CHARGING + SHIFT_SCREEN_ON;
+    public static final int CHARGING_SCREEN_OFF = SHIFT_CHARGING + SHIFT_SCREEN_OFF;
+    public static final int BATTERY_SCREEN_ON = SHIFT_BATTERY + SHIFT_SCREEN_ON;
+    public static final int BATTERY_SCREEN_OFF = SHIFT_BATTERY + SHIFT_SCREEN_OFF;
+
     public static final String ENABLED_MASTER = "enabled_master";
     private static final boolean ENABLED_MASTER_DEFAULT = true;
 
@@ -65,6 +75,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public static final String SEEN_ON_USER_PRESENT = "seen_on_user_present";
     private static final boolean SEEN_ON_USER_PRESENT_DEFAULT = true;
+
+    public static final String ANIMATION_BLINKER = "animation_blinker";
+    private static final int ANIMATION_BLINKER_DEFAULT = (1 << BATTERY_SCREEN_OFF);
     
     private static final String CUTOUT_AREA_LEFT = "cutout_area_left";
     private static final String CUTOUT_AREA_TOP = "cutout_area_top";
@@ -325,5 +338,25 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public boolean isSeenOnUserPresent(boolean effective) {
         return (!effective || isEnabledWhileScreenOffAny()) && prefs.getBoolean(SEEN_ON_USER_PRESENT, SEEN_ON_USER_PRESENT_DEFAULT);
+    }
+
+    public boolean isAnimationBlinker(int mode) {
+        return (prefs.getInt(ANIMATION_BLINKER, ANIMATION_BLINKER_DEFAULT) & (1 << mode)) == (1 << mode);
+    }
+
+    public void setAnimationBlinker(int mode, boolean enabled) {
+        edit();
+        try {
+            editor.putInt(ANIMATION_BLINKER, enabled ?
+                    prefs.getInt(ANIMATION_BLINKER, ANIMATION_BLINKER_DEFAULT) | (1 << mode) :
+                    prefs.getInt(ANIMATION_BLINKER, ANIMATION_BLINKER_DEFAULT) & ~(1 << mode)
+            );
+        } finally {
+            save(true);
+        }
+    }
+
+    public int getMode(boolean charging, boolean screenOn) {
+        return (charging ? SHIFT_CHARGING : SHIFT_BATTERY) + (screenOn ? SHIFT_SCREEN_ON : SHIFT_SCREEN_OFF);
     }
 }

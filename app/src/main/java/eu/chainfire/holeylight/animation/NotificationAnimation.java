@@ -252,7 +252,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
             spritePlayer.setSpeed(getSpeedFactor());
 
-            spritePlayer.setOnSpriteSheetNeededListener((w, h) -> SpriteSheet.fromLottieComposition(lottieComposition, w, h));
+            spritePlayer.setOnSpriteSheetNeededListener((w, h, p) -> SpriteSheet.fromLottieComposition(lottieComposition, w, h, p));
 
             if (!spritePlayer.isAnimating() && play) {
                 spritePlayer.playAnimation();

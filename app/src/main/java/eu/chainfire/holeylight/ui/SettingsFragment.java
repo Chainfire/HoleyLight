@@ -176,6 +176,39 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             startActivity(new Intent(getActivity(), ColorActivity.class));
             return false;
         });
+        pref(catAnimation, R.string.settings_animation_blinker_title, R.string.settings_animation_blinker_description, null, true, preference -> {
+            (new AlertDialog.Builder(getContext()))
+                    .setTitle(R.string.settings_animation_blinker_title)
+                    .setMultiChoiceItems(new CharSequence[] {
+                            getString(R.string.settings_animation_blinker_screen_on_charging),
+                            getString(R.string.settings_animation_blinker_screen_off_charging),
+                            getString(R.string.settings_animation_blinker_screen_on_battery),
+                            getString(R.string.settings_animation_blinker_screen_off_battery)
+                    }, new boolean[] {
+                            settings.isAnimationBlinker(Settings.CHARGING_SCREEN_ON),
+                            settings.isAnimationBlinker(Settings.CHARGING_SCREEN_OFF),
+                            settings.isAnimationBlinker(Settings.BATTERY_SCREEN_ON),
+                            settings.isAnimationBlinker(Settings.BATTERY_SCREEN_OFF)
+                    }, (dialog, which, isChecked) -> {
+                        switch (which) {
+                            case 0:
+                                settings.setAnimationBlinker(Settings.CHARGING_SCREEN_ON, isChecked);
+                                break;
+                            case 1:
+                                settings.setAnimationBlinker(Settings.CHARGING_SCREEN_OFF, isChecked);
+                                break;
+                            case 2:
+                                settings.setAnimationBlinker(Settings.BATTERY_SCREEN_ON, isChecked);
+                                break;
+                            case 3:
+                                settings.setAnimationBlinker(Settings.BATTERY_SCREEN_OFF, isChecked);
+                                break;
+                        }
+                    })
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+            return false;
+        });
 
         PreferenceCategory catChainfire = category(root, R.string.settings_category_chainfire_title, 0);
         pref(catChainfire, R.string.settings_playstore_title, R.string.settings_playstore_description, null, true, preference -> {

@@ -22,24 +22,29 @@
     <string name="help_hide_overlay_notification_title">Hide Holey Light notification</string>
     <string name="help_hide_overlay_notification_description"><![CDATA[Help you hide the <b>Holey Light is displaying over other apps</b> notification]]></string>
     <string name="help_hide_overlay_notification_message"><![CDATA[On the next screen, make sure <b>Show notifications</b> (at the top only) is unchecked]]></string>
+    
+    <string name="charging_screen_on">Charging: Screen on</string>
+    <string name="charging_screen_off">Charging: Screen off</string>
+    <string name="battery_screen_on">Battery: Screen on</string>
+    <string name="battery_screen_off">Battery: Screen off</string>
 
     <string name="settings_category_operation_title">Operation</string>
     <string name="settings_screen_on_title">Screen on</string>
     <string name="settings_screen_on_description">Show notification light while the phone is in normal use</string>
-    <string name="settings_screen_off_charging_title">Charging: Screen off</string>
+    <string name="settings_screen_off_charging_title">@string/charging_screen_off</string>
     <string name="settings_screen_off_charging_description">Show notification light while the phone is off and charging</string>
-    <string name="settings_screen_off_battery_title">Battery: Screen off</string>
+    <string name="settings_screen_off_battery_title">@string/battery_screen_off</string>
     <string name="settings_screen_off_battery_description">This feature is still under development and not available right now</string>
 
     <string name="settings_category_seen_pickup_title">Mark as seen: Pickup</string>
     <string name="settings_category_seen_pickup_description">Stationary for &gt;10s before moving</string>
-    <string name="settings_seen_pickup_screen_on_charging_title">Charging: Screen on</string>
+    <string name="settings_seen_pickup_screen_on_charging_title">@string/charging_screen_on</string>
     <string name="settings_seen_pickup_screen_on_charging_description">Makes sense when you usually charge your phone where you can see it</string>
-    <string name="settings_seen_pickup_screen_off_charging_title">Charging: Screen off</string>
+    <string name="settings_seen_pickup_screen_off_charging_title">@string/charging_screen_off</string>
     <string name="settings_seen_pickup_screen_off_charging_description">Makes sense when you usually charge your phone where you can see it</string>
-    <string name="settings_seen_pickup_screen_on_battery_title">Battery: Screen on</string>
+    <string name="settings_seen_pickup_screen_on_battery_title">@string/battery_screen_on</string>
     <string name="settings_seen_pickup_screen_on_battery_description">Consumes a little additional power</string>
-    <string name="settings_seen_pickup_screen_off_battery_title">Battery: Screen off</string>
+    <string name="settings_seen_pickup_screen_off_battery_title">@string/battery_screen_off</string>
     <string name="settings_seen_pickup_screen_off_battery_description">Consumes significant additional power</string>
 
     <string name="settings_category_seen_lockscreen_title">Mark as seen: Lockscreen</string>
@@ -60,6 +65,13 @@
     <string name="settings_animation_tune_description">Fine-tune size, position, and speed</string>
     <string name="settings_animation_colors_title">Colors</string>
     <string name="settings_animation_colors_description">Adjust per-package notification colors</string>
+
+    <string name="settings_animation_blinker_title">Blinker</string>
+    <string name="settings_animation_blinker_description">Use blinking animation instead of swirl, significantly reduces battery use</string>
+    <string name="settings_animation_blinker_screen_on_charging">@string/charging_screen_on</string>
+    <string name="settings_animation_blinker_screen_off_charging">@string/charging_screen_off</string>
+    <string name="settings_animation_blinker_screen_on_battery">@string/battery_screen_on</string>
+    <string name="settings_animation_blinker_screen_off_battery">@string/battery_screen_off</string>
 
     <string name="settings_category_chainfire_title">Chainfire</string>
     <string name="settings_playstore_title">All my apps</string>

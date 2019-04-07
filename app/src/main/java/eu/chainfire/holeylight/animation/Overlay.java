@@ -32,6 +32,9 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.WindowManager;
 
+import eu.chainfire.holeylight.misc.Battery;
+import eu.chainfire.holeylight.misc.Settings;
+
 import static android.content.Context.DISPLAY_SERVICE;
 import static android.content.Context.KEYGUARD_SERVICE;
 
@@ -58,9 +61,13 @@ public class Overlay {
                 }
             } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
                 evaluate();
+            } else if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {
+                evaluate();
             } else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
                 evaluate();
-            } else if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {
+            } else if (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED)) {
+                evaluate();
+            } else if (intent.getAction().equals(Intent.ACTION_POWER_DISCONNECTED)) {
                 evaluate();
             }
         }
@@ -73,6 +80,7 @@ public class Overlay {
     private final KeyguardManager keyguardManager;
     private final Display display;
     private final Handler handler;
+    private final Settings settings;
 
     private int[] colors = new int[0];
     private boolean wanted = false;
@@ -81,6 +89,7 @@ public class Overlay {
     private boolean lastState = false;
     private int[] lastColors = new int[0];
     private boolean added = false;
+    private boolean inLockscreen = false;
 
     private Overlay(Context context) {
         windowManager = (WindowManager)context.getSystemService(Activity.WINDOW_SERVICE);
@@ -88,6 +97,7 @@ public class Overlay {
         keyguardManager = (KeyguardManager)context.getSystemService(KEYGUARD_SERVICE);
         display = ((DisplayManager)context.getSystemService(DISPLAY_SERVICE)).getDisplay(0);
         handler = new Handler();
+        settings = Settings.getInstance(context);
 
         initParams();
         animation = new NotificationAnimation(context, spritePlayer, new NotificationAnimation.OnNotificationAnimationListener() {
@@ -106,9 +116,11 @@ public class Overlay {
         });
 
         intentFilter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
-        intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_USER_PRESENT);
+        intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        intentFilter.addAction(Intent.ACTION_POWER_CONNECTED);
+        intentFilter.addAction(Intent.ACTION_POWER_DISCONNECTED);
 
         spritePlayer.getContext().getApplicationContext().registerReceiver(broadcastReceiver, intentFilter);
     }
@@ -211,6 +223,10 @@ public class Overlay {
                 lastState = false;
             }
         }
+
+        if (visible) {
+            spritePlayer.setPowerSaverMode(settings.isAnimationBlinker(settings.getMode(Battery.isCharging(spritePlayer.getContext()), !inLockscreen)));
+        }
     }
 
     public void show(int[] colors) {
@@ -230,5 +246,12 @@ public class Overlay {
         wanted = false;
         kill = immediately;
         evaluate();
+    }
+
+    public void setInLockscreen(boolean inLockscreen) {
+        if (this.inLockscreen != inLockscreen) {
+            this.inLockscreen = inLockscreen;
+            evaluate();
+        }
     }
 }

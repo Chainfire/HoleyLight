@@ -359,6 +359,7 @@ public class NotificationListenerService extends android.service.notification.No
             handleLEDNotifications();
         }
         startMotionSensor();
+        overlay.setInLockscreen(false);
     }
 
     private boolean canMarkAsReadFromPickup() {

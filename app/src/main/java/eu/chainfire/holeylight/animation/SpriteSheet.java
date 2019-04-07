@@ -31,24 +31,48 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SpriteSheet {
-    public static SpriteSheet fromLottieComposition(LottieComposition lottieComposition, int width, int height) {
-        int frames = (int)lottieComposition.getDurationFrames();
-        int frameRate = (int)lottieComposition.getFrameRate();
+    public static SpriteSheet fromLottieComposition(LottieComposition lottieComposition, int width, int height, boolean powerSaver) {
+        SpriteSheet ss;
 
-        SpriteSheet ss = new SpriteSheet(width, height, frames, frameRate);
+        if (!powerSaver) {
+            int frames = (int)lottieComposition.getDurationFrames();
+            int frameRate = (int)lottieComposition.getFrameRate();
 
-        LottieDrawable lottieDrawable = new LottieDrawable();
-        lottieDrawable.setComposition(lottieComposition);
+            ss = new SpriteSheet(width, height, frames, frameRate);
 
-        Bitmap frame = Bitmap.createBitmap(lottieDrawable.getIntrinsicWidth(), lottieDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            LottieDrawable lottieDrawable = new LottieDrawable();
+            lottieDrawable.setComposition(lottieComposition);
 
-        for (int i = 0; i < frames; i++) {
+            Bitmap frame = Bitmap.createBitmap(lottieDrawable.getIntrinsicWidth(), lottieDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+
+            for (int i = 0; i < frames; i++) {
+                frame.eraseColor(Color.TRANSPARENT);
+
+                Canvas frame_canvas = new Canvas(frame);
+                lottieDrawable.setFrame(i);
+                lottieDrawable.draw(frame_canvas);
+
+                ss.addFrame(frame);
+            }
+        } else {
+            int frames = (int)lottieComposition.getDurationFrames();
+
+            ss = new SpriteSheet(width, height, 2, 1);
+
+            LottieDrawable lottieDrawable = new LottieDrawable();
+            lottieDrawable.setComposition(lottieComposition);
+
+            Bitmap frame = Bitmap.createBitmap(lottieDrawable.getIntrinsicWidth(), lottieDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+
             frame.eraseColor(Color.TRANSPARENT);
+            for (int i = 0; i < frames; i++) {
+                Canvas frame_canvas = new Canvas(frame);
+                lottieDrawable.setFrame(i);
+                lottieDrawable.draw(frame_canvas);
+            }
+            ss.addFrame(frame);
 
-            Canvas frame_canvas = new Canvas(frame);
-            lottieDrawable.setFrame(i);
-            lottieDrawable.draw(frame_canvas);
-
+            frame.eraseColor(Color.TRANSPARENT);
             ss.addFrame(frame);
         }
 

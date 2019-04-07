@@ -8,7 +8,7 @@
     tools:context=".ui.LockscreenActivity">
     
     <eu.chainfire.holeylight.animation.SpritePlayer
-        android:id="@+id/lottie"
+        android:id="@+id/spritePlayer"
         android:layout_width="0px"
         android:layout_height="0px"
         app:layout_constraintStart_toStartOf="parent"

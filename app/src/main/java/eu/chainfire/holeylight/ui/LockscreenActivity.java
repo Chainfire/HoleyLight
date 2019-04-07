@@ -40,6 +40,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.NotificationAnimation;
+import eu.chainfire.holeylight.animation.Overlay;
 import eu.chainfire.holeylight.animation.SpritePlayer;
 import eu.chainfire.holeylight.misc.Battery;
 import eu.chainfire.holeylight.misc.Settings;
@@ -105,7 +106,9 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
                         if (proximityWakeLock.isHeld()) {
                             proximityWakeLock.release();
                         }
+                        spritePlayer.setPowerSaverMode(settings.isAnimationBlinker(settings.getMode(true, false)));
                     }
+                    break;
                 case Intent.ACTION_POWER_DISCONNECTED:
                     if (!settings.isEnabledWhileScreenOffBattery()) {
                         // Turn off
@@ -114,6 +117,7 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
                         if (!proximityWakeLock.isHeld()) {
                             proximityWakeLock.acquire(15000);
                         }
+                        spritePlayer.setPowerSaverMode(settings.isAnimationBlinker(settings.getMode(false, false)));
                     }
                     break;
             }
@@ -173,7 +177,7 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
         keyguardManager = (KeyguardManager)getSystemService(KEYGUARD_SERVICE);
         powerManager = (PowerManager)getSystemService(POWER_SERVICE);
 
-        spritePlayer = findViewById(R.id.lottie);
+        spritePlayer = findViewById(R.id.spritePlayer);
         notificationAnimation = new NotificationAnimation(this, spritePlayer, null);
         int[] colors = getIntent().getIntArrayExtra(BuildConfig.APPLICATION_ID + ".colors");
         haveNotifications = (colors != null) && (colors.length > 0);
@@ -206,6 +210,8 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
         registerReceiver(broadcastReceiver, intentFilter);
         broadcastReceiverRegistered = true;
 
+        spritePlayer.setPowerSaverMode(settings.isAnimationBlinker(settings.getMode(Battery.isCharging(this), false)));
+
         gestureDetector = new GestureDetector(this, this);
 
         handler.postDelayed(new Runnable() {
@@ -216,11 +222,13 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
                 if (!keyguardManager.isKeyguardLocked()) {
                     if (spritePlayer.getVisibility() != View.INVISIBLE) {
                         spritePlayer.setVisibility(View.INVISIBLE);
+                        Overlay.getInstance(LockscreenActivity.this).setInLockscreen(true);
                     }
                     handler.postDelayed(this, 500);
                 } else {
                     if (spritePlayer.getVisibility() == View.INVISIBLE) {
                         spritePlayer.setVisibility(View.VISIBLE);
+                        Overlay.getInstance(LockscreenActivity.this).setInLockscreen(false);
                     }
                 }
             }
@@ -309,6 +317,7 @@ public class LockscreenActivity extends AppCompatActivity implements GestureDete
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BuildConfig.APPLICATION_ID + ".onLockscreen"));
         handler.removeCallbacks(repeatedWhileVisible);
         unregister();
+        Overlay.getInstance(LockscreenActivity.this).setInLockscreen(false);
         super.finish();
         overridePendingTransition(0, 0);
         if (proximityWakeLock.isHeld()) proximityWakeLock.release();

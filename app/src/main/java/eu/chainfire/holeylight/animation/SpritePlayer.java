@@ -29,6 +29,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Choreographer;
@@ -42,7 +43,7 @@ import androidx.annotation.NonNull;
 
 public class SpritePlayer extends SurfaceView {
     public interface OnSpriteSheetNeededListener {
-        SpriteSheet onSpriteSheetNeeded(int width, int height);
+        SpriteSheet onSpriteSheetNeeded(int width, int height, boolean powerSaver);
     }
 
     public interface OnAnimationCompleteListener {
@@ -57,7 +58,8 @@ public class SpritePlayer extends SurfaceView {
     private OnAnimationCompleteListener onAnimationCompleteListener = null;
 
     private int frame = -1;
-    private SpriteSheet spriteSheet = null;
+    private SpriteSheet spriteSheetNormal = null;
+    private SpriteSheet spriteSheetPowerSaver = null;
     private Rect dest = new Rect();
     private Paint paint = new Paint();
     private boolean surfaceInvalidated = true;
@@ -67,6 +69,7 @@ public class SpritePlayer extends SurfaceView {
     private int height = -1;
     private int color = 0;
     private float speed = 1.0f;
+    private boolean powerSaverMode = false;
 
     private void log(String fmt, Object... args) {
         Log.d("HoleyLight/SpritePlayer", String.format(Locale.ENGLISH, fmt, args));
@@ -168,6 +171,7 @@ public class SpritePlayer extends SurfaceView {
         @Override
         public void doFrame(long frameTimeNanos) {
             synchronized (SpritePlayer.this) {
+                SpriteSheet spriteSheet = getSpriteSheet();
                 if (draw && (spriteSheet != null)) {
                     if (frame == -1) {
                         startTimeNanos = frameTimeNanos;
@@ -218,22 +222,30 @@ public class SpritePlayer extends SurfaceView {
         }
     };
 
+    private Runnable frameCallbackRunnable = () -> frameCallback.doFrame(SystemClock.elapsedRealtimeNanos());
+
     private void cancelNextFrame() {
         choreographer.removeFrameCallback(frameCallback);
+        handler.removeCallbacks(frameCallbackRunnable);
     }
 
     private void callNextFrame() {
         cancelNextFrame();
-        choreographer.postFrameCallback(frameCallback);
+        if (powerSaverMode) {
+            handler.postDelayed(frameCallbackRunnable, 250);
+        } else {
+            choreographer.postFrameCallback(frameCallback);
+        }
     }
 
     private void callOnSpriteSheetNeeded(int width, int height) {
         cancelNextFrame();
-        resetSpriteSheet();
+        resetSpriteSheet(null);
         handler.post(() -> {
             synchronized (SpritePlayer.this) {
                 if (onSpriteSheetNeededListener != null) {
-                    setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height));
+                    setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height, false), false);
+                    setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height, true), true);
                 }
             }
         });
@@ -243,7 +255,11 @@ public class SpritePlayer extends SurfaceView {
         if (this.onSpriteSheetNeededListener == onSpriteSheetNeededListener) return;
 
         this.onSpriteSheetNeededListener = onSpriteSheetNeededListener;
-        if ((width != -1) && (height != -1) && !((spriteSheet != null) && (spriteSheet.getWidth() == width) && spriteSheet.getHeight() == height)) {
+        if (
+                (width != -1) && (height != -1) && 
+                !((spriteSheetNormal != null) && (spriteSheetNormal.getWidth() == width) && spriteSheetNormal.getHeight() == height) &&
+                !((spriteSheetPowerSaver != null) && (spriteSheetPowerSaver.getWidth() == width) && spriteSheetPowerSaver.getHeight() == height)
+        ) {
             callOnSpriteSheetNeeded(width, height);
         }
     }
@@ -252,32 +268,48 @@ public class SpritePlayer extends SurfaceView {
         this.onAnimationCompleteListener = onAnimationCompleteListener;
     }
 
-    private synchronized void resetSpriteSheet() {
-        frame = -1;
-        SpriteSheet old = spriteSheet;
-        spriteSheet = null;
-        if (old != null) {
-            old.recycle();
+    private synchronized void resetSpriteSheet(Boolean powerSaver) {
+        if ((powerSaver == null) || (powerSaverMode == powerSaver)) {
+            frame = -1;
         }
-        surfaceInvalidated = true;
-        try {
-            Canvas canvas = getHolder().lockCanvas();
+        if ((powerSaver == null) || powerSaver) {
+            SpriteSheet old = spriteSheetPowerSaver;
+            spriteSheetPowerSaver = null;
+            if (old != null) old.recycle();
+        }
+        if ((powerSaver == null) || !powerSaver) {
+            SpriteSheet old = spriteSheetNormal;
+            spriteSheetNormal = null;
+            if (old != null) old.recycle();
+        }
+        if ((powerSaver == null) || (powerSaverMode == powerSaver)) {
+            surfaceInvalidated = true;
             try {
-                if (!canvas.isHardwareAccelerated()) {
-                    canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                Canvas canvas = getHolder().lockCanvas();
+                try {
+                    if (!canvas.isHardwareAccelerated()) {
+                        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                    }
+                } finally {
+                    getHolder().unlockCanvasAndPost(canvas);
                 }
-            } finally {
-                getHolder().unlockCanvasAndPost(canvas);
+            } catch (Throwable t) {
+                // ...
             }
-        } catch (Throwable t) {
-            // ...
         }
     }
 
-    public synchronized void setSpriteSheet(SpriteSheet spriteSheet) {
-        if (spriteSheet == this.spriteSheet) return;
-        resetSpriteSheet();
-        this.spriteSheet = spriteSheet;
+    public synchronized void setSpriteSheet(SpriteSheet spriteSheet, boolean powerSaver) {
+        if (
+                (!powerSaver && (spriteSheet == this.spriteSheetNormal)) ||
+                (powerSaver && (spriteSheet == this.spriteSheetPowerSaver))
+        ) return;
+        resetSpriteSheet(powerSaver);
+        if (powerSaver) {
+            this.spriteSheetPowerSaver = spriteSheet;
+        } else {
+            this.spriteSheetNormal = spriteSheet;
+        }
         evaluate();
     }
 
@@ -296,7 +328,7 @@ public class SpritePlayer extends SurfaceView {
     }
 
     private synchronized void evaluate() {
-        if (wanted && (spriteSheet != null) && (getWindowVisibility() == View.VISIBLE) && (getVisibility() == View.VISIBLE)) {
+        if (wanted && (getSpriteSheet() != null) && (getWindowVisibility() == View.VISIBLE) && (getVisibility() == View.VISIBLE)) {
             startUpdating();
         } else {
             stopUpdating();
@@ -321,5 +353,21 @@ public class SpritePlayer extends SurfaceView {
     public synchronized void setSpeed(float speed) {
         frame = -1;
         this.speed = speed;
+    }
+
+    public boolean isPowerSaverMode() {
+        return powerSaverMode;
+    }
+
+    public synchronized void setPowerSaverMode(boolean powerSaverMode) {
+        if (powerSaverMode != this.powerSaverMode) {
+            frame = -1;
+            this.powerSaverMode = powerSaverMode;
+            evaluate();
+        }
+    }
+
+    private synchronized SpriteSheet getSpriteSheet() {
+        return powerSaverMode ? spriteSheetPowerSaver : spriteSheetNormal;
     }
 }
