@@ -16,6 +16,9 @@ device!
 My personal test devices is the *plain* S10, if things are out of
 whack on the other models, let me know.
 
+There is a link to XDA thread at the bottom, which is the place for
+discussing this app.
+
 ### Features
 
 - Emulates notification LED
@@ -55,31 +58,6 @@ That is absurd. Who would even do such a thing. Certainly not me. /s
 
 No.
 
-#### Why doesn't the animation show in the lockscreen?
-
-It is currently not possible to arbitrarily draw over the lockscreen
-for a standard third-party app, unless we replace the lockscreen in
-its entirety. 
-
-It *may* be possible to do this with root.
-
-#### When I'm using the Screen off feature, my lockscreen behaves weirdly
-
-Please describe exactly what happens and what you expected to happen.
-As we're *faking* the screen being off, various events of the devices
-turning on and off have to be faked as well. It might not always work
-so well.
-
-#### So what about LED emulation when the device is on battery power?
-
-This isn't done yet. I've been trying different things to see their
-effects, but I'm not quite satisfied with how things have worked out.
-
-Currently, the animation is only shown when the screen is on, or when
-the screen is off and the device is charging.
-
-See the battery use section below.
-
 ### Battery use 
 
 To display an animation like the one we're doing, we obviously need
@@ -95,12 +73,17 @@ states. These are power saving states, that reduce power used by the
 CPU and/or display directly. Aside from that, code running in the
 background is restricted. Unfortunately, it is not possible for
 third-party apps such as these to attain these power-saving states,
-at least not without root.
+at least not without root. I've made some progress using shell runners
+(which need to be started through adb, or root if you have it), but
+nothing too convincing just yet.
 
 The *Always On Display* mode (which is just Samsung-speak for 
 Android's *Ambient Display* feature) does run in this mode, but 
 decompiling AOD and several of it's plugins, I did not find a way
-to hook into it (or overlay it) properly.
+to *properly* hook into it. We *can* currently overlay it, but not
+without it's own problems: we need to keep the CPU and screen
+semi-active. In other words, it's not a true AOD tap-in, and uses
+(significantly) more battery power than just AOD does.
 
 For the devs among us, if you were unaware, *Ambient Display* is quite
 literally just a Dream (with a few extra hidden methods to trigger *doze*
@@ -111,35 +94,20 @@ rooting my S10, but it seems doable in theory. Typical Google to lock
 something like this down while it could so easily be used for nice
 things.
 
-Since we are not able to run in or trigger any of the power saving
-states we want to, we are left only with the standard wakelocks 
-(and equivalent flags/attrs) to keep the CPU and/or screen awake.
-
-While those methods are tested and true, implementing as an *Ambient
-Dream* would be simpler logic (if it worked). And aside from not
-running the CPU and display in a lower power state, other code running
-in the background is not particularly restricted either. For all 
-intents and purposes, the device is *fully* awake, even though it's
-showing a black screen with only a small animation it.
-
-Of course, since it's an AMOLED screen, the black pixels themselves
-use practically no power, but the chips are still in full power mode. 
-We're still drawing relatively large amounts of power compared to 
-full sleep or even the *doze*/*suspended* states. Enough so that it 
-can drain your battery from full straight to zero overnight.
-
-None of this really matters while the device is charging, but it does
-when it's on battery power.
-
-I'm still thinking about and testing how to handle that case. The
-most obvious solution would be to run only for a while after a new
-notification comes in, or show the animation periodically. The best
-parameters for that take some testing, and that is slow going when
-you need to wait many hours each round to be able to compare the
-results.
-
-Of course, you can recompile it yourself, enable the feature, and 
-see what happens. 
+This app tries to piggyback on AOD smartly, and does not currently
+keep any CPU wakelocks itself. The code that does run is pretty
+heavily profiled, and the effects on other processes (such as 
+system_server and surfaceflinger) closely monitored to pick the
+best paths. Some things might seem slow in the code, but there are
+actual reasons for most of these things.
+  
+Since the app cannot currently tap into the power management features 
+directly, nor into the true AOD surface (hol*e*y grail material), it 
+has to make do with several work-arounds and indirect triggers. This 
+means at this level it can never be as efficient as AOD itself is 
+(which impresses at sub-1% per hour).
+ 
+Here's a potentially interesting and somewhat [in-depth post on XDA](https://forum.xda-developers.com/showpost.php?p=79303152&postcount=319).
 
 ### Freedom!
 
