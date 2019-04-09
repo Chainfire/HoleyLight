@@ -35,13 +35,15 @@ import androidx.core.view.WindowInsetsCompat;
 import eu.chainfire.holeylight.misc.CameraCutout;
 import eu.chainfire.holeylight.misc.Settings;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({ "unused", "WeakerAccess" })
 public class NotificationAnimation implements Settings.OnSettingsChangedListener {
     private static CameraCutout.Cutout OVERRIDE_CUTOUT = null; //CameraCutout.CUTOUT_S10PLUS;
     private static String OVERRIDE_DEVICE = null; //"beyond2";
 
     public interface OnNotificationAnimationListener {
         void onDimensionsApplied(SpritePlayer view);
+        boolean onAnimationFrameStart(SpritePlayer view, boolean draw);
+        void onAnimationFrameEnd(SpritePlayer view, boolean draw);
         boolean onAnimationComplete(SpritePlayer view);
     }
 
@@ -69,6 +71,9 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
     private volatile int[] colorsNext = null;
     private volatile boolean playNext = false;
+
+    private int lastWidth = 0;
+    private int lastHeight = 0;
 
     public NotificationAnimation(Context context, SpritePlayer spritePlayer, OnNotificationAnimationListener onNotificationAnimationListener) {
         this.onNotificationAnimationListener = onNotificationAnimationListener;
@@ -110,40 +115,58 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
             applyDimensions();
         });
 
-        spritePlayer.setOnAnimationCompleteListener(() -> {
-            boolean again = false;
-
-            synchronized (NotificationAnimation.this) {
-                boolean newColors = false;
-                colorIndex++;
-                if (colorIndex >= colors.length) {
-                    colorIndex = 0;
-                    if (colorsNext != null) {
-                        colors = colorsNext;
-                        colorsNext = null;
-                        newColors = true;
-                    }
+        spritePlayer.setOnAnimationListener(new SpritePlayer.OnAnimationListener() {
+            @Override
+            public boolean onAnimationFrameStart(boolean draw) {
+                if (onNotificationAnimationListener != null) {
+                    return onNotificationAnimationListener.onAnimationFrameStart(NotificationAnimation.this.spritePlayer, draw);
                 }
-                if (colors.length > 0) {
-                    setColor(colors[colorIndex]);
-                    if (play || newColors || (colorIndex > 0)) {
-                        again = true;
+                return true;
+            }
+
+            @Override
+            public void onAnimationFrameEnd(boolean draw) {
+                if (onNotificationAnimationListener != null) {
+                    onNotificationAnimationListener.onAnimationFrameEnd(NotificationAnimation.this.spritePlayer, draw);
+                }
+            }
+
+            @Override
+            public boolean onAnimationComplete() {
+                boolean again = false;
+
+                synchronized (NotificationAnimation.this) {
+                    boolean newColors = false;
+                    colorIndex++;
+                    if (colorIndex >= colors.length) {
+                        colorIndex = 0;
+                        if (colorsNext != null) {
+                            colors = colorsNext;
+                            colorsNext = null;
+                            newColors = true;
+                        }
+                    }
+                    if (colors.length > 0) {
+                        setColor(colors[colorIndex]);
+                        if (play || newColors || (colorIndex > 0)) {
+                            again = true;
+                        } else {
+                            if (onNotificationAnimationListener != null) {
+                                again = onNotificationAnimationListener.onAnimationComplete(NotificationAnimation.this.spritePlayer);
+                            }
+                        }
+                        if (newColors) {
+                            play = playNext;
+                        }
                     } else {
                         if (onNotificationAnimationListener != null) {
                             again = onNotificationAnimationListener.onAnimationComplete(NotificationAnimation.this.spritePlayer);
                         }
                     }
-                    if (newColors) {
-                        play = playNext;
-                    }
-                } else {
-                    if (onNotificationAnimationListener != null) {
-                        again = onNotificationAnimationListener.onAnimationComplete(NotificationAnimation.this.spritePlayer);
-                    }
                 }
-            }
 
-            return again;
+                return again;
+            }
         });
 
         settings.registerOnSettingsChangedListener(this);
@@ -170,7 +193,11 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     }
 
     private synchronized void setColor(int color) {
-        spritePlayer.setColor(color);
+        if (spritePlayer.getMode() == SpritePlayer.Mode.SINGLE) {
+            spritePlayer.setColors(colors);
+        } else {
+            spritePlayer.setColors(new int[] { color });
+        }
     }
 
     public synchronized void updateFromInsets(WindowInsetsCompat insets) {
@@ -223,6 +250,12 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
             width = scaledWidth;
             height = scaledHeight;
 
+            // Update internal views first
+            lastWidth = (int)width;
+            lastHeight = (int)height;
+            spritePlayer.updateInternalViews(lastWidth, lastHeight);
+
+            // Update parent view
             ViewGroup.LayoutParams params = spritePlayer.getLayoutParams();
             params.width = (int)width;
             params.height = (int)height;
@@ -242,46 +275,32 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
                 // we're only going to allow portrait and reverse-portrait
                 spritePlayer.setVisibility((rotation % 2) == 0 ? View.VISIBLE : View.INVISIBLE);
-            } else if (params instanceof ViewGroup.MarginLayoutParams) {
-                ((ViewGroup.MarginLayoutParams)params).setMargins((int)left, (int)top, 0, 0);
             }
             spritePlayer.setLayoutParams(params);
 
+            // Get going
             spritePlayer.setSpeed(getSpeedFactor());
-
-            spritePlayer.setOnSpriteSheetNeededListener((w, h, p) -> SpriteSheet.fromLottieComposition(lottieComposition, w, h, p));
-
+            spritePlayer.setOnSpriteSheetNeededListener((w, h, m) -> SpriteSheet.fromLottieComposition(lottieComposition, w, h, m));
             if (!spritePlayer.isAnimating() && play) {
                 spritePlayer.playAnimation();
             }
-
             if (onNotificationAnimationListener != null) {
                 onNotificationAnimationListener.onDimensionsApplied(spritePlayer);
             }
         }
     }
 
-    public synchronized void play(boolean once) {
-        play = !once;
-        if (!spritePlayer.isAnimating()) {
-            if (colors.length > 0) {
-                colorIndex = 0;
-                setColor(colors[colorIndex]);
-                spritePlayer.playAnimation();
-            }
-        }
-    }
-
-    public synchronized void play(int[] colors, boolean once) {
+    public synchronized void play(int[] colors, boolean once, boolean immediately) {
         if ((colors == null) || (colors.length == 0)) {
             play = false;
             stop(true);
             return;
         }
-        if (spritePlayer.isAnimating()) {
+        if (spritePlayer.isAnimating() && !immediately) {
             this.colorsNext = colors;
             this.playNext = !once;
         } else {
+            if (immediately) spritePlayer.cancelAnimation();
             this.colors = colors;
             play = !once;
             colorIndex = 0;
@@ -325,5 +344,13 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
     public float getSpeedFactor() {
         return settings.getSpeedFactor();
+    }
+
+    public int getLastWidth() {
+        return lastWidth;
+    }
+
+    public int getLastHeight() {
+        return lastHeight;
     }
 }

@@ -24,7 +24,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Html;
 
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.Preference;
@@ -32,7 +31,6 @@ import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
-import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.misc.Settings;
 
@@ -44,6 +42,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefScreenOn = null;
     private CheckBoxPreference prefScreenOffCharging = null;
     private CheckBoxPreference prefScreenOffBattery = null;
+    private CheckBoxPreference prefLockscreenOn = null;
     private CheckBoxPreference prefSeenPickupScreenOnCharging = null;
     private CheckBoxPreference prefSeenPickupScreenOffCharging = null;
     private CheckBoxPreference prefSeenPickupScreenOnBattery = null;
@@ -51,7 +50,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefSeenOnLockscreen = null;
     private CheckBoxPreference prefSeenOnUserPresent = null;
     private Preference prefAdviceAOD = null;
-    private Preference prefAdviceLock = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -133,27 +131,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         copyright.setTitle(title);
         root.addPreference(copyright);
 
-        Preference hideNot = pref(null, R.string.help_hide_overlay_notification_title, 0, null, true, preference -> {
-            (new AlertDialog.Builder(getActivity()))
-                    .setMessage(Html.fromHtml(getString(R.string.help_hide_overlay_notification_message)))
-                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                            TestNotification.show(getActivity(), TestNotification.NOTIFICATION_ID_HIDE_NOTIFICATION);
-                            Intent settingsIntent = new Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, "android")
-                                    .putExtra(android.provider.Settings.EXTRA_CHANNEL_ID, "com.android.server.wm.AlertWindowNotification - " + BuildConfig.APPLICATION_ID);
-                            startActivity(settingsIntent);
-                    })
-                    .show();
-            return false;
-        });
-        hideNot.setSummary(Html.fromHtml(getString(R.string.help_hide_overlay_notification_description)));
-        root.addPreference(hideNot);
-
         PreferenceCategory catOperation = category(root, R.string.settings_category_operation_title, 0);
         prefScreenOn = check(catOperation, R.string.settings_screen_on_title, R.string.settings_screen_on_description, Settings.ENABLED_MASTER, settings.isEnabled(), true);
         prefScreenOffCharging = check(catOperation, R.string.settings_screen_off_charging_title, R.string.settings_screen_off_charging_description, Settings.ENABLED_SCREEN_OFF_CHARGING, settings.isEnabledWhileScreenOffCharging(), true);
         prefScreenOffBattery = check(catOperation, R.string.settings_screen_off_battery_title, R.string.settings_screen_off_battery_description, Settings.ENABLED_SCREEN_OFF_BATTERY, settings.isEnabledWhileScreenOffBattery(), false);
+        prefLockscreenOn = check(catOperation, R.string.settings_lockscreen_on_title, R.string.settings_lockscreen_on_description, Settings.ENABLED_LOCKSCREEN, settings.isEnabledOnLockscreen(), true);
 
         PreferenceCategory catMarkAsSeen;
 
@@ -176,32 +158,32 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             startActivity(new Intent(getActivity(), ColorActivity.class));
             return false;
         });
-        pref(catAnimation, R.string.settings_animation_blinker_title, R.string.settings_animation_blinker_description, null, true, preference -> {
+        pref(catAnimation, R.string.settings_animation_powersave_title, R.string.settings_animation_powersave_description, null, true, preference -> {
             (new AlertDialog.Builder(getContext()))
-                    .setTitle(R.string.settings_animation_blinker_title)
+                    .setTitle(R.string.settings_animation_powersave_title)
                     .setMultiChoiceItems(new CharSequence[] {
-                            getString(R.string.settings_animation_blinker_screen_on_charging),
-                            getString(R.string.settings_animation_blinker_screen_off_charging),
-                            getString(R.string.settings_animation_blinker_screen_on_battery),
-                            getString(R.string.settings_animation_blinker_screen_off_battery)
+                            getString(R.string.settings_animation_powersave_screen_on_charging),
+                            getString(R.string.settings_animation_powersave_screen_off_charging),
+                            getString(R.string.settings_animation_powersave_screen_on_battery),
+                            getString(R.string.settings_animation_powersave_screen_off_battery)
                     }, new boolean[] {
-                            settings.isAnimationBlinker(Settings.CHARGING_SCREEN_ON),
-                            settings.isAnimationBlinker(Settings.CHARGING_SCREEN_OFF),
-                            settings.isAnimationBlinker(Settings.BATTERY_SCREEN_ON),
-                            settings.isAnimationBlinker(Settings.BATTERY_SCREEN_OFF)
+                            settings.isAnimationPowerSave(Settings.CHARGING_SCREEN_ON),
+                            settings.isAnimationPowerSave(Settings.CHARGING_SCREEN_OFF),
+                            settings.isAnimationPowerSave(Settings.BATTERY_SCREEN_ON),
+                            settings.isAnimationPowerSave(Settings.BATTERY_SCREEN_OFF)
                     }, (dialog, which, isChecked) -> {
                         switch (which) {
                             case 0:
-                                settings.setAnimationBlinker(Settings.CHARGING_SCREEN_ON, isChecked);
+                                settings.setAnimationPowerSave(Settings.CHARGING_SCREEN_ON, isChecked);
                                 break;
                             case 1:
-                                settings.setAnimationBlinker(Settings.CHARGING_SCREEN_OFF, isChecked);
+                                settings.setAnimationPowerSave(Settings.CHARGING_SCREEN_OFF, isChecked);
                                 break;
                             case 2:
-                                settings.setAnimationBlinker(Settings.BATTERY_SCREEN_ON, isChecked);
+                                settings.setAnimationPowerSave(Settings.BATTERY_SCREEN_ON, isChecked);
                                 break;
                             case 3:
-                                settings.setAnimationBlinker(Settings.BATTERY_SCREEN_OFF, isChecked);
+                                settings.setAnimationPowerSave(Settings.BATTERY_SCREEN_OFF, isChecked);
                                 break;
                         }
                     })
@@ -234,7 +216,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         PreferenceCategory catAdvice = category(root, R.string.settings_category_advice_title, 0);
         prefAdviceAOD = pref(catAdvice, R.string.settings_advice_aod_title, 0, null, true, null);
-        prefAdviceLock = pref(catAdvice, R.string.settings_advice_lock_title, 0, null, true, null);
 
         updatePrefs(null);
         prefs.registerOnSharedPreferenceChangeListener(this);
@@ -270,22 +251,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 // no action
             }
         }
-        if (prefAdviceLock != null) {
-            try {
-                if (settings.isEnabledWhileScreenOffCharging() || settings.isEnabledWhileScreenOffBattery()) {
-                    int timeout = android.provider.Settings.Secure.getInt(getContext().getContentResolver(), "lock_screen_lock_after_timeout", 0);
-                    prefAdviceLock.setSummary(getString(R.string.settings_advice_lock_description, (int)(timeout / 1000)));
-                } else {
-                    prefAdviceLock.setSummary(R.string.settings_advice_irrelevant);
-                }
-            } catch (Exception e) {
-                // no action
-            }
-        }
         if (prefScreenOn != null) {
             prefScreenOn.setChecked(settings.isEnabled()); // for sync with master switch
             prefScreenOffCharging.setEnabled(settings.isEnabled());
-            prefScreenOffBattery.setEnabled(settings.isEnabledWhileScreenOffCharging() && Settings.IS_SCREEN_OFF_BATTERY_ALLOWED);
+            prefScreenOffBattery.setEnabled(settings.isEnabledWhileScreenOffCharging());
+            prefLockscreenOn.setEnabled(settings.isEnabled());
             prefSeenPickupScreenOnCharging.setEnabled(settings.isEnabled());
             prefSeenPickupScreenOffCharging.setEnabled(settings.isEnabledWhileScreenOffCharging());
             prefSeenPickupScreenOnBattery.setEnabled(settings.isEnabled());

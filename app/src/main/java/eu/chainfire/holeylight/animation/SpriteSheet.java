@@ -32,10 +32,10 @@ import java.util.List;
 
 @SuppressWarnings({ "WeakerAccess", "unused", "UnusedReturnValue" })
 public class SpriteSheet {
-    public static SpriteSheet fromLottieComposition(LottieComposition lottieComposition, int width, int height, boolean powerSaver) {
+    public static SpriteSheet fromLottieComposition(LottieComposition lottieComposition, int width, int height, SpritePlayer.Mode mode) {
         SpriteSheet ss;
 
-        if (!powerSaver) {
+        if (mode == SpritePlayer.Mode.SWIRL) {
             int frames = (int)lottieComposition.getDurationFrames();
             int frameRate = (int)lottieComposition.getFrameRate();
 
@@ -55,7 +55,7 @@ public class SpriteSheet {
 
                 ss.addFrame(frame);
             }
-        } else {
+        } else if (mode == SpritePlayer.Mode.BLINK){
             int frames = (int)lottieComposition.getDurationFrames();
 
             ss = new SpriteSheet(width, height, 2, 1);
@@ -75,6 +75,25 @@ public class SpriteSheet {
 
             frame.eraseColor(Color.TRANSPARENT);
             ss.addFrame(frame);
+        } else if (mode == SpritePlayer.Mode.SINGLE) {
+            int frames = (int)lottieComposition.getDurationFrames();
+
+            ss = new SpriteSheet(width, height, 1, 1);
+
+            LottieDrawable lottieDrawable = new LottieDrawable();
+            lottieDrawable.setComposition(lottieComposition);
+
+            Bitmap frame = Bitmap.createBitmap(lottieDrawable.getIntrinsicWidth(), lottieDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+
+            frame.eraseColor(Color.TRANSPARENT);
+            for (int i = 0; i < frames; i++) {
+                Canvas frame_canvas = new Canvas(frame);
+                lottieDrawable.setFrame(i);
+                lottieDrawable.draw(frame_canvas);
+            }
+            ss.addFrame(frame);
+        } else {
+            return null;
         }
 
         if (ss.isValid()) {

@@ -30,11 +30,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import androidx.preference.PreferenceManager;
+import eu.chainfire.holeylight.animation.SpritePlayer;
 
 @SuppressWarnings({"WeakerAccess", "unused", "UnusedReturnValue"})
 public class Settings implements SharedPreferences.OnSharedPreferenceChangeListener {
-    public static boolean IS_SCREEN_OFF_BATTERY_ALLOWED = false;
-
     public interface OnSettingsChangedListener {
         void onSettingsChanged();
     }
@@ -56,10 +55,13 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     private static final boolean ENABLED_SCREEN_OFF_CHARGING_DEFAULT = true;
 
     public static final String ENABLED_SCREEN_OFF_BATTERY = "enabled_screen_off_battery";
-    private static final boolean ENABLED_SCREEN_OFF_BATTERY_DEFAULT = false;
+    private static final boolean ENABLED_SCREEN_OFF_BATTERY_DEFAULT = true;
+
+    public static final String ENABLED_LOCKSCREEN = "enabled_lockscreen";
+    private static final boolean ENABLED_LOCKSCREEN_DEFAULT = true;
 
     public static final String SEEN_PICKUP_SCREEN_ON_CHARGING = "seen_pickup_screen_on_charging";
-    private static final boolean SEEN_PICKUP_SCREEN_ON_CHARGING_DEFAULT = true;
+    private static final boolean SEEN_PICKUP_SCREEN_ON_CHARGING_DEFAULT = false;
 
     public static final String SEEN_PICKUP_SCREEN_OFF_CHARGING = "seen_pickup_screen_off_charging";
     private static final boolean SEEN_PICKUP_SCREEN_OFF_CHARGING_DEFAULT = false;
@@ -74,10 +76,10 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     private static final boolean SEEN_ON_LOCKSCREEN_DEFAULT = false;
 
     public static final String SEEN_ON_USER_PRESENT = "seen_on_user_present";
-    private static final boolean SEEN_ON_USER_PRESENT_DEFAULT = true;
+    private static final boolean SEEN_ON_USER_PRESENT_DEFAULT = false;
 
-    public static final String ANIMATION_BLINKER = "animation_blinker";
-    private static final int ANIMATION_BLINKER_DEFAULT = (1 << BATTERY_SCREEN_OFF);
+    public static final String ANIMATION_POWERSAVE = "animation_blinker";
+    private static final int ANIMATION_POWERSAVE_DEFAULT = (1 << BATTERY_SCREEN_OFF);
     
     private static final String CUTOUT_AREA_LEFT = "cutout_area_left";
     private static final String CUTOUT_AREA_TOP = "cutout_area_top";
@@ -284,7 +286,11 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public boolean isEnabledWhileScreenOffBattery() {
-        return isEnabled() && prefs.getBoolean(ENABLED_SCREEN_OFF_BATTERY, ENABLED_SCREEN_OFF_BATTERY_DEFAULT) && IS_SCREEN_OFF_BATTERY_ALLOWED;
+        return isEnabled() && prefs.getBoolean(ENABLED_SCREEN_OFF_BATTERY, ENABLED_SCREEN_OFF_BATTERY_DEFAULT);
+    }
+
+    public boolean isEnabledOnLockscreen() {
+        return isEnabled() && prefs.getBoolean(ENABLED_LOCKSCREEN, ENABLED_LOCKSCREEN_DEFAULT);
     }
 
     public int getColorForPackage(String packageName, int defaultValue) {
@@ -340,16 +346,23 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         return (!effective || isEnabledWhileScreenOffAny()) && prefs.getBoolean(SEEN_ON_USER_PRESENT, SEEN_ON_USER_PRESENT_DEFAULT);
     }
 
-    public boolean isAnimationBlinker(int mode) {
-        return (prefs.getInt(ANIMATION_BLINKER, ANIMATION_BLINKER_DEFAULT) & (1 << mode)) == (1 << mode);
+    public SpritePlayer.Mode getAnimationMode(int mode) {
+        // testing, correct code below
+        boolean powerSave = isAnimationPowerSave(mode);
+        if (!powerSave) return SpritePlayer.Mode.SWIRL;
+        return SpritePlayer.Mode.BLINK;
     }
 
-    public void setAnimationBlinker(int mode, boolean enabled) {
+    public boolean isAnimationPowerSave(int mode) {
+        return (prefs.getInt(ANIMATION_POWERSAVE, ANIMATION_POWERSAVE_DEFAULT) & (1 << mode)) == (1 << mode);
+    }
+
+    public void setAnimationPowerSave(int mode, boolean enabled) {
         edit();
         try {
-            editor.putInt(ANIMATION_BLINKER, enabled ?
-                    prefs.getInt(ANIMATION_BLINKER, ANIMATION_BLINKER_DEFAULT) | (1 << mode) :
-                    prefs.getInt(ANIMATION_BLINKER, ANIMATION_BLINKER_DEFAULT) & ~(1 << mode)
+            editor.putInt(ANIMATION_POWERSAVE, enabled ?
+                    prefs.getInt(ANIMATION_POWERSAVE, ANIMATION_POWERSAVE_DEFAULT) | (1 << mode) :
+                    prefs.getInt(ANIMATION_POWERSAVE, ANIMATION_POWERSAVE_DEFAULT) & ~(1 << mode)
             );
         } finally {
             save(true);

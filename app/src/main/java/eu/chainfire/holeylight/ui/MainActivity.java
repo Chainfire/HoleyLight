@@ -28,7 +28,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PowerManager;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,10 +37,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.core.app.NotificationManagerCompat;
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
-import eu.chainfire.holeylight.animation.NotificationAnimation;
+import eu.chainfire.holeylight.misc.Permissions;
 import eu.chainfire.holeylight.misc.Settings;
 
 public class MainActivity extends AppCompatActivity implements Settings.OnSettingsChangedListener {
@@ -94,83 +92,90 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
 
     @SuppressWarnings("deprecation")
     private void checkPermissions() {
-        if (!(new NotificationAnimation(this, null, null)).isDeviceSupported()) {
-            currentDialog = newAlert(true)
-                    .setTitle(R.string.error)
-                    .setMessage(Html.fromHtml(getString(R.string.error_unsupported_device, Build.DEVICE)))
-                    .setPositiveButton(android.R.string.ok, null)
-                    .show();
-        } else if (android.provider.Settings.Secure.getInt(getContentResolver(), "display_cutout_hide_notch", 0) == 1) {
-            currentDialog = newAlert(true)
-                    .setTitle(R.string.error)
-                    .setMessage(Html.fromHtml(getString(R.string.error_hide_notch)))
-                    .setPositiveButton(android.R.string.ok, null)
-                    .show();
-        } else if (!android.provider.Settings.canDrawOverlays(this)) {
-            currentDialog = newAlert(false)
-                    .setTitle(getString(R.string.permission_required) + " 1/4")
-                    .setMessage(Html.fromHtml(getString(R.string.permission_overlay)))
-                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                        Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
-                        intent.setData(Uri.parse("package:" + BuildConfig.APPLICATION_ID));
-                        startActivity(intent);
-                    })
-                    .show();
-        } else if (((CompanionDeviceManager)getSystemService(COMPANION_DEVICE_SERVICE)).getAssociations().size() == 0) {
-            currentDialog = newAlert(false)
-                    .setTitle(getString(R.string.permission_required) + " 2/4")
-                    .setMessage(Html.fromHtml(getString(R.string.permission_associate)))
-                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                        CompanionDeviceManager companionDeviceManager = (CompanionDeviceManager)getSystemService(COMPANION_DEVICE_SERVICE);
-                        companionDeviceManager.associate((new AssociationRequest.Builder()).build(), new CompanionDeviceManager.Callback() {
-                            @Override
-                            public void onDeviceFound(IntentSender chooserLauncher) {
-                                try {
-                                    startIntentSenderForResult(chooserLauncher, 0, null, 0, 0, 0);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
+        switch (Permissions.detect(this)) {
+            case DEVICE_SUPPORT:
+                currentDialog = newAlert(true)
+                        .setTitle(R.string.error)
+                        .setMessage(Html.fromHtml(getString(R.string.error_unsupported_device, Build.DEVICE)))
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
+                break;
+            case UNHIDE_NOTCH:
+                currentDialog = newAlert(true)
+                        .setTitle(R.string.error)
+                        .setMessage(Html.fromHtml(getString(R.string.error_hide_notch)))
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
+                break;
+            case COMPANION_DEVICE:
+                currentDialog = newAlert(false)
+                        .setTitle(getString(R.string.permission_required) + " 1/4")
+                        .setMessage(Html.fromHtml(getString(R.string.permission_associate)))
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            CompanionDeviceManager companionDeviceManager = (CompanionDeviceManager)getSystemService(COMPANION_DEVICE_SERVICE);
+                            companionDeviceManager.associate((new AssociationRequest.Builder()).build(), new CompanionDeviceManager.Callback() {
+                                @Override
+                                public void onDeviceFound(IntentSender chooserLauncher) {
+                                    try {
+                                        startIntentSenderForResult(chooserLauncher, 0, null, 0, 0, 0);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                            }
 
-                            @Override
-                            public void onFailure(CharSequence error) {
-                                (new AlertDialog.Builder(MainActivity.this))
-                                        .setTitle(getString(R.string.error))
-                                        .setMessage(error)
-                                        .setPositiveButton(android.R.string.ok, null)
-                                        .show();
-                            }
-                        }, handler);
-                    })
-                    .show();
-        } else if (!NotificationManagerCompat.getEnabledListenerPackages(this).contains(getPackageName())) {
-            currentDialog = newAlert(false)
-                    .setTitle(getString(R.string.permission_required) + " 3/4")
-                    .setMessage(Html.fromHtml(getString(R.string.permission_notifications)))
-                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                        Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
-                        startActivity(intent);
-                    })
-                    .show();
-        } else if (!((PowerManager)getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)) {
-            // keep this one last
-            currentDialog = newAlert(false)
-                    .setTitle(getString(R.string.permission_required) + " 4/4")
-                    .setMessage(Html.fromHtml(getString(R.string.permission_battery)))
-                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                        @SuppressLint("BatteryLife") Intent intent = new Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-                        intent.setData(Uri.parse("package:" + BuildConfig.APPLICATION_ID));
-                        startActivity(intent);
-                    })
-                    .show();
+                                @Override
+                                public void onFailure(CharSequence error) {
+                                    (new AlertDialog.Builder(MainActivity.this))
+                                            .setTitle(getString(R.string.error))
+                                            .setMessage(error)
+                                            .setPositiveButton(android.R.string.ok, null)
+                                            .show();
+                                }
+                            }, handler);
+                        })
+                        .show();
+                break;
+            case NOTIFICATION_SERVICE:
+                currentDialog = newAlert(false)
+                        .setTitle(getString(R.string.permission_required) + " 2/4")
+                        .setMessage(Html.fromHtml(getString(R.string.permission_notifications)))
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
+                            startActivity(intent);
+                        })
+                        .show();
+                break;
+            case ACCESSIBILITY_SERVICE:
+                currentDialog = newAlert(false)
+                        .setTitle(getString(R.string.permission_required) + " 3/4")
+                        .setMessage(Html.fromHtml(getString(R.string.permission_accessibility)))
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                            startActivity(intent);
+                        })
+                        .show();
+                break;
+            case BATTERY_OPTIMIZATION_EXEMPTION:
+                currentDialog = newAlert(false)
+                        .setTitle(getString(R.string.permission_required) + " 4/4")
+                        .setMessage(Html.fromHtml(getString(R.string.permission_battery)))
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            @SuppressLint("BatteryLife") Intent intent = new Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                            intent.setData(Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+                            startActivity(intent);
+                        })
+                        .show();
+                break;
+            case NONE:
+                newAlert(false); // dismiss leftovers
         }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        Permissions.unnotify(this);
         checkPermissions();
-        TestNotification.hide(this, TestNotification.NOTIFICATION_ID_HIDE_NOTIFICATION);
         TestNotification.show(this, TestNotification.NOTIFICATION_ID_MAIN);
     }
 

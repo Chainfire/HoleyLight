@@ -27,26 +27,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.hardware.display.DisplayManager;
 import android.os.Process;
-import android.os.SystemClock;
 import android.os.UserHandle;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
-import android.view.Display;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.animation.Overlay;
 import eu.chainfire.holeylight.misc.Battery;
+import eu.chainfire.holeylight.misc.Display;
 import eu.chainfire.holeylight.misc.MotionSensor;
 import eu.chainfire.holeylight.misc.Settings;
-import eu.chainfire.holeylight.ui.LockscreenActivity;
 
 public class NotificationListenerService extends android.service.notification.NotificationListenerService implements Settings.OnSettingsChangedListener {
     private Settings settings = null;
@@ -56,21 +52,10 @@ public class NotificationListenerService extends android.service.notification.No
     private KeyguardManager keyguardManager = null;
     private int[] currentColors = new int[0];
     private boolean enabled = true;
-    private Display display = null;
     private boolean isUserPresent = false;
     private MotionSensor.MotionState lastMotionState = MotionSensor.MotionState.UNKNOWN;
     private long stationary_for_ms = 0;
     private boolean connected = false;
-
-    @SuppressWarnings("all")
-    private boolean isDisplayOn(boolean ifDoze) {
-        int state = display.getState();
-        if (state == Display.STATE_OFF) return false;
-        if (state == Display.STATE_DOZE) return ifDoze;
-        if (state == Display.STATE_DOZE_SUSPEND) return ifDoze;
-        if (state == Display.STATE_ON_SUSPEND) return ifDoze;
-        return true;
-    }
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -79,52 +64,23 @@ public class NotificationListenerService extends android.service.notification.No
 
             log("Intent: %s", intent.getAction());
 
-            if (
-                    intent.getAction().equals(Intent.ACTION_SCREEN_OFF) ||
-                    (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED) && !isDisplayOn(false))  //TODO is proximity?
-            ) {
-                if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+            switch (intent.getAction()) {
+                case Intent.ACTION_SCREEN_OFF:
                     isUserPresent = false;
-                }
-
-                boolean charging = Battery.isCharging(NotificationListenerService.this);
-                if (
-                        (settings.isEnabledWhileScreenOffCharging() && charging) ||
-                        (settings.isEnabledWhileScreenOffBattery() && !charging)
-                 ) {
-                    // this is a really bad way to detect we didn't just press the power button while
-                    // our LockscreenActivity was in the foreground
-                    if (SystemClock.elapsedRealtime() - LockscreenActivity.lastVisible() > 2500) {
-                        log("Showing lockscreen");
-                        Intent i = new Intent(NotificationListenerService.this, LockscreenActivity.class);
-                        i.setFlags(
-                                Intent.FLAG_ACTIVITY_NEW_TASK |
-                                Intent.FLAG_ACTIVITY_NO_HISTORY |
-                                Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
-                        );
-                        i.putExtra(BuildConfig.APPLICATION_ID + ".colors", currentColors);
-                        startActivity(i);
+                    break;
+                case Intent.ACTION_SCREEN_ON:
+                    if (keyguardManager.isKeyguardLocked()) {
+                        onLockscreen();
                     }
-                }
-            } else if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {
-                isUserPresent = true;
-                onUserPresent();
+                    break;
+                case Intent.ACTION_USER_PRESENT:
+                    isUserPresent = true;
+                    onUserPresent();
+                    break;
             }
         }
     };
     private IntentFilter intentFilter = null;
-
-    private BroadcastReceiver localBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction() == null) return;
-
-            if (intent.getAction().equals(BuildConfig.APPLICATION_ID + ".onLockscreen")) {
-                onLockscreen();
-            }
-        }
-    };
-    private IntentFilter localIntentFilter = null;
 
     private void log(String fmt, Object... args) {
         Log.d("HoleyLight/Listener", String.format(Locale.ENGLISH, fmt, args));
@@ -139,19 +95,13 @@ public class NotificationListenerService extends android.service.notification.No
         motionSensor = MotionSensor.getInstance(this);
         keyguardManager = (KeyguardManager)getSystemService(KEYGUARD_SERVICE);
 
-        display = ((DisplayManager)getSystemService(DISPLAY_SERVICE)).getDisplay(0);
-
         tracker = new NotificationTracker();
 
         intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
         intentFilter.addAction(Intent.ACTION_USER_PRESENT);
-        intentFilter.addAction(Intent.ACTION_POWER_CONNECTED);
         intentFilter.setPriority(998);
-
-        localIntentFilter = new IntentFilter();
-        localIntentFilter.addAction(BuildConfig.APPLICATION_ID + ".onLockscreen");
 
         settings.registerOnSettingsChangedListener(this);
     }
@@ -177,9 +127,8 @@ public class NotificationListenerService extends android.service.notification.No
         log("onListenerConnected");
         connected = true;
         tracker.clear();
-        isUserPresent = isDisplayOn(false) && !keyguardManager.isKeyguardLocked();
+        isUserPresent = Display.isOn(this, false) && !keyguardManager.isKeyguardLocked();
         registerReceiver(broadcastReceiver, intentFilter);
-        LocalBroadcastManager.getInstance(this).registerReceiver(localBroadcastReceiver, localIntentFilter);
         handleLEDNotifications();
         startMotionSensor();
     }
@@ -189,7 +138,6 @@ public class NotificationListenerService extends android.service.notification.No
         log("onListenerDisconnected");
         connected = false;
         stopMotionSensor();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(localBroadcastReceiver);
         unregisterReceiver(broadcastReceiver);
         overlay.hide(true);
         tracker.clear();
@@ -338,10 +286,6 @@ public class NotificationListenerService extends android.service.notification.No
         } else {
             overlay.hide(!enabled);
         }
-        //TODO do we need a (short) wakelock here?
-        Intent intent = new Intent(BuildConfig.APPLICATION_ID + ".colors");
-        intent.putExtra(BuildConfig.APPLICATION_ID + ".colors", currentColors);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         startMotionSensor();
     }
 
@@ -360,7 +304,6 @@ public class NotificationListenerService extends android.service.notification.No
             handleLEDNotifications();
         }
         startMotionSensor();
-        overlay.setInLockscreen(false);
     }
 
     private boolean canMarkAsReadFromPickup() {
@@ -387,7 +330,6 @@ public class NotificationListenerService extends android.service.notification.No
             if ((stationary_for_ms >= 10000) && (motionState == MotionSensor.MotionState.MOVING)) {
                 if (canMarkAsReadFromPickup()) {
                     log("onMovement: pickup");
-                    //TODO screen must actually be visible AND not temp-off due to proximity here
                     tracker.markAllAsSeen();
                     handleLEDNotifications();
                 }

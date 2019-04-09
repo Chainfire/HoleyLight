@@ -4,13 +4,16 @@
     <string name="app_website_url">https://forum.xda-developers.com/galaxy-s10/themes/app-holey-light-t3917675</string>
 
     <string name="permission_required">Permissions needed</string>
-    <string name="permission_overlay"><![CDATA[On the next screen, please allow <b>Holey Light</b> to appear on top. This is required to show the notification animation.]]></string>
     <string name="permission_battery"><![CDATA[In the next dialog, please allow <b>Holey Light</b> to stop optimizing battery usage. This is required to keep the notification animation running.]]></string>
     <string name="permission_associate"><![CDATA[In the next dialog, please link <b>Holey Light</b> with <b>any</b> device. This is required to be able to access notifications colors. It does not seem to matter which device you choose.<br><br>Please <b>turn on Wi-Fi and Bluetooth</b> before continuing; you can turn them off again afterwards.<br><br>If no popup comes up, try making sure <b>Nearby device scanning</b> is enabled, and pairing with a Bluetooth device.]]></string>
     <string name="permission_notifications"><![CDATA[In the next screen, please allow <b>Holey Light</b> notification access. This is required to be able to detect notifications.]]></string>
+    <string name="permission_accessibility"><![CDATA[In the next screen, please go to <b>Installed services</b>, and enable <b>Holey Light</b>. This is required to show the notification animation.]]></string>
 
     <string name="notification_test_title">Holey Light: Test</string>
     <string name="notification_test_description">Test notification, white LED</string>
+
+    <string name="notification_permissions_title">Holey Light</string>
+    <string name="notification_permissions_description">Some permissions need to be updated. Tap to start.</string>
 
     <string name="error">Error</string>
     <string name="error_hide_notch"><![CDATA[<b>Holey Light</b> cannot function while the notch is hidden. Uncheck <b>Settings</b> - <b>Display</b> - <b>Full screen apps</b> - <b>Hide front camera</b>.]]></string>
@@ -19,10 +22,6 @@
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>
 
-    <string name="help_hide_overlay_notification_title">Hide Holey Light notification</string>
-    <string name="help_hide_overlay_notification_description"><![CDATA[Help you hide the <b>Holey Light is displaying over other apps</b> notification]]></string>
-    <string name="help_hide_overlay_notification_message"><![CDATA[On the next screen, make sure <b>Show notifications</b> (at the top only) is unchecked]]></string>
-    
     <string name="charging_screen_on">Charging: Screen on</string>
     <string name="charging_screen_off">Charging: Screen off</string>
     <string name="battery_screen_on">Battery: Screen on</string>
@@ -32,9 +31,11 @@
     <string name="settings_screen_on_title">Screen on</string>
     <string name="settings_screen_on_description">Show notification light while the phone is in normal use</string>
     <string name="settings_screen_off_charging_title">@string/charging_screen_off</string>
-    <string name="settings_screen_off_charging_description">Show notification light while the phone is off and charging</string>
+    <string name="settings_screen_off_charging_description">Show notification light while the screen is off and charging</string>
     <string name="settings_screen_off_battery_title">@string/battery_screen_off</string>
-    <string name="settings_screen_off_battery_description">This feature is still under development and not available right now</string>
+    <string name="settings_screen_off_battery_description">Show notification light while the screen is off and on battery power</string>
+    <string name="settings_lockscreen_on_title">Lockscreen</string>
+    <string name="settings_lockscreen_on_description">Show notification light on lockscreen; this may look strange if face unlock is enabled</string>
 
     <string name="settings_category_seen_pickup_title">Mark as seen: Pickup</string>
     <string name="settings_category_seen_pickup_description">Stationary for &gt;10s before moving</string>
@@ -56,8 +57,6 @@
     <string name="settings_category_advice_title">Advisory</string>
     <string name="settings_advice_aod_title">Always On Display</string>
     <string name="settings_advice_aod_description">AOD is advised to be disabled for consistent operation. Current setting:\n[ %s ]</string>
-    <string name="settings_advice_lock_title">Lock Automatically</string>
-    <string name="settings_advice_lock_description">It is advised to lock the device immediately (0 seconds) after screen off. Current setting:\n[ %d seconds ]</string>
     <string name="settings_advice_irrelevant">No advice applies for the current configuration</string>
 
     <string name="settings_category_animation_title">Animation</string>
@@ -66,12 +65,12 @@
     <string name="settings_animation_colors_title">Colors</string>
     <string name="settings_animation_colors_description">Adjust per-package notification colors</string>
 
-    <string name="settings_animation_blinker_title">Blinker</string>
-    <string name="settings_animation_blinker_description">Use blinking animation instead of swirl, significantly reduces battery use</string>
-    <string name="settings_animation_blinker_screen_on_charging">@string/charging_screen_on</string>
-    <string name="settings_animation_blinker_screen_off_charging">@string/charging_screen_off</string>
-    <string name="settings_animation_blinker_screen_on_battery">@string/battery_screen_on</string>
-    <string name="settings_animation_blinker_screen_off_battery">@string/battery_screen_off</string>
+    <string name="settings_animation_powersave_title">Power saving animation</string>
+    <string name="settings_animation_powersave_description">Use power saving animation instead of swirl, significantly reduces battery use</string>
+    <string name="settings_animation_powersave_screen_on_charging">@string/charging_screen_on</string>
+    <string name="settings_animation_powersave_screen_off_charging">@string/charging_screen_off</string>
+    <string name="settings_animation_powersave_screen_on_battery">@string/battery_screen_on</string>
+    <string name="settings_animation_powersave_screen_off_battery">@string/battery_screen_off</string>
 
     <string name="settings_category_chainfire_title">Chainfire</string>
     <string name="settings_playstore_title">All my apps</string>
