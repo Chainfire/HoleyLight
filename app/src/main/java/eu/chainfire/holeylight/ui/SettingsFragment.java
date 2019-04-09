@@ -24,6 +24,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
 
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.Preference;
@@ -131,6 +132,16 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         copyright.setTitle(title);
         root.addPreference(copyright);
 
+        Preference basicHelp = pref(null, R.string.help_basic_title, R.string.help_basic_descrption, null, true, preference -> {
+            (new AlertDialog.Builder(getContext()))
+                    .setTitle(R.string.help_basic_title)
+                    .setMessage(Html.fromHtml(getString(R.string.help_basic_message)))
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+           return false;
+        });
+        root.addPreference(basicHelp);
+
         PreferenceCategory catOperation = category(root, R.string.settings_category_operation_title, 0);
         prefScreenOn = check(catOperation, R.string.settings_screen_on_title, R.string.settings_screen_on_description, Settings.ENABLED_MASTER, settings.isEnabled(), true);
         prefScreenOffCharging = check(catOperation, R.string.settings_screen_off_charging_title, R.string.settings_screen_off_charging_description, Settings.ENABLED_SCREEN_OFF_CHARGING, settings.isEnabledWhileScreenOffCharging(), true);
@@ -214,9 +225,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return false;
         });
 
-        PreferenceCategory catAdvice = category(root, R.string.settings_category_advice_title, 0);
-        prefAdviceAOD = pref(catAdvice, R.string.settings_advice_aod_title, 0, null, true, null);
-
         updatePrefs(null);
         prefs.registerOnSharedPreferenceChangeListener(this);
         return root;
@@ -239,18 +247,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     @SuppressWarnings({ "unused", "ConstantConditions" })
     private void updatePrefs(String key) {
-        if (prefAdviceAOD != null) {
-            try {
-                if (settings.isEnabledWhileScreenOffCharging() || settings.isEnabledWhileScreenOffBattery()) {
-                    int aod_mode = android.provider.Settings.System.getInt(getContext().getContentResolver(), "aod_mode", 0);
-                    prefAdviceAOD.setSummary(getString(R.string.settings_advice_aod_description, aod_mode == 1 ? getString(R.string.enabled) : getString(R.string.disabled)));
-                } else {
-                    prefAdviceAOD.setSummary(R.string.settings_advice_irrelevant);
-                }
-            } catch (Exception e) {
-                // no action
-            }
-        }
         if (prefScreenOn != null) {
             prefScreenOn.setChecked(settings.isEnabled()); // for sync with master switch
             prefScreenOffCharging.setEnabled(settings.isEnabled());

@@ -7,7 +7,7 @@
     <string name="permission_battery"><![CDATA[In the next dialog, please allow <b>Holey Light</b> to stop optimizing battery usage. This is required to keep the notification animation running.]]></string>
     <string name="permission_associate"><![CDATA[In the next dialog, please link <b>Holey Light</b> with <b>any</b> device. This is required to be able to access notifications colors. It does not seem to matter which device you choose.<br><br>Please <b>turn on Wi-Fi and Bluetooth</b> before continuing; you can turn them off again afterwards.<br><br>If no popup comes up, try making sure <b>Nearby device scanning</b> is enabled, and pairing with a Bluetooth device.]]></string>
     <string name="permission_notifications"><![CDATA[In the next screen, please allow <b>Holey Light</b> notification access. This is required to be able to detect notifications.]]></string>
-    <string name="permission_accessibility"><![CDATA[In the next screen, please go to <b>Installed services</b>, and enable <b>Holey Light</b>. This is required to show the notification animation.]]></string>
+    <string name="permission_accessibility"><![CDATA[In the next screen, please go to <b>Installed services</b>, and enable <b>Holey Light</b>. This is required to show the notification animation. If this doesn't work right, try rebooting.]]></string>
 
     <string name="notification_test_title">Holey Light: Test</string>
     <string name="notification_test_description">Test notification, white LED</string>
@@ -18,6 +18,20 @@
     <string name="error">Error</string>
     <string name="error_hide_notch"><![CDATA[<b>Holey Light</b> cannot function while the notch is hidden. Uncheck <b>Settings</b> - <b>Display</b> - <b>Full screen apps</b> - <b>Hide front camera</b>.]]></string>
     <string name="error_unsupported_device"><![CDATA[<b>Holey Light</b> does not appear support your device. If you are using an <b>S10</b> variant please report this code to the XDA thread:<br><br>[ <b>%s</b> ]]]></string>
+
+    <string name="help_basic_title">Help</string>
+    <string name="help_basic_descrption">Some basic advice</string>
+    <string name="help_basic_message"><![CDATA[
+        <b>Holey Light</b> piggybacks on <b>Always On Display (AOD)</b> (see Android Settings) to show notifications when the screen is off,
+        so AOD must be enabled for those modes to work.<br>
+        <br>
+        AOD\'s <b>Show Always</b>, <b>Tap to show</b> and <b>Show as scheduled</b> modes are all supported. If you\'re not using <b>Tap to show</b>
+        mode, it is <i>strongly</i> advised to enable the <b>schedule</b> to turn off AOD while you are sleeping. This may help prevent
+        screen burn-in!<br>
+        <br>
+        While a lot of effort has been put into reducing battery use as much as possible, <b>Holey Light</b> <i>does</i> use additionally battery
+        compared to only using <b>AOD</b>.
+    ]]></string>
 
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>
@@ -33,7 +47,7 @@
     <string name="settings_screen_off_charging_title">@string/charging_screen_off</string>
     <string name="settings_screen_off_charging_description">Show notification light while the screen is off and charging</string>
     <string name="settings_screen_off_battery_title">@string/battery_screen_off</string>
-    <string name="settings_screen_off_battery_description">Show notification light while the screen is off and on battery power</string>
+    <string name="settings_screen_off_battery_description">Show notification light while the screen is off and on battery power, consuming additional power</string>
     <string name="settings_lockscreen_on_title">Lockscreen</string>
     <string name="settings_lockscreen_on_description">Show notification light on lockscreen; this may look strange if face unlock is enabled</string>
 
@@ -54,16 +68,11 @@
     <string name="settings_seen_on_user_present_title">After unlock</string>
     <string name="settings_seen_on_user_present_description">Each time the lockscreen is unlocked</string>
 
-    <string name="settings_category_advice_title">Advisory</string>
-    <string name="settings_advice_aod_title">Always On Display</string>
-    <string name="settings_advice_aod_description">AOD is advised to be disabled for consistent operation. Current setting:\n[ %s ]</string>
-    <string name="settings_advice_irrelevant">No advice applies for the current configuration</string>
-
     <string name="settings_category_animation_title">Animation</string>
     <string name="settings_animation_tune_title">Tune</string>
     <string name="settings_animation_tune_description">Fine-tune size, position, and speed</string>
     <string name="settings_animation_colors_title">Colors</string>
-    <string name="settings_animation_colors_description">Adjust per-package notification colors</string>
+    <string name="settings_animation_colors_description">Adjust per-package notification colors (use full black to hide)</string>
 
     <string name="settings_animation_powersave_title">Power saving animation</string>
     <string name="settings_animation_powersave_description">Use power saving animation instead of swirl, significantly reduces battery use</string>
