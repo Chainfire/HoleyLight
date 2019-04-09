@@ -62,6 +62,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private final int dpAddScaleHorizontal;
     private final int dpShiftVertical;
     private final int dpShiftHorizontal;
+    private volatile int dpAdd = 0;
 
     private volatile LottieComposition lottieComposition;
     private volatile boolean play = false;
@@ -241,7 +242,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
             // you'd assume as these animations come straight from Samsung's ROMs that they'd work perfectly
             // out of the box, but oh no...
-            float addVertical = getDpAddScaleBase() * realDpToPx;
+            float addVertical = (getDpAddScaleBase() + dpAdd) * realDpToPx;
             float addHorizontal = (addVertical * ((float)b.width() / (float)b.height())) + (getDpAddScaleHorizontal() * realDpToPx);
             float scaledWidth = width + addHorizontal;
             float scaledHeight = height + addVertical;
@@ -352,5 +353,16 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
     public int getLastHeight() {
         return lastHeight;
+    }
+
+    public int getDpAdd() {
+        return dpAdd;
+    }
+
+    public synchronized void setDpAdd(int dpAdd) {
+        if (this.dpAdd != dpAdd) {
+            this.dpAdd = dpAdd;
+            applyDimensions();
+        }
     }
 }

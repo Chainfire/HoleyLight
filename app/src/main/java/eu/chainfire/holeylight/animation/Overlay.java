@@ -96,6 +96,7 @@ public class Overlay {
     private boolean lastState = false;
     private int[] lastColors = new int[0];
     private SpritePlayer.Mode lastMode = SpritePlayer.Mode.SWIRL;
+    private int lastDpAdd = 0;
     private boolean added = false;
 
     private Overlay(Context context) {
@@ -288,14 +289,17 @@ public class Overlay {
             visible = visible && settings.isEnabledOnLockscreen();
         }
         if (wanted && visible && (colors.length > 0)) {
+            int dpAdd = (doze ? 1 : 0);
             SpritePlayer.Mode mode = settings.getAnimationMode(context, settings.getMode(Battery.isCharging(context), visible && !doze));
-            if (!lastState || colorsChanged() || mode != lastMode) {
+            if (!lastState || colorsChanged() || mode != lastMode || (dpAdd != lastDpAdd)) {
                 spritePlayer.setMode(mode);
                 createOverlay();
+                animation.setDpAdd(dpAdd);
                 animation.play(colors, false, (mode != lastMode));
                 lastColors = colors;
                 lastState = true;
                 lastMode = mode;
+                lastDpAdd = dpAdd;
             }
         } else {
             if (lastState) {

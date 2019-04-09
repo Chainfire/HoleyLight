@@ -24,6 +24,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.PorterDuffXfermode;
@@ -68,6 +69,7 @@ public class SpritePlayer extends AbsoluteLayout {
     private SpriteSheet spriteSheetSwirl = null;
     private SpriteSheet spriteSheetBlink = null;
     private SpriteSheet spriteSheetSingle = null;
+    private volatile Point lastSpriteSheetRequest = new Point(0, 0);
     private Rect dest = new Rect();
     private Rect destDouble = new Rect();
     private Paint paint = new Paint();
@@ -296,6 +298,15 @@ public class SpritePlayer extends AbsoluteLayout {
     }
 
     private void callOnSpriteSheetNeeded(int width, int height) {
+        synchronized (this) {
+            if (
+                (spriteSheetSwirl != null) && (spriteSheetSwirl.getWidth() == width) && (spriteSheetSwirl.getHeight() == height) &&
+                (spriteSheetBlink != null) && (spriteSheetBlink.getWidth() == width) && (spriteSheetBlink.getHeight() == height) &&
+                (spriteSheetSingle != null) && (spriteSheetSingle.getWidth() == width) && (spriteSheetSingle.getHeight() == height)
+            ) return;
+            if ((lastSpriteSheetRequest.x == width) && (lastSpriteSheetRequest.y == height)) return;
+            lastSpriteSheetRequest.set(width, height);
+        }
         cancelNextFrame();
         resetSpriteSheet(null);
         handler.post(() -> {
@@ -468,6 +479,6 @@ public class SpritePlayer extends AbsoluteLayout {
         this.width = width;
         this.height = height;
 
-        renderSingleFrame();
+        callOnSpriteSheetNeeded(width, height);
     }
 }
