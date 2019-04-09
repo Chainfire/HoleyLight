@@ -119,6 +119,7 @@ public class NotificationListenerService extends android.service.notification.No
             enabled = newEnabled;
             apply();
         }
+        if (connected) handleLEDNotifications();
     }
 
     @Override
@@ -200,8 +201,10 @@ public class NotificationListenerService extends android.service.notification.No
                     List<NotificationChannel> chans = getNotificationChannels(sbn.getPackageName(), Process.myUserHandle());
                     for (NotificationChannel chan : chans) {
                         if (chan.getId().equals(not.getChannelId())) {
+                            int c = 0xFF000000;
+
                             if (chan.shouldShowLights()) {
-                                int c = chan.getLightColor();
+                                c = chan.getLightColor();
 
                                 // Twitter passes black for some reason, make white
                                 if ((c & 0xFFFFFF) == 0) c = 0xFFFFFF;
@@ -227,28 +230,28 @@ public class NotificationListenerService extends android.service.notification.No
 
                                 // Make sure we have alpha
                                 c = c | 0xFF000000;
+                            }
 
-                                // Save to prefs, or get overriden value from prefs
-                                c = settings.getColorForPackage(sbn.getPackageName(), c);
-                                settings.setColorForPackage(sbn.getPackageName(), c, true);
+                            // Save to prefs, or get overriden value from prefs
+                            c = settings.getColorForPackage(sbn.getPackageName(), c);
+                            settings.setColorForPackage(sbn.getPackageName(), c, true);
 
-                                // user has set notification to full black, skip
-                                if ((c & 0x00FFFFFF) == 0) {
-                                    continue;
-                                }
+                            // Make sure we have alpha (again)
+                            c = c | 0xFF000000;
 
-                                // Make sure we have alpha (again)
-                                c = c | 0xFF000000;
+                            // user has set notification to full black, skip
+                            if ((c & 0xFFFFFF) == 0) {
+                                continue;
+                            }
 
-                                // Log and save
-                                Integer color = c;
-                                log("%s --> #%08X / #%08X --> #%08X", sbn.getPackageName(), chan.getLightColor(), not.color, c);
-                                if (!colors.contains(color)) {
-                                    colors.add(color);
-                                }
-                                if (!pkgs.contains(sbn.getPackageName())) {
-                                    pkgs.add(sbn.getPackageName());
-                                }
+                            // Log and save
+                            Integer color = c;
+                            log("%s --> #%08X / #%08X --> #%08X", sbn.getPackageName(), chan.getLightColor(), not.color, c);
+                            if (!colors.contains(color)) {
+                                colors.add(color);
+                            }
+                            if (!pkgs.contains(sbn.getPackageName())) {
+                                pkgs.add(sbn.getPackageName());
                             }
                         }
                     }
