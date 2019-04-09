@@ -36,13 +36,13 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsoluteLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 
 @SuppressWarnings({ "deprecation", "FieldCanBeLocal" })
-public class SpritePlayer extends AbsoluteLayout {
+public class SpritePlayer extends RelativeLayout {
     public enum Mode { SWIRL, BLINK, SINGLE }
 
     public interface OnSpriteSheetNeededListener {
@@ -81,8 +81,10 @@ public class SpritePlayer extends AbsoluteLayout {
     private int[] colors = null;
     private float speed = 1.0f;
     private Mode drawMode = Mode.SWIRL;
+    private boolean drawBackground = false;
     private Bitmap bitmap = null;
-    private int[] bitmapLastColors = null;
+    private int[] bitmapColors = null;
+    private boolean bitmapDrawBackground = false;
 
     public SpritePlayer(Context context) {
         super(context);
@@ -100,18 +102,18 @@ public class SpritePlayer extends AbsoluteLayout {
             choreographer = Choreographer.getInstance();
         });
         
-        AbsoluteLayout.LayoutParams params = new AbsoluteLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 0, 0);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
         surfaceView = new SurfaceView(context);
         surfaceView.getHolder().setFormat(PixelFormat.RGBA_8888);
         surfaceView.getHolder().addCallback(surfaceCallback);
         surfaceView.setVisibility(View.VISIBLE);
-        surfaceView.setLayoutParams(new AbsoluteLayout.LayoutParams(params));
+        surfaceView.setLayoutParams(new RelativeLayout.LayoutParams(params));
         addView(surfaceView);
 
         imageView = new ImageView(context);
         imageView.setVisibility(View.INVISIBLE);
-        imageView.setLayoutParams(new AbsoluteLayout.LayoutParams(params));
+        imageView.setLayoutParams(new RelativeLayout.LayoutParams(params));
         addView(imageView);
 
         while (choreographer == null) {
@@ -175,6 +177,8 @@ public class SpritePlayer extends AbsoluteLayout {
         return false;
     }
 
+    //TODO does this look a little bit off on-screen? maybe the addDp? Blinker looks fine though...
+    @SuppressWarnings("UnusedReturnValue")
     private Bitmap renderSingleFrame() {
         if (drawMode != Mode.SINGLE) return null;
         if ((width == -1) || (height == -1)) return null;
@@ -182,27 +186,33 @@ public class SpritePlayer extends AbsoluteLayout {
         if ((spriteSheetSingle.getWidth() != width) || (spriteSheetSingle.getHeight() != height)) {
             callOnSpriteSheetNeeded(width, height);
         }
-        boolean colorsChanged = colorsChanged(bitmapLastColors);
+        boolean changes = colorsChanged(bitmapColors) || (drawBackground != bitmapDrawBackground);
         if ((bitmap == null) || (bitmap.getWidth() != width) || (bitmap.getHeight() != height)) {
             if (bitmap != null) bitmap.recycle();
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            colorsChanged = true;
+            changes = true;
         }
         if (bitmap == null) {
             return bitmap;
         }
-        if (!colorsChanged) {
+        if (!changes) {
             return bitmap;
         }
         Canvas canvas = new Canvas(bitmap);
         renderFrame(canvas, spriteSheetSingle, 0);
+        bitmapColors = colors;
+        bitmapDrawBackground = drawBackground;
         handler.post(() -> imageView.setImageBitmap(bitmap));
         return bitmap;
     }
 
     private void renderFrame(Canvas canvas, SpriteSheet spriteSheet, int frame) {
-        if (!canvas.isHardwareAccelerated()) {
-            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        if (!canvas.isHardwareAccelerated() || drawBackground) {
+            if (drawBackground) {
+                canvas.drawColor(Color.BLACK, PorterDuff.Mode.SRC);
+            } else {
+                canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+            }
         }
         paint.setXfermode(null);
         paint.setColor(Color.WHITE);
@@ -299,6 +309,7 @@ public class SpritePlayer extends AbsoluteLayout {
 
     private void callOnSpriteSheetNeeded(int width, int height) {
         synchronized (this) {
+            if (onSpriteSheetNeededListener == null) return;
             if (
                 (spriteSheetSwirl != null) && (spriteSheetSwirl.getWidth() == width) && (spriteSheetSwirl.getHeight() == height) &&
                 (spriteSheetBlink != null) && (spriteSheetBlink.getWidth() == width) && (spriteSheetBlink.getHeight() == height) &&
@@ -316,6 +327,7 @@ public class SpritePlayer extends AbsoluteLayout {
                     setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height, Mode.BLINK), Mode.BLINK);
                     setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height, Mode.SINGLE), Mode.SINGLE);
                     renderSingleFrame();
+                    evaluate();
                 }
             }
         });
@@ -463,15 +475,19 @@ public class SpritePlayer extends AbsoluteLayout {
         return null;
     }
 
-    public synchronized void updateInternalViews(int width, int height) {
-        AbsoluteLayout.LayoutParams params;
+    public synchronized void updateInternalViews(int x, int y, int width, int height) {
+        RelativeLayout.LayoutParams params;
 
-        params = (AbsoluteLayout.LayoutParams)surfaceView.getLayoutParams();
+        params = (RelativeLayout.LayoutParams)surfaceView.getLayoutParams();
+        params.leftMargin = x;
+        params.topMargin = y;
         params.width = width;
         params.height = height;
         surfaceView.setLayoutParams(params);
 
-        params = (AbsoluteLayout.LayoutParams)imageView.getLayoutParams();
+        params = (RelativeLayout.LayoutParams)imageView.getLayoutParams();
+        params.leftMargin = x;
+        params.topMargin = y;
         params.width = width;
         params.height = height;
         imageView.setLayoutParams(params);
@@ -480,5 +496,13 @@ public class SpritePlayer extends AbsoluteLayout {
         this.height = height;
 
         callOnSpriteSheetNeeded(width, height);
+    }
+
+    public synchronized void setDrawBackground(boolean drawBackground) {
+        if (this.drawBackground != drawBackground) {
+            this.drawBackground = drawBackground;
+            surfaceInvalidated = true;
+            renderSingleFrame();
+        }
     }
 }

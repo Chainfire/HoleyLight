@@ -25,7 +25,6 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import com.airbnb.lottie.LottieComposition;
@@ -73,8 +72,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private volatile int[] colorsNext = null;
     private volatile boolean playNext = false;
 
-    private int lastWidth = 0;
-    private int lastHeight = 0;
+    private volatile boolean hideAOD = false;
 
     public NotificationAnimation(Context context, SpritePlayer spritePlayer, OnNotificationAnimationListener onNotificationAnimationListener) {
         this.onNotificationAnimationListener = onNotificationAnimationListener;
@@ -251,33 +249,39 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
             width = scaledWidth;
             height = scaledHeight;
 
+            if (rotation == 2) { // upside down
+                left = resolution.x - (int)(left + width);
+                top = resolution.y - (int)(top + height);
+            }
+            spritePlayer.setRotation(rotation * -90);
+
+            // we're only going to allow portrait and reverse-portrait
+            spritePlayer.setVisibility((rotation % 2) == 0 ? View.VISIBLE : View.INVISIBLE);
+
             // Update internal views first
-            lastWidth = (int)width;
-            lastHeight = (int)height;
-            spritePlayer.updateInternalViews(lastWidth, lastHeight);
+            if (hideAOD) {
+                spritePlayer.updateInternalViews((int)left, (int)top, (int)width, (int)height);
+            } else {
+                spritePlayer.updateInternalViews(0, 0, (int)width, (int)height);
+            }
 
             // Update parent view
-            ViewGroup.LayoutParams params = spritePlayer.getLayoutParams();
-            params.width = (int)width;
-            params.height = (int)height;
-            if (params instanceof WindowManager.LayoutParams) {
-                if (rotation == 0) {
-                    ((WindowManager.LayoutParams)params).x = (int)left;
-                    ((WindowManager.LayoutParams)params).y = (int)top;
-                } else if (rotation == 1) {
-                    // not possible to reach area to render
-                } else if (rotation == 2) {
-                    ((WindowManager.LayoutParams)params).x = resolution.x - (int)(left + width);
-                    ((WindowManager.LayoutParams)params).y = resolution.y - (int)(top + height);
-                } else if (rotation == 3) {
-                    // not possible to reach area to render
-                }
-                spritePlayer.setRotation(rotation * -90);
-
-                // we're only going to allow portrait and reverse-portrait
-                spritePlayer.setVisibility((rotation % 2) == 0 ? View.VISIBLE : View.INVISIBLE);
+            WindowManager.LayoutParams params = (WindowManager.LayoutParams)spritePlayer.getLayoutParams();
+            if (hideAOD) {
+                params.x = 0;
+                params.y = 0;
+                params.width = resolution.x;
+                params.height = resolution.y;
+                spritePlayer.setBackgroundColor(Color.BLACK);
+            } else {
+                params.x = (int)left;
+                params.y = (int)top;
+                params.width = (int)width;
+                params.height = (int)height;
+                spritePlayer.setBackgroundColor(Color.TRANSPARENT);
             }
             spritePlayer.setLayoutParams(params);
+            spritePlayer.setDrawBackground(hideAOD);
 
             // Get going
             spritePlayer.setSpeed(getSpeedFactor());
@@ -347,14 +351,6 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         return settings.getSpeedFactor();
     }
 
-    public int getLastWidth() {
-        return lastWidth;
-    }
-
-    public int getLastHeight() {
-        return lastHeight;
-    }
-
     public int getDpAdd() {
         return dpAdd;
     }
@@ -362,6 +358,18 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     public synchronized void setDpAdd(int dpAdd) {
         if (this.dpAdd != dpAdd) {
             this.dpAdd = dpAdd;
+            applyDimensions();
+        }
+    }
+
+    public boolean getHideAOD() {
+        return hideAOD;
+    }
+
+    //TODO this doesn't actually work, the clock renders on top of AOD :')
+    public synchronized void setHideAOD(boolean hideAOD) {
+        if (this.hideAOD != hideAOD) {
+            this.hideAOD = hideAOD;
             applyDimensions();
         }
     }
