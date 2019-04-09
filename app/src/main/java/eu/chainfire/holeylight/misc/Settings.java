@@ -365,10 +365,15 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
             } catch (Exception e) {
                 // no action
             }
-            if (
-                    ((aod_mode > 0) && (aod_tap > 0)) ||  // aod on tap
-                    ((fingerprint_unlock > 0 && (fingerprint_icon > 0)))  // fingerprint icon on tap
-            ) return SpritePlayer.Mode.SINGLE;
+            if (aod_mode > 0) {
+                if (aod_tap > 0) {
+                    return SpritePlayer.Mode.SINGLE;
+                }
+            } else if (fingerprint_unlock > 0) {
+                if (fingerprint_icon > 0) {
+                    return SpritePlayer.Mode.SINGLE;
+                }
+            }
         }
         return SpritePlayer.Mode.BLINK;
     }
