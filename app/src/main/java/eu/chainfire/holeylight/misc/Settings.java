@@ -19,6 +19,7 @@
 package eu.chainfire.holeylight.misc;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Rect;
@@ -346,10 +347,29 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         return (!effective || isEnabledWhileScreenOffAny()) && prefs.getBoolean(SEEN_ON_USER_PRESENT, SEEN_ON_USER_PRESENT_DEFAULT);
     }
 
-    public SpritePlayer.Mode getAnimationMode(int mode) {
+    public SpritePlayer.Mode getAnimationMode(Context context, int mode) {
         // testing, correct code below
         boolean powerSave = isAnimationPowerSave(mode);
         if (!powerSave) return SpritePlayer.Mode.SWIRL;
+        if ((mode & SHIFT_SCREEN_OFF) == SHIFT_SCREEN_OFF) {
+            int aod_mode = 0;
+            int aod_tap = 0;
+            int fingerprint_unlock = 0;
+            int fingerprint_icon = 0;
+            try {
+                ContentResolver resolver = context.getContentResolver();
+                aod_mode = android.provider.Settings.System.getInt(resolver, "aod_mode", 0);
+                aod_tap = android.provider.Settings.System.getInt(resolver, "aod_tap_to_show_mode", 0);
+                fingerprint_unlock = android.provider.Settings.Secure.getInt(resolver, "fingerprint_screen_lock", 0);
+                fingerprint_icon = android.provider.Settings.Secure.getInt(resolver, "fingerprint_adaptive_icon", 0);
+            } catch (Exception e) {
+                // no action
+            }
+            if (
+                    ((aod_mode > 0) && (aod_tap > 0)) ||  // aod on tap
+                    ((fingerprint_unlock > 0 && (fingerprint_icon > 0)))  // fingerprint icon on tap
+            ) return SpritePlayer.Mode.SINGLE;
+        }
         return SpritePlayer.Mode.BLINK;
     }
 

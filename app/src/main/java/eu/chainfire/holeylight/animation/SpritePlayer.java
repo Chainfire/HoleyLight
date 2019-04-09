@@ -36,6 +36,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsoluteLayout;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
@@ -58,6 +59,7 @@ public class SpritePlayer extends AbsoluteLayout {
     private Choreographer choreographer;
 
     private final SurfaceView surfaceView;
+    private final ImageView imageView;
 
     private OnSpriteSheetNeededListener onSpriteSheetNeededListener = null;
     private OnAnimationListener onAnimationListener = null;
@@ -77,6 +79,8 @@ public class SpritePlayer extends AbsoluteLayout {
     private int[] colors = null;
     private float speed = 1.0f;
     private Mode drawMode = Mode.SWIRL;
+    private Bitmap bitmap = null;
+    private int[] bitmapLastColors = null;
 
     public SpritePlayer(Context context) {
         super(context);
@@ -93,13 +97,20 @@ public class SpritePlayer extends AbsoluteLayout {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
             choreographer = Choreographer.getInstance();
         });
+        
+        AbsoluteLayout.LayoutParams params = new AbsoluteLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 0, 0);
 
         surfaceView = new SurfaceView(context);
         surfaceView.getHolder().setFormat(PixelFormat.RGBA_8888);
         surfaceView.getHolder().addCallback(surfaceCallback);
         surfaceView.setVisibility(View.VISIBLE);
-        surfaceView.setLayoutParams(new AbsoluteLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 0, 0));
+        surfaceView.setLayoutParams(new AbsoluteLayout.LayoutParams(params));
         addView(surfaceView);
+
+        imageView = new ImageView(context);
+        imageView.setVisibility(View.INVISIBLE);
+        imageView.setLayoutParams(new AbsoluteLayout.LayoutParams(params));
+        addView(imageView);
 
         while (choreographer == null) {
             try {
@@ -151,21 +162,77 @@ public class SpritePlayer extends AbsoluteLayout {
         }
     };
 
+    private boolean colorsChanged(int[] lastColors) {
+        if ((lastColors == null) != (colors == null)) return true;
+        if (lastColors == null) return false;
+        if (lastColors.length != colors.length) return true;
+        if (lastColors.length == 0) return false;
+        for (int i = 0; i < lastColors.length; i++) {
+            if (lastColors[i] != colors[i]) return true;
+        }
+        return false;
+    }
+
+    private Bitmap renderSingleFrame() {
+        if (drawMode != Mode.SINGLE) return null;
+        if ((width == -1) || (height == -1)) return null;
+        if (spriteSheetSingle == null) return null;
+        if ((spriteSheetSingle.getWidth() != width) || (spriteSheetSingle.getHeight() != height)) {
+            callOnSpriteSheetNeeded(width, height);
+        }
+        boolean colorsChanged = colorsChanged(bitmapLastColors);
+        if ((bitmap == null) || (bitmap.getWidth() != width) || (bitmap.getHeight() != height)) {
+            if (bitmap != null) bitmap.recycle();
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            colorsChanged = true;
+        }
+        if (bitmap == null) {
+            return bitmap;
+        }
+        if (!colorsChanged) {
+            return bitmap;
+        }
+        Canvas canvas = new Canvas(bitmap);
+        renderFrame(canvas, spriteSheetSingle, 0);
+        handler.post(() -> imageView.setImageBitmap(bitmap));
+        return bitmap;
+    }
+
+    private void renderFrame(Canvas canvas, SpriteSheet spriteSheet, int frame) {
+        if (!canvas.isHardwareAccelerated()) {
+            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        }
+        paint.setXfermode(null);
+        paint.setColor(Color.WHITE);
+        if ((colors != null) && (colors.length == 1)) {
+            // fast single-color mode
+            paint.setColorFilter(new PorterDuffColorFilter(colors[0], PorterDuff.Mode.SRC_ATOP));
+        } else {
+            paint.setColorFilter(null);
+        }
+        SpriteSheet.Sprite sprite = spriteSheet.getFrame(frame);
+        Bitmap bitmap = sprite.getBitmap();
+        if (!bitmap.isRecycled()) {
+            canvas.drawBitmap(sprite.getBitmap(), sprite.getArea(), dest, paint);
+        }
+        if ((colors != null) && (colors.length > 1)) {
+            // slower multi-colored mode
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
+
+            float startAngle = 0;
+            float anglePerColor = 360f / colors.length;
+            for (int i = 0; i < colors.length; i++) {
+                // we use double size here because the arc may cut off the larger S10+ animation otherwise
+                paint.setColor(colors[i]);
+                canvas.drawArc(destDouble.left, destDouble.top, destDouble.right, destDouble.bottom, startAngle + 270 + (anglePerColor * i), anglePerColor, true, paint);
+            }
+        }
+    }
+
     private Choreographer.FrameCallback frameCallback = new Choreographer.FrameCallback() {
         private long startTimeNanos = 0;
         private int lastFrameDrawn = -1;
         private int[] lastColors = null;
-
-        private boolean colorsChanged() {
-            if ((lastColors == null) != (colors == null)) return true;
-            if (lastColors == null) return false;
-            if (lastColors.length != colors.length) return true;
-            if (lastColors.length == 0) return false;
-            for (int i = 0; i < lastColors.length; i++) {
-                if (lastColors[i] != colors[i]) return true;
-            }
-            return false;
-        }
 
         @Override
         public void doFrame(long frameTimeNanos) {
@@ -181,7 +248,7 @@ public class SpritePlayer extends AbsoluteLayout {
                     }
 
                     int drawFrame = Math.max(Math.min(frame, spriteSheet.getFrames() - 1), 0);
-                    boolean doDraw = ((drawFrame != lastFrameDrawn) || colorsChanged() || surfaceInvalidated);
+                    boolean doDraw = ((drawFrame != lastFrameDrawn) || colorsChanged(lastColors) || surfaceInvalidated);
                     if (onAnimationListener != null) {
                         doDraw = onAnimationListener.onAnimationFrameStart(doDraw);
                     }
@@ -194,34 +261,7 @@ public class SpritePlayer extends AbsoluteLayout {
                         Canvas canvas = surfaceView.getHolder().lockCanvas();
                         if (canvas != null) {
                             try {
-                                if (!canvas.isHardwareAccelerated()) {
-                                    canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-                                }
-                                paint.setXfermode(null);
-                                paint.setColor(Color.WHITE);
-                                if ((colors != null) && (colors.length == 1)) {
-                                    // fast single-color mode
-                                    paint.setColorFilter(new PorterDuffColorFilter(colors[0], PorterDuff.Mode.SRC_ATOP));
-                                } else {
-                                    paint.setColorFilter(null);
-                                }
-                                SpriteSheet.Sprite sprite = spriteSheet.getFrame(drawFrame);
-                                Bitmap bitmap = sprite.getBitmap();
-                                if (!bitmap.isRecycled()) {
-                                    canvas.drawBitmap(sprite.getBitmap(), sprite.getArea(), dest, paint);
-                                }
-                                if ((colors != null) && (colors.length > 1)) {
-                                    // slower multi-colored mode
-                                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
-
-                                    float startAngle = 0;
-                                    float anglePerColor = 360f / colors.length;
-                                    for (int i = 0; i < colors.length; i++) {
-                                        // we use double size here because the arc may cut off the larger S10+ animation otherwise
-                                        paint.setColor(colors[i]);
-                                        canvas.drawArc(destDouble.left, destDouble.top, destDouble.right, destDouble.bottom, startAngle + 270 + (anglePerColor * i), anglePerColor, true, paint);
-                                    }
-                                }
+                                renderFrame(canvas, getSpriteSheet(), drawFrame);
                             } finally {
                                 try {
                                     surfaceView.getHolder().unlockCanvasAndPost(canvas);
@@ -264,6 +304,7 @@ public class SpritePlayer extends AbsoluteLayout {
                     setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height, Mode.SWIRL), Mode.SWIRL);
                     setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height, Mode.BLINK), Mode.BLINK);
                     setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height, Mode.SINGLE), Mode.SINGLE);
+                    renderSingleFrame();
                 }
             }
         });
@@ -345,6 +386,7 @@ public class SpritePlayer extends AbsoluteLayout {
 
     public void setColors(int[] colors) {
         this.colors = colors;
+        renderSingleFrame();
     }
 
     private void startUpdating() {
@@ -394,6 +436,9 @@ public class SpritePlayer extends AbsoluteLayout {
             frame = -1;
             drawMode = mode;
             surfaceInvalidated = true;
+            surfaceView.setVisibility(mode != Mode.SINGLE ? View.VISIBLE : View.INVISIBLE);
+            imageView.setVisibility(mode == Mode.SINGLE ? View.VISIBLE : View.INVISIBLE);
+            renderSingleFrame();
             evaluate();
         }
     }
@@ -408,9 +453,21 @@ public class SpritePlayer extends AbsoluteLayout {
     }
 
     public synchronized void updateInternalViews(int width, int height) {
-        AbsoluteLayout.LayoutParams params = (AbsoluteLayout.LayoutParams)surfaceView.getLayoutParams();
+        AbsoluteLayout.LayoutParams params;
+
+        params = (AbsoluteLayout.LayoutParams)surfaceView.getLayoutParams();
         params.width = width;
         params.height = height;
         surfaceView.setLayoutParams(params);
+
+        params = (AbsoluteLayout.LayoutParams)imageView.getLayoutParams();
+        params.width = width;
+        params.height = height;
+        imageView.setLayoutParams(params);
+
+        this.width = width;
+        this.height = height;
+
+        renderSingleFrame();
     }
 }

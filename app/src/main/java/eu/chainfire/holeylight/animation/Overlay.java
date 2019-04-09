@@ -288,7 +288,7 @@ public class Overlay {
             visible = visible && settings.isEnabledOnLockscreen();
         }
         if (wanted && visible && (colors.length > 0)) {
-            SpritePlayer.Mode mode = settings.getAnimationMode(settings.getMode(Battery.isCharging(context), visible && !doze));
+            SpritePlayer.Mode mode = settings.getAnimationMode(context, settings.getMode(Battery.isCharging(context), visible && !doze));
             if (!lastState || colorsChanged() || mode != lastMode) {
                 spritePlayer.setMode(mode);
                 createOverlay();
@@ -316,7 +316,7 @@ public class Overlay {
             wanted = false;
         } else {
             wanted = true;
-            handler.postDelayed(evaluateLoop, 1000);
+            handler.postDelayed(evaluateLoop, 500);
         }
         evaluate();
     }
