@@ -129,5 +129,9 @@ The workings of the app are quite intricate, so describe what is happening in mi
 
 You can find the TODO list in the [issue tracker](https://github.com/Chainfire/HoleyLight/issues?utf8=%E2%9C%93&q=is%3Aissue).
 
+### Translations
+
+[app/src/main/res/values/strings.xml](./app/src/main/res/values/strings.xml) is the master English file that needs to be translated.  
+
 ### Enjoy!
 Or not.
