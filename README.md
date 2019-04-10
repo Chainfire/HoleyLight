@@ -131,7 +131,10 @@ You can find the TODO list in the [issue tracker](https://github.com/Chainfire/H
 
 ### Translations
 
-[app/src/main/res/values/strings.xml](./app/src/main/res/values/strings.xml) is the master English file that needs to be translated.  
+[app/src/main/res/values/strings.xml](./app/src/main/res/values/strings.xml) is the master English file that needs to be translated.
+
+You can use the *History* button there to see when/what has changed over 
+time if you want to keep your translation updated.
 
 ### Enjoy!
 Or not.
