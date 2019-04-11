@@ -120,7 +120,12 @@ public class Overlay {
                 @Override
                 public void onDimensionsApplied(SpritePlayer view) {
                     if (added) {
-                        windowManager.updateViewLayout(view, view.getLayoutParams());
+                        try {
+                            windowManager.updateViewLayout(view, view.getLayoutParams());
+                        } catch (IllegalArgumentException e) {
+                            //TODO figure out why this happens
+                            e.printStackTrace();
+                        }
                     }
                 }
 
