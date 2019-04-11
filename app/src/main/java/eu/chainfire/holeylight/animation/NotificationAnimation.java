@@ -297,7 +297,6 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
     public synchronized void play(int[] colors, boolean once, boolean immediately) {
         if ((colors == null) || (colors.length == 0)) {
-            play = false;
             stop(true);
             return;
         }
@@ -315,6 +314,8 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     }
 
     public synchronized void stop(boolean immediately) {
+        playNext = false;
+        colorsNext = null;
         play = false;
         if (isPlaying()) {
             if (immediately) {
