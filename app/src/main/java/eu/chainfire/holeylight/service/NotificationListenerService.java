@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.os.Handler;
 import android.os.Process;
 import android.os.UserHandle;
 import android.service.notification.StatusBarNotification;
@@ -56,6 +57,7 @@ public class NotificationListenerService extends android.service.notification.No
     private MotionSensor.MotionState lastMotionState = MotionSensor.MotionState.UNKNOWN;
     private long stationary_for_ms = 0;
     private boolean connected = false;
+    private Handler handler;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -94,6 +96,8 @@ public class NotificationListenerService extends android.service.notification.No
         overlay = Overlay.getInstance(this);
         motionSensor = MotionSensor.getInstance(this);
         keyguardManager = (KeyguardManager)getSystemService(KEYGUARD_SERVICE);
+
+        handler = new Handler();
 
         tracker = new NotificationTracker();
 
@@ -187,8 +191,19 @@ public class NotificationListenerService extends android.service.notification.No
         handleLEDNotifications();
     }
 
+    private Runnable runHandleLEDNotifications = this::handleLEDNotificationsInternal;
+
     private void handleLEDNotifications() {
+        // Prevent update storm caused by updates in rapid succession, and us updating settings ourselves
+        handler.removeCallbacks(runHandleLEDNotifications);
         if (!connected) return;
+        handler.postDelayed(runHandleLEDNotifications, 100);
+    }
+
+    private synchronized void handleLEDNotificationsInternal() {
+        if (!connected) return;
+
+        log("handleLEDNotifications");
 
         List<Integer> colors = new ArrayList<>();
         List<String> pkgs = new ArrayList<>();
@@ -203,12 +218,12 @@ public class NotificationListenerService extends android.service.notification.No
                 String src = "legacy";
 
                 if (not.getChannelId() != null) {
+                    src = not.getChannelId();
+
                     List<NotificationChannel> chans = getNotificationChannels(sbn.getPackageName(), Process.myUserHandle());
                     for (NotificationChannel chan : chans) {
                         if (chan.getId().equals(not.getChannelId())) {
                             if (chan.shouldShowLights()) {
-                                src = "channel";
-
                                 c = chan.getLightColor();
                                 cChan = c;
 
