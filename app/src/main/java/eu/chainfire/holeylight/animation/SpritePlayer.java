@@ -41,7 +41,7 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 
-@SuppressWarnings({ "deprecation", "FieldCanBeLocal" })
+@SuppressWarnings({ "deprecation", "FieldCanBeLocal", "unused", "UnusedReturnValue" })
 public class SpritePlayer extends RelativeLayout {
     public enum Mode { SWIRL, BLINK, SINGLE }
 
@@ -153,10 +153,7 @@ public class SpritePlayer extends RelativeLayout {
             synchronized (SpritePlayer.this) {
                 SpritePlayer.this.width = width;
                 SpritePlayer.this.height = height;
-                dest.set(0, 0, width, height);
-                destDouble.set(dest.centerX() - width, dest.centerY() - height, dest.centerX() + width, dest.centerY() + height);
                 callOnSpriteSheetNeeded(width, height);
-                surfaceInvalidated = true;
             }
         }
 
@@ -178,7 +175,6 @@ public class SpritePlayer extends RelativeLayout {
     }
 
     //TODO does this look a little bit off on-screen? maybe the addDp? Blinker looks fine though...
-    @SuppressWarnings("UnusedReturnValue")
     private Bitmap renderSingleFrame() {
         if (drawMode != Mode.SINGLE) return null;
         if ((width == -1) || (height == -1)) return null;
@@ -186,7 +182,7 @@ public class SpritePlayer extends RelativeLayout {
         if ((spriteSheetSingle.getWidth() != width) || (spriteSheetSingle.getHeight() != height)) {
             callOnSpriteSheetNeeded(width, height);
         }
-        boolean changes = colorsChanged(bitmapColors) || (drawBackground != bitmapDrawBackground);
+        boolean changes = colorsChanged(bitmapColors) || (drawBackground != bitmapDrawBackground) || surfaceInvalidated;
         if ((bitmap == null) || (bitmap.getWidth() != width) || (bitmap.getHeight() != height)) {
             if (bitmap != null) bitmap.recycle();
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -323,9 +319,12 @@ public class SpritePlayer extends RelativeLayout {
         handler.post(() -> {
             synchronized (SpritePlayer.this) {
                 if (onSpriteSheetNeededListener != null) {
+                    dest.set(0, 0, width, height);
+                    destDouble.set(dest.centerX() - width, dest.centerY() - height, dest.centerX() + width, dest.centerY() + height);
                     setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height, Mode.SWIRL), Mode.SWIRL);
                     setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height, Mode.BLINK), Mode.BLINK);
                     setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height, Mode.SINGLE), Mode.SINGLE);
+                    surfaceInvalidated = true;
                     renderSingleFrame();
                     evaluate();
                 }

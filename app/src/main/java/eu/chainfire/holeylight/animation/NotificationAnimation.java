@@ -253,7 +253,6 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                 left = resolution.x - (int)(left + width);
                 top = resolution.y - (int)(top + height);
             }
-            spritePlayer.setRotation(rotation * -90);
 
             // we're only going to allow portrait and reverse-portrait
             spritePlayer.setVisibility((rotation % 2) == 0 ? View.VISIBLE : View.INVISIBLE);
