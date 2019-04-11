@@ -80,7 +80,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     private static final boolean SEEN_ON_USER_PRESENT_DEFAULT = false;
 
     public static final String ANIMATION_POWERSAVE = "animation_blinker";
-    private static final int ANIMATION_POWERSAVE_DEFAULT = (1 << BATTERY_SCREEN_OFF);
+    private static final int ANIMATION_POWERSAVE_DEFAULT = (1 << BATTERY_SCREEN_OFF) | (1 << CHARGING_SCREEN_OFF);
     
     private static final String CUTOUT_AREA_LEFT = "cutout_area_left";
     private static final String CUTOUT_AREA_TOP = "cutout_area_top";
