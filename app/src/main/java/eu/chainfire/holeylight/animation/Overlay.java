@@ -20,15 +20,21 @@ package eu.chainfire.holeylight.animation;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.KeyguardManager;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.SystemClock;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.WindowManager;
 
@@ -37,6 +43,7 @@ import eu.chainfire.holeylight.misc.Battery;
 import eu.chainfire.holeylight.misc.Display;
 import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.service.AccessibilityService;
+import eu.chainfire.holeylight.ui.DetectCutoutActivity;
 
 import static android.content.Context.KEYGUARD_SERVICE;
 
@@ -65,7 +72,36 @@ public class Overlay {
 
             switch (intent.getAction()) {
                 case Intent.ACTION_CONFIGURATION_CHANGED:
-                    if (added) {
+                    Point resolutionNow = getResolution();
+                    if (
+                            ((resolutionNow.x != resolution.x) || (resolutionNow.y != resolution.y)) &&
+                            ((resolutionNow.x != resolution.y) || (resolutionNow.y != resolution.x))
+                    ) {
+                        // Resolution changed
+                        // This is an extremely ugly hack, don't try this at home
+                        // There are some internal states that are hard to figure out, including
+                        // oddities with Lottie's renderer. We just hard exit and let Android
+                        // restart us.
+                        resolution = resolutionNow;
+                        Intent start = new Intent(context, DetectCutoutActivity.class);
+                        start.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(start);
+                        handler.postDelayed(() -> {
+                            Context context1 = spritePlayer.getContext();
+                            AlarmManager alarmManager = (AlarmManager) context1.getSystemService(Service.ALARM_SERVICE);
+                            alarmManager.setExactAndAllowWhileIdle(
+                                    AlarmManager.ELAPSED_REALTIME,
+                                    SystemClock.elapsedRealtime() + 1000,
+                                    PendingIntent.getActivity(
+                                            context1,
+                                            0,
+                                            new Intent(context1, DetectCutoutActivity.class),
+                                            0
+                                    )
+                            );
+                            System.exit(0);
+                        }, 1000);
+                    } else {
                         updateParams();
                     }
                     break;
@@ -98,21 +134,31 @@ public class Overlay {
     private SpritePlayer.Mode lastMode = SpritePlayer.Mode.SWIRL;
     private int lastDpAdd = 0;
     private boolean added = false;
+    private Point resolution;
+    private IBinder windowToken;
 
     private Overlay(Context context) {
         windowManager = (WindowManager)context.getSystemService(Activity.WINDOW_SERVICE);
         keyguardManager = (KeyguardManager)context.getSystemService(KEYGUARD_SERVICE);
         handler = new Handler();
         settings = Settings.getInstance(context);
+        resolution = getResolution();
+    }
+
+    private Point getResolution() {
+        DisplayMetrics metrics = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getRealMetrics(metrics);
+        return new Point(metrics.heightPixels, metrics.widthPixels);
     }
 
     private void initActualOverlay(Context context, IBinder windowToken) {
         synchronized (this) {
+            this.windowToken = windowToken;
             if (spritePlayer != null) return;
 
             spritePlayer = new SpritePlayer(context);
 
-            initParams(windowToken);
+            initParams();
             animation = new NotificationAnimation(context, spritePlayer, new NotificationAnimation.OnNotificationAnimationListener() {
                 private PowerManager.WakeLock wakeLock = null;
                 private int skips = 0;
@@ -209,7 +255,7 @@ public class Overlay {
     }
 
     @SuppressLint("RtlHardcoded")
-    private void initParams(IBinder windowToken) {
+    private void initParams() {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 0,
                 0,
