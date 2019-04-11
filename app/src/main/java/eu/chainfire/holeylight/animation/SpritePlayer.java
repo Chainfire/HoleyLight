@@ -55,6 +55,8 @@ public class SpritePlayer extends RelativeLayout {
         boolean onAnimationComplete();
     }
 
+    private final Object sync = new Object();
+
     private final HandlerThread handlerThread;
     private final Handler handler;
     private Choreographer choreographer;
@@ -150,7 +152,7 @@ public class SpritePlayer extends RelativeLayout {
 
         @Override
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-            synchronized (SpritePlayer.this) {
+            synchronized (sync) {
                 SpritePlayer.this.width = width;
                 SpritePlayer.this.height = height;
                 callOnSpriteSheetNeeded(width, height);
@@ -244,7 +246,7 @@ public class SpritePlayer extends RelativeLayout {
 
         @Override
         public void doFrame(long frameTimeNanos) {
-            synchronized (SpritePlayer.this) {
+            synchronized (sync) {
                 SpriteSheet spriteSheet = getSpriteSheet();
                 if (draw && (spriteSheet != null)) {
                     if (frame == -1) {
@@ -304,7 +306,7 @@ public class SpritePlayer extends RelativeLayout {
     }
 
     private void callOnSpriteSheetNeeded(int width, int height) {
-        synchronized (this) {
+        synchronized (sync) {
             if (onSpriteSheetNeededListener == null) return;
             if (
                 (spriteSheetSwirl != null) && (spriteSheetSwirl.getWidth() == width) && (spriteSheetSwirl.getHeight() == height) &&
@@ -313,35 +315,37 @@ public class SpritePlayer extends RelativeLayout {
             ) return;
             if ((lastSpriteSheetRequest.x == width) && (lastSpriteSheetRequest.y == height)) return;
             lastSpriteSheetRequest.set(width, height);
-        }
-        cancelNextFrame();
-        resetSpriteSheet(null);
-        handler.post(() -> {
-            synchronized (SpritePlayer.this) {
-                if (onSpriteSheetNeededListener != null) {
-                    dest.set(0, 0, width, height);
-                    destDouble.set(dest.centerX() - width, dest.centerY() - height, dest.centerX() + width, dest.centerY() + height);
-                    setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height, Mode.SWIRL), Mode.SWIRL);
-                    setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height, Mode.BLINK), Mode.BLINK);
-                    setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height, Mode.SINGLE), Mode.SINGLE);
-                    surfaceInvalidated = true;
-                    renderSingleFrame();
-                    evaluate();
+            cancelNextFrame();
+            resetSpriteSheet(null);
+            handler.post(() -> {
+                synchronized (sync) {
+                    if (onSpriteSheetNeededListener != null) {
+                        dest.set(0, 0, width, height);
+                        destDouble.set(dest.centerX() - width, dest.centerY() - height, dest.centerX() + width, dest.centerY() + height);
+                        setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height, Mode.SWIRL), Mode.SWIRL);
+                        setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height, Mode.BLINK), Mode.BLINK);
+                        setSpriteSheet(onSpriteSheetNeededListener.onSpriteSheetNeeded(width, height, Mode.SINGLE), Mode.SINGLE);
+                        surfaceInvalidated = true;
+                        renderSingleFrame();
+                        evaluate();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
-    public synchronized void setOnSpriteSheetNeededListener(OnSpriteSheetNeededListener onSpriteSheetNeededListener) {
-        if (this.onSpriteSheetNeededListener == onSpriteSheetNeededListener) return;
+    public void setOnSpriteSheetNeededListener(OnSpriteSheetNeededListener onSpriteSheetNeededListener) {
+        synchronized (sync) {
+            if (this.onSpriteSheetNeededListener == onSpriteSheetNeededListener) return;
 
-        this.onSpriteSheetNeededListener = onSpriteSheetNeededListener;
-        if (
-                (width != -1) && (height != -1) && 
-                !((spriteSheetSwirl != null) && (spriteSheetSwirl.getWidth() == width) && spriteSheetSwirl.getHeight() == height) &&
-                !((spriteSheetBlink != null) && (spriteSheetBlink.getWidth() == width) && spriteSheetBlink.getHeight() == height)
-        ) {
-            callOnSpriteSheetNeeded(width, height);
+            this.onSpriteSheetNeededListener = onSpriteSheetNeededListener;
+            if (
+                    (width != -1) && (height != -1) &&
+                    !((spriteSheetSwirl != null) && (spriteSheetSwirl.getWidth() == width) && spriteSheetSwirl.getHeight() == height) &&
+                    !((spriteSheetBlink != null) && (spriteSheetBlink.getWidth() == width) && spriteSheetBlink.getHeight() == height)
+            ) {
+                callOnSpriteSheetNeeded(width, height);
+            }
         }
     }
 
@@ -349,159 +353,189 @@ public class SpritePlayer extends RelativeLayout {
         this.onAnimationListener = onAnimationListener;
     }
 
-    private synchronized void resetSpriteSheet(Mode mode) {
-        if ((mode == null) || (drawMode == mode)) {
-            frame = -1;
-        }
-        if ((mode == null) || (mode == Mode.SWIRL)) {
-            SpriteSheet old = spriteSheetSwirl;
-            spriteSheetSwirl = null;
-            if (old != null) old.recycle();
-        }
-        if ((mode == null) || (mode == Mode.BLINK)) {
-            SpriteSheet old = spriteSheetBlink;
-            spriteSheetBlink = null;
-            if (old != null) old.recycle();
-        }
-        if ((mode == null) || (mode == Mode.SINGLE)) {
-            SpriteSheet old = spriteSheetSingle;
-            spriteSheetSingle = null;
-            if (old != null) old.recycle();
-        }
-        if ((mode == null) || (drawMode == mode)) {
-            surfaceInvalidated = true;
-            try {
-                Canvas canvas = surfaceView.getHolder().lockCanvas();
+    private void resetSpriteSheet(Mode mode) {
+        synchronized (sync) {
+            if ((mode == null) || (drawMode == mode)) {
+                frame = -1;
+            }
+            if ((mode == null) || (mode == Mode.SWIRL)) {
+                SpriteSheet old = spriteSheetSwirl;
+                spriteSheetSwirl = null;
+                if (old != null) old.recycle();
+            }
+            if ((mode == null) || (mode == Mode.BLINK)) {
+                SpriteSheet old = spriteSheetBlink;
+                spriteSheetBlink = null;
+                if (old != null) old.recycle();
+            }
+            if ((mode == null) || (mode == Mode.SINGLE)) {
+                SpriteSheet old = spriteSheetSingle;
+                spriteSheetSingle = null;
+                if (old != null) old.recycle();
+            }
+            if ((mode == null) || (drawMode == mode)) {
+                surfaceInvalidated = true;
                 try {
-                    if (!canvas.isHardwareAccelerated()) {
-                        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                    Canvas canvas = surfaceView.getHolder().lockCanvas();
+                    try {
+                        if (!canvas.isHardwareAccelerated()) {
+                            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                        }
+                    } finally {
+                        surfaceView.getHolder().unlockCanvasAndPost(canvas);
                     }
-                } finally {
-                    surfaceView.getHolder().unlockCanvasAndPost(canvas);
+                } catch (Throwable t) {
+                    // ...
                 }
-            } catch (Throwable t) {
-                // ...
             }
         }
     }
 
-    public synchronized void setSpriteSheet(SpriteSheet spriteSheet, Mode mode) {
-        if (
-                ((mode == Mode.SWIRL) && (spriteSheet == this.spriteSheetSwirl)) ||
-                ((mode == Mode.BLINK) && (spriteSheet == this.spriteSheetBlink)) ||
-                ((mode == Mode.SINGLE) && (spriteSheet == this.spriteSheetSingle))
-        ) return;
-        resetSpriteSheet(mode);
-        switch (mode) {
-            case SWIRL:
-                this.spriteSheetSwirl = spriteSheet;
-                break;
-            case BLINK:
-                this.spriteSheetBlink = spriteSheet;
-                break;
-            case SINGLE:
-                this.spriteSheetSingle = spriteSheet;
-                break;
+    public void setSpriteSheet(SpriteSheet spriteSheet, Mode mode) {
+        synchronized (sync) {
+            if (
+                    ((mode == Mode.SWIRL) && (spriteSheet == this.spriteSheetSwirl)) ||
+                    ((mode == Mode.BLINK) && (spriteSheet == this.spriteSheetBlink)) ||
+                    ((mode == Mode.SINGLE) && (spriteSheet == this.spriteSheetSingle))
+            ) return;
+            resetSpriteSheet(mode);
+            switch (mode) {
+                case SWIRL:
+                    this.spriteSheetSwirl = spriteSheet;
+                    break;
+                case BLINK:
+                    this.spriteSheetBlink = spriteSheet;
+                    break;
+                case SINGLE:
+                    this.spriteSheetSingle = spriteSheet;
+                    break;
+            }
+            evaluate();
         }
-        evaluate();
     }
 
     public void setColors(int[] colors) {
-        this.colors = colors;
-        renderSingleFrame();
-    }
-
-    private void startUpdating() {
-        draw = true;
-        callNextFrame();
-    }
-
-    private void stopUpdating() {
-        draw = false;
-        cancelNextFrame();
-    }
-
-    private synchronized void evaluate() {
-        if (wanted && (getSpriteSheet() != null) && (getWindowVisibility() == View.VISIBLE) && (getVisibility() == View.VISIBLE)) {
-            startUpdating();
-        } else {
-            stopUpdating();
+        synchronized (sync) {
+            this.colors = colors;
+            renderSingleFrame();
         }
     }
 
-    public synchronized void playAnimation() {
-        wanted = true;
-        frame = -1;
-        evaluate();
+    private void startUpdating() {
+        synchronized (sync) {
+            draw = true;
+            callNextFrame();
+        }
     }
 
-    public synchronized void cancelAnimation() {
-        wanted = false;
-        evaluate();
+    private void stopUpdating() {
+        synchronized (sync) {
+            draw = false;
+            cancelNextFrame();
+        }
+    }
+
+    private void evaluate() {
+        synchronized (sync) {
+            if (wanted && (getSpriteSheet() != null) && (getWindowVisibility() == View.VISIBLE) && (getVisibility() == View.VISIBLE)) {
+                startUpdating();
+            } else {
+                stopUpdating();
+            }
+        }
+    }
+
+    public void playAnimation() {
+        synchronized (sync) {
+            wanted = true;
+            frame = -1;
+            evaluate();
+        }
+    }
+
+    public void cancelAnimation() {
+        synchronized (sync) {
+            wanted = false;
+            evaluate();
+        }
     }
 
     public boolean isAnimating() {
         return draw;
     }
 
-    public synchronized void setSpeed(float speed) {
-        frame = -1;
-        this.speed = speed;
+    public void setSpeed(float speed) {
+        synchronized (sync) {
+            frame = -1;
+            this.speed = speed;
+        }
     }
 
     public Mode getMode() {
         return drawMode;
     }
 
-    public synchronized void setMode(Mode mode) {
-        if (mode != drawMode) {
-            frame = -1;
-            drawMode = mode;
-            surfaceInvalidated = true;
-            surfaceView.setVisibility(mode != Mode.SINGLE ? View.VISIBLE : View.INVISIBLE);
-            imageView.setVisibility(mode == Mode.SINGLE ? View.VISIBLE : View.INVISIBLE);
-            renderSingleFrame();
-            evaluate();
+    public void setMode(Mode mode) {
+        synchronized (sync) {
+            if (mode != drawMode) {
+                frame = -1;
+                drawMode = mode;
+                surfaceInvalidated = true;
+                surfaceView.setVisibility(mode != Mode.SINGLE ? View.VISIBLE : View.INVISIBLE);
+                imageView.setVisibility(mode == Mode.SINGLE ? View.VISIBLE : View.INVISIBLE);
+                renderSingleFrame();
+                evaluate();
+            }
         }
     }
 
-    private synchronized SpriteSheet getSpriteSheet() {
-        switch (drawMode) {
-            case SWIRL: return spriteSheetSwirl;
-            case BLINK: return spriteSheetBlink;
-            case SINGLE: return spriteSheetSingle;
+    private SpriteSheet getSpriteSheet() {
+        synchronized (sync) {
+            switch (drawMode) {
+                case SWIRL: return spriteSheetSwirl;
+                case BLINK: return spriteSheetBlink;
+                case SINGLE: return spriteSheetSingle;
+            }
+            return null;
         }
-        return null;
     }
 
-    public synchronized void updateInternalViews(int x, int y, int width, int height) {
-        RelativeLayout.LayoutParams params;
+    public void updateInternalViews(int x, int y, int width, int height) {
+        synchronized (sync) {
+            RelativeLayout.LayoutParams params;
 
-        params = (RelativeLayout.LayoutParams)surfaceView.getLayoutParams();
-        params.leftMargin = x;
-        params.topMargin = y;
-        params.width = width;
-        params.height = height;
-        surfaceView.setLayoutParams(params);
+            params = (RelativeLayout.LayoutParams)surfaceView.getLayoutParams();
+            params.leftMargin = x;
+            params.topMargin = y;
+            params.width = width;
+            params.height = height;
+            surfaceView.setLayoutParams(params);
 
-        params = (RelativeLayout.LayoutParams)imageView.getLayoutParams();
-        params.leftMargin = x;
-        params.topMargin = y;
-        params.width = width;
-        params.height = height;
-        imageView.setLayoutParams(params);
+            params = (RelativeLayout.LayoutParams)imageView.getLayoutParams();
+            params.leftMargin = x;
+            params.topMargin = y;
+            params.width = width;
+            params.height = height;
+            imageView.setLayoutParams(params);
 
-        this.width = width;
-        this.height = height;
+            this.width = width;
+            this.height = height;
 
-        callOnSpriteSheetNeeded(width, height);
+            callOnSpriteSheetNeeded(width, height);
+        }
     }
 
-    public synchronized void setDrawBackground(boolean drawBackground) {
-        if (this.drawBackground != drawBackground) {
-            this.drawBackground = drawBackground;
-            surfaceInvalidated = true;
-            renderSingleFrame();
+    public void setDrawBackground(boolean drawBackground) {
+        synchronized (sync) {
+            if (this.drawBackground != drawBackground) {
+                this.drawBackground = drawBackground;
+                surfaceInvalidated = true;
+                renderSingleFrame();
+            }
         }
+    }
+
+    public Object getSynchronizer() {
+        return sync;
     }
 }
