@@ -59,6 +59,7 @@ public class SpritePlayer extends RelativeLayout {
 
     private final HandlerThread handlerThread;
     private final Handler handler;
+    private final Handler handlerMain;
     private Choreographer choreographer;
 
     private final SurfaceView surfaceView;
@@ -94,6 +95,7 @@ public class SpritePlayer extends RelativeLayout {
         handlerThread = new HandlerThread("SpritePlayer");
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
+        handlerMain = new Handler();
 
         paint.setAntiAlias(false);
         paint.setDither(false);
@@ -200,7 +202,7 @@ public class SpritePlayer extends RelativeLayout {
         renderFrame(canvas, spriteSheetSingle, 0);
         bitmapColors = colors;
         bitmapDrawBackground = drawBackground;
-        handler.post(() -> imageView.setImageBitmap(bitmap));
+        handlerMain.post(() -> imageView.setImageBitmap(bitmap));
         return bitmap;
     }
 
