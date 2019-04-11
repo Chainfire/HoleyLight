@@ -52,6 +52,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final String ENABLED_MASTER = "enabled_master";
     private static final boolean ENABLED_MASTER_DEFAULT = true;
 
+    public static final String ENABLED_SCREEN_ON = "enabled_screen_on";
+    private static final boolean ENABLED_SCREEN_ON_DEFAULT = true;
+
     public static final String ENABLED_SCREEN_OFF_CHARGING = "enabled_screen_off_charging";
     private static final boolean ENABLED_SCREEN_OFF_CHARGING_DEFAULT = true;
 
@@ -280,6 +283,10 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
+    public boolean isEnabledWhileScreenOn() {
+        return isEnabled() && prefs.getBoolean(ENABLED_SCREEN_ON, ENABLED_SCREEN_ON_DEFAULT);
+    }
+
     public boolean isEnabledWhileScreenOffAny() {
         return isEnabledWhileScreenOffCharging() || isEnabledWhileScreenOffBattery();
     }
@@ -293,7 +300,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public boolean isEnabledOnLockscreen() {
-        return isEnabled() && prefs.getBoolean(ENABLED_LOCKSCREEN, ENABLED_LOCKSCREEN_DEFAULT);
+        return isEnabledWhileScreenOn() && prefs.getBoolean(ENABLED_LOCKSCREEN, ENABLED_LOCKSCREEN_DEFAULT);
     }
 
     public int getColorForPackageAndChannel(String packageName, String channelName, int defaultValue) {

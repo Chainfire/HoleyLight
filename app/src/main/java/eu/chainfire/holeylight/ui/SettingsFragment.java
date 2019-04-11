@@ -142,7 +142,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         root.addPreference(basicHelp);
 
         PreferenceCategory catOperation = category(root, R.string.settings_category_operation_title, 0);
-        prefScreenOn = check(catOperation, R.string.settings_screen_on_title, R.string.settings_screen_on_description, Settings.ENABLED_MASTER, settings.isEnabled(), true);
+        prefScreenOn = check(catOperation, R.string.settings_screen_on_title, R.string.settings_screen_on_description, Settings.ENABLED_SCREEN_ON, settings.isEnabledWhileScreenOn(), true);
         prefScreenOffCharging = check(catOperation, R.string.settings_screen_off_charging_title, R.string.settings_screen_off_charging_description, Settings.ENABLED_SCREEN_OFF_CHARGING, settings.isEnabledWhileScreenOffCharging(), true);
         prefScreenOffBattery = check(catOperation, R.string.settings_screen_off_battery_title, R.string.settings_screen_off_battery_description, Settings.ENABLED_SCREEN_OFF_BATTERY, settings.isEnabledWhileScreenOffBattery(), false);
         prefLockscreenOn = check(catOperation, R.string.settings_lockscreen_on_title, R.string.settings_lockscreen_on_description, Settings.ENABLED_LOCKSCREEN, settings.isEnabledOnLockscreen(), true);
@@ -247,13 +247,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @SuppressWarnings({ "unused", "ConstantConditions" })
     private void updatePrefs(String key) {
         if (prefScreenOn != null) {
-            prefScreenOn.setChecked(settings.isEnabled()); // for sync with master switch
+            prefScreenOn.setEnabled(settings.isEnabled());
             prefScreenOffCharging.setEnabled(settings.isEnabled());
-            prefScreenOffBattery.setEnabled(settings.isEnabledWhileScreenOffCharging());
-            prefLockscreenOn.setEnabled(settings.isEnabled());
-            prefSeenPickupScreenOnCharging.setEnabled(settings.isEnabled());
+            prefScreenOffBattery.setEnabled(settings.isEnabled());
+            prefLockscreenOn.setEnabled(settings.isEnabledWhileScreenOn());
+            prefSeenPickupScreenOnCharging.setEnabled(settings.isEnabledWhileScreenOn());
             prefSeenPickupScreenOffCharging.setEnabled(settings.isEnabledWhileScreenOffCharging());
-            prefSeenPickupScreenOnBattery.setEnabled(settings.isEnabled());
+            prefSeenPickupScreenOnBattery.setEnabled(settings.isEnabledWhileScreenOn());
             prefSeenPickupScreenOffBattery.setEnabled(settings.isEnabledWhileScreenOffBattery());
             prefSeenOnLockscreen.setEnabled(settings.isEnabledWhileScreenOffAny());
             prefSeenOnUserPresent.setEnabled(settings.isEnabledWhileScreenOffAny());

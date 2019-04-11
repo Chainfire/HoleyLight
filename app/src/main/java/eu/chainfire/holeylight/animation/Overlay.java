@@ -351,18 +351,25 @@ public class Overlay {
 
         Context context = spritePlayer.getContext();
 
-        boolean visible = Display.isOn(context, true);
+        boolean on = Display.isOn(context, false);
         boolean doze = Display.isDoze(context);
-        if (!visible && !doze && settings.isHideAOD()) {
+        boolean visible = on || doze;
+        if (!visible && settings.isHideAOD()) {
+            // we will be visible soon
             visible = true;
             doze = true;
         }
-        if (visible && !doze && keyguardManager.isKeyguardLocked()) {
-            visible = settings.isEnabledOnLockscreen();
-        }
-        if (wanted && visible && (colors.length > 0)) {
+        boolean lockscreen = on && keyguardManager.isKeyguardLocked();
+        boolean charging = Battery.isCharging(context);
+        boolean wantedEffective = wanted && (
+                (on && !lockscreen && settings.isEnabledWhileScreenOn()) ||
+                (on && lockscreen && settings.isEnabledOnLockscreen()) ||
+                (!on && charging && settings.isEnabledWhileScreenOffCharging()) ||
+                (!on && !charging && settings.isEnabledWhileScreenOffBattery())
+        );
+        if (wantedEffective && visible && (colors.length > 0)) {
             int dpAdd = (doze ? 1 : 0);
-            SpritePlayer.Mode mode = settings.getAnimationMode(context, settings.getMode(Battery.isCharging(context), !doze));
+            SpritePlayer.Mode mode = settings.getAnimationMode(context, settings.getMode(charging, !doze));
             if (!lastState || colorsChanged() || mode != lastMode || (dpAdd != lastDpAdd)) {
                 spritePlayer.setMode(mode);
                 createOverlay();
