@@ -57,10 +57,10 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private final SpritePlayer spritePlayer;
 
     private final String json;
-    private final int dpAddScaleBase;
-    private final int dpAddScaleHorizontal;
-    private final int dpShiftVertical;
-    private final int dpShiftHorizontal;
+    private final float dpAddScaleBase;
+    private final float dpAddScaleHorizontal;
+    private final float dpShiftVertical;
+    private final float dpShiftHorizontal;
     private volatile float dpAdd = 0;
 
     private volatile LottieComposition lottieComposition;
@@ -94,6 +94,12 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
             dpShiftVertical = 0;
             dpShiftHorizontal = 0;
         } else if (device.startsWith("beyond2")) { // s10+
+            json = jsonBeyond2;
+            dpAddScaleBase = 4;
+            dpAddScaleHorizontal = 1;
+            dpShiftVertical = 0;
+            dpShiftHorizontal = -1;
+        } else if (device.startsWith("beyondx")) { // s10 x
             json = jsonBeyond2;
             dpAddScaleBase = 4;
             dpAddScaleHorizontal = 1;
