@@ -148,7 +148,7 @@ public class Overlay {
     private Point getResolution() {
         DisplayMetrics metrics = new DisplayMetrics();
         windowManager.getDefaultDisplay().getRealMetrics(metrics);
-        return new Point(metrics.heightPixels, metrics.widthPixels);
+        return new Point(metrics.widthPixels, metrics.heightPixels);
     }
 
     private void initActualOverlay(Context context, IBinder windowToken) {
@@ -273,6 +273,12 @@ public class Overlay {
         params.gravity = Gravity.LEFT | Gravity.TOP;
         params.setTitle("HoleyLight");
         params.token = windowToken;
+        try { // disable animation when we move/resize
+            int currentFlags = (Integer)params.getClass().getField("privateFlags").get(params);
+            params.getClass().getField("privateFlags").set(params, currentFlags | 0x00000040); /* PRIVATE_FLAG_NO_MOVE_ANIMATION */
+        } catch (Exception e) {
+            //do nothing. Probably using other version of android
+        }
         spritePlayer.setLayoutParams(params);
     }
 
@@ -345,6 +351,7 @@ public class Overlay {
             if (!lastState || colorsChanged() || mode != lastMode || (dpAdd != lastDpAdd)) {
                 spritePlayer.setMode(mode);
                 createOverlay();
+                animation.setHideAOD(doze); //TODO
                 animation.setDpAdd(dpAdd);
                 animation.play(colors, false, (mode != lastMode));
                 lastColors = colors;
