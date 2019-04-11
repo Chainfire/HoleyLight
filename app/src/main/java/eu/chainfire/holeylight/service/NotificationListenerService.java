@@ -200,13 +200,16 @@ public class NotificationListenerService extends android.service.notification.No
         handler.postDelayed(runHandleLEDNotifications, 100);
     }
 
+    private String sanitizeChannelId(String channelId) {
+        return channelId.replaceAll("[^a-zA-Z0-9_:.-]", "_");
+    }
+
     private synchronized void handleLEDNotificationsInternal() {
         if (!connected) return;
 
         log("handleLEDNotifications");
 
         List<Integer> colors = new ArrayList<>();
-        List<String> pkgs = new ArrayList<>();
 
         try {
             StatusBarNotification[] sbns = tracker.prune(getActiveNotifications());
@@ -215,10 +218,10 @@ public class NotificationListenerService extends android.service.notification.No
 
                 int c = 0xFF000000;
                 int cChan = c;
-                String src = "legacy";
+                String channelName = "legacy";
 
                 if (not.getChannelId() != null) {
-                    src = not.getChannelId();
+                    channelName = sanitizeChannelId(not.getChannelId());
 
                     List<NotificationChannel> chans = getNotificationChannels(sbn.getPackageName(), Process.myUserHandle());
                     for (NotificationChannel chan : chans) {
@@ -257,8 +260,8 @@ public class NotificationListenerService extends android.service.notification.No
                 }
 
                 // Save to prefs, or get overriden value from prefs
-                c = settings.getColorForPackage(sbn.getPackageName(), c);
-                settings.setColorForPackage(sbn.getPackageName(), c, true);
+                c = settings.getColorForPackageAndChannel(sbn.getPackageName(), channelName, c);
+                settings.setColorForPackageAndChannel(sbn.getPackageName(), channelName, c, true);
 
                 // Make sure we have alpha (again)
                 c = c | 0xFF000000;
@@ -270,12 +273,9 @@ public class NotificationListenerService extends android.service.notification.No
 
                 // Log and save
                 Integer color = c;
-                log("%s (%s) --> #%08X / #%08X --> #%08X", sbn.getPackageName(), src, cChan, not.color, c);
+                log("%s [%s] (%s) --> #%08X / #%08X --> #%08X", sbn.getKey(), sbn.getPackageName(), channelName, cChan, not.color, c);
                 if (!colors.contains(color)) {
                     colors.add(color);
-                }
-                if (!pkgs.contains(sbn.getPackageName())) {
-                    pkgs.add(sbn.getPackageName());
                 }
             }
         } catch (SecurityException e) {

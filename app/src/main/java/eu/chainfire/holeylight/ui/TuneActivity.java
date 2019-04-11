@@ -113,6 +113,7 @@ public class TuneActivity extends AppCompatActivity implements Settings.OnSettin
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuItem menuItem = menu.add(R.string.reset);
+        menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         menuItem.setOnMenuItemClickListener(item -> {
             settings.resetTuning();
             updateLabels();

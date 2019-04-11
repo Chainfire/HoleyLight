@@ -94,8 +94,8 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     private static final String SPEED_FACTOR = "speed_factor";
 
-    private static final String PACKAGE_COLOR = "package_color:";
-    private static final String PACKAGE_COLOR_FMT = PACKAGE_COLOR + "%s";
+    private static final String CHANNEL_COLOR = "CHANNEL_COLOR:";
+    private static final String CHANNEL_COLOR_FMT = CHANNEL_COLOR + "%s:%s";
 
     private static Settings instance;
     public static Settings getInstance(Context context) {
@@ -296,12 +296,12 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         return isEnabled() && prefs.getBoolean(ENABLED_LOCKSCREEN, ENABLED_LOCKSCREEN_DEFAULT);
     }
 
-    public int getColorForPackage(String packageName, int defaultValue) {
-        return prefs.getInt(String.format(Locale.ENGLISH, PACKAGE_COLOR_FMT, packageName), defaultValue);
+    public int getColorForPackageAndChannel(String packageName, String channelName, int defaultValue) {
+        return prefs.getInt(String.format(Locale.ENGLISH, CHANNEL_COLOR_FMT, packageName, channelName), defaultValue);
     }
 
-    public void setColorForPackage(String packageName, int color, boolean fromListener) {
-        String key = String.format(Locale.ENGLISH, PACKAGE_COLOR_FMT, packageName);
+    public void setColorForPackageAndChannel(String packageName, String channelName, int color, boolean fromListener) {
+        String key = String.format(Locale.ENGLISH, CHANNEL_COLOR_FMT, packageName, channelName);
         if (!prefs.contains(key) || (prefs.getInt(key, -1) != color)) {
             edit();
             try {
@@ -312,12 +312,12 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
-    public Map<String, Integer> getPackagesAndColors() {
+    public Map<String, Integer> getPackagesChannelsAndColors() {
         Map<String, Integer> ret = new HashMap<>();
         Map<String, ?> all = prefs.getAll();
         for (String key : all.keySet()) {
-            if (key.startsWith(PACKAGE_COLOR)) {
-                String pkg = key.substring(PACKAGE_COLOR.length());
+            if (key.startsWith(CHANNEL_COLOR)) {
+                String pkg = key.substring(CHANNEL_COLOR.length());
                 Integer color = prefs.getInt(key, 0);
                 ret.put(pkg, color);
             }

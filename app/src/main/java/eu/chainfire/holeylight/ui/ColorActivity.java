@@ -23,6 +23,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +46,7 @@ import top.defaults.colorpicker.ColorPickerPopup;
 
 public class ColorActivity extends AppCompatActivity {
     private Settings settings = null;
+    private AppAdapter apps = null;
 
     @SuppressWarnings("ConstantConditions")
     @Override
@@ -60,11 +62,11 @@ public class ColorActivity extends AppCompatActivity {
         RecyclerView list = findViewById(R.id.list);
         list.setLayoutManager(new LinearLayoutManager(this));
         list.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-        AppAdapter apps = new AppAdapter();
+        apps = new AppAdapter();
         list.setAdapter(apps);
 
         //TODO Async this, slow with many items
-        apps.loadAppItems(settings.getPackagesAndColors());
+        apps.loadAppItems(settings.getPackagesChannelsAndColors());
     }
 
     @Override
@@ -77,6 +79,16 @@ public class ColorActivity extends AppCompatActivity {
     protected void onStop() {
         TestNotification.hide(this, TestNotification.NOTIFICATION_ID_COLOR);
         super.onStop();
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+    @Override
+    protected void onUserLeaveHint() {
+        finish();
     }
 
     @Override
@@ -108,13 +120,9 @@ public class ColorActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
             holder.appItem = items.get(position);
             holder.ivIcon.setImageDrawable(holder.appItem.icon);
-            if (holder.appItem.title == null) {
-                holder.tvTitle.setText(holder.appItem.packageName);
-                holder.tvPackageName.setText("");
-            } else {
-                holder.tvTitle.setText(holder.appItem.title);
-                holder.tvPackageName.setText(holder.appItem.packageName);
-            }
+            holder.tvTitleOrPackage.setText(holder.appItem.title != null ? holder.appItem.title : holder.appItem.packageName);
+            holder.tvTitleOrPackage.setText(holder.appItem.title);
+            holder.tvChannel.setText(holder.appItem.channelName);
             holder.ivColor.setBackgroundColor(holder.appItem.color);
             holder.view.setOnClickListener(v -> {
                 final AppItem item = holder.appItem;
@@ -130,7 +138,7 @@ public class ColorActivity extends AppCompatActivity {
                         .show(new ColorPickerPopup.ColorPickerObserver() {
                             @Override
                             public void onColorPicked(int color) {
-                                settings.setColorForPackage(item.packageName, color, false);
+                                settings.setColorForPackageAndChannel(item.packageName, item.channelName, color, false);
                                 item.color = color;
 
                                 // force overlay reload
@@ -152,8 +160,8 @@ public class ColorActivity extends AppCompatActivity {
         public class ViewHolder extends RecyclerView.ViewHolder {
             public final View view;
             public final ImageView ivIcon;
-            public final TextView tvTitle;
-            public final TextView tvPackageName;
+            public final TextView tvTitleOrPackage;
+            public final TextView tvChannel;
             public final View ivColor;
             public AppItem appItem;
 
@@ -161,8 +169,8 @@ public class ColorActivity extends AppCompatActivity {
                 super(view);
                 this.view = view;
                 ivIcon = view.findViewById(R.id.icon);
-                tvTitle = view.findViewById(R.id.title);
-                tvPackageName = view.findViewById(R.id.packageName);
+                tvTitleOrPackage = view.findViewById(R.id.titleOrPackage);
+                tvChannel = view.findViewById(R.id.channel);
                 ivColor = view.findViewById(R.id.color);
             }
 
@@ -190,53 +198,79 @@ public class ColorActivity extends AppCompatActivity {
         }
 
         @SuppressWarnings("ConstantConditions")
-        public void loadAppItems(Map<String, Integer> packagesAndColors) {
+        public void loadAppItems(Map<String, Integer> packagesChannelsAndColors) {
             List<AppItem> results = new ArrayList<>();
             PackageManager pm = getPackageManager();
-            for (String pkg : packagesAndColors.keySet()) {
-                try {
-                    ApplicationInfo info = pm.getApplicationInfo(pkg, 0);
-                    results.add(new AppItem(
-                            getLabel(pm, info),
-                            pkg,
-                            getIcon(pm, info),
-                            packagesAndColors.get(pkg)
-                    ));
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
+            for (String pkgChan : packagesChannelsAndColors.keySet()) {
+                int sep = pkgChan.indexOf(':');
+                if (sep >= 0) {
+                    String pkg = pkgChan.substring(0, sep);
+                    String chan = pkgChan.substring(sep + 1);
+                    try {
+                        ApplicationInfo info = pm.getApplicationInfo(pkg, 0);
+                        results.add(new AppItem(
+                                getLabel(pm, info),
+                                pkg,
+                                chan,
+                                getIcon(pm, info),
+                                packagesChannelsAndColors.get(pkgChan)
+                        ));
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             Collections.sort(results, (a, b) -> {
+                int sort;
                 if ((a.title == null) && (b.title == null)) {
-                    return a.packageName.compareToIgnoreCase(b.packageName);
+                    sort = a.packageName.compareToIgnoreCase(b.packageName);
                 } else if ((a.title == null) && (b.title != null)) {
-                    return 1;
+                    sort = 1;
                 } else if ((a.title != null) && (b.title == null)) {
-                    return -1;
+                    sort = -1;
                 } else {
-                    return a.title.compareToIgnoreCase(b.title);
+                    sort = a.title.compareToIgnoreCase(b.title);
                 }
+                if (sort == 0) {
+                    sort = a.channelName.compareToIgnoreCase(b.channelName);
+                }
+                return sort;
             });
             items.clear();
             items.addAll(results);
+            notifyDataSetChanged();
         }
 
         public class AppItem {
             public final String title;
             public final String packageName;
+            public final String channelName;
             public final Drawable icon;
             public int color;
 
-            public AppItem(String title, String packageName, Drawable icon, int color) {
+            public AppItem(String title, String packageName, String channelName, Drawable icon, int color) {
                 if ((title != null) && title.equals(packageName)) {
                     title = null;
                 }
                 this.title = title;
                 this.packageName = packageName;
+                this.channelName = channelName;
                 this.icon = icon;
                 this.color = color;
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuItem menuItem = menu.add(R.string.refresh);
+        menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menuItem.setOnMenuItemClickListener(item -> {
+            //TODO Async this, slow with many items
+            apps.loadAppItems(settings.getPackagesChannelsAndColors());
+            return true;
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 }
 

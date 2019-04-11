@@ -98,4 +98,6 @@
     <!-- v0.50 -->
 
     <string name="reset">Reset</string>
+    <string name="refresh">Refresh</string>
+    <string name="settings_animation_colors_description_v2">Adjust per-channel notification colors (use full black to hide)</string>
 </resources>

@@ -27,7 +27,7 @@
         android:clickable="false">
 
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/titleOrPackage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
@@ -36,20 +36,27 @@
             android:clickable="false" />
 
         <TextView
-            android:id="@+id/packageName"
+            android:id="@+id/channel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxLines="1"
+            android:maxLines="2"
             android:textAppearance="?attr/textAppearanceListItemSmall"
             android:ellipsize="end"
             android:clickable="false" />
     </LinearLayout>
 
-    <View
-        android:id="@+id/color"
+    <FrameLayout
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_margin="16dp"
-        android:scaleType="centerInside"
-        android:clickable="false" />
+        android:background="#FF000000"
+        android:padding="1dp">
+
+        <View
+            android:id="@+id/color"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            android:clickable="false" />
+    </FrameLayout>
 </LinearLayout>

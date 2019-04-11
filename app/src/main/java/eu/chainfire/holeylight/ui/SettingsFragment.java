@@ -50,7 +50,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefSeenPickupScreenOffBattery = null;
     private CheckBoxPreference prefSeenOnLockscreen = null;
     private CheckBoxPreference prefSeenOnUserPresent = null;
-    private Preference prefAdviceAOD = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -165,7 +164,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             startActivity(new Intent(getActivity(), TuneActivity.class));
             return false;
         });
-        pref(catAnimation, R.string.settings_animation_colors_title, R.string.settings_animation_colors_description, null, true, preference -> {
+        pref(catAnimation, R.string.settings_animation_colors_title, R.string.settings_animation_colors_description_v2, null, true, preference -> {
             startActivity(new Intent(getActivity(), ColorActivity.class));
             return false;
         });
