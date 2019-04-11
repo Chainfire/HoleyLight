@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="battery_screen_off">Батарея: экран выключен</string>
+    <string name="battery_screen_on">Батарея: экран включен</string>
+    <string name="charging_screen_off">Зарядка: экран выключен</string>
+    <string name="charging_screen_on">Зарядка: экран включен</string>
+    <string name="disabled">Отключить</string>
+    <string name="enabled">Включить</string>
+    <string name="error">Ошибка</string>
+    <string name="error_hide_notch">&lt;b>Holey Light&lt;/b> не может работать, пока метка скрыта. Снимите галочку &lt;b>Настройки&lt;/b> - &lt;b>Экран&lt;/b> - &lt;b>Полноэкранные приложения&lt;/b> - &lt;b>Скрыть фронтальную камеру&lt;/b>.</string>
+    <string name="error_unsupported_device">&lt;b>Holey Light&lt;/b> не поддерживает ваше устройство. Если вы используете вариант &lt;b>S10&lt;/b> сообщите об этом в форуме на XDA:&lt;br>&lt;br>[ &lt;b>%s&lt;/b> ]</string>
+    <string name="help_basic_descrption">Несколько основных советов</string>
+    <string name="help_basic_message">"&lt;b>Holey Light&lt;/b> установить на &lt;b>Always On Display (AOD)&lt;/b> (см. Настройки Android) для отображения уведомлений, когда экран выключен,
+        поэтому для работы этих режимов необходимо включить AOD.&lt;br>
+        &lt;br>
+        AOD's &lt;b>Показывать всегда&lt;/b>, &lt;b>Нажмите, чтобы показать режимы&lt;/b> и &lt;b>Показывать как запланированные режимы&lt;/b> все поддерживаются. Если вы не используете &lt;b>Нажмите, чтобы показать&lt;/b>
+        В этом режиме &lt;i>настоятельно&lt;/i> рекомендуется включить &lt;b>расписание&lt;/b> чтобы отключить AOD, когда вы спите. Это может помочь предотвратить
+        выжигание экрана!&lt;br>
+        &lt;br>
+        Несмотря на то, что было приложено много усилий для максимального сокращения использования батареи,, &lt;b>Holey Light&lt;/b> &lt;i>does&lt;/i> использует дополнительный заряд
+        по сравнению только с использованием &lt;b>AOD&lt;/b>."</string>
+    <string name="help_basic_title">Помощь</string>
+    <string name="notification_permissions_description">Некоторые разрешения необходимо обновить. Нажмите, чтобы начать.</string>
+    <string name="notification_test_description">Тестовое уведомление, белый светодиод</string>
+    <string name="notification_test_title">Holey Light: Тест</string>
+    <string name="permission_accessibility">На следующем экране перейдите к  &lt;b>Установленным службам&lt;/b>, и включите &lt;b>Holey Light&lt;/b>. Это необходимо для отображения анимации уведомления. Если это не работает, попробуйте перезагрузить устройство.</string>
+    <string name="permission_associate"> В следующем диалоговом окне, пожалуйста, свяжитесь &lt;b>Holey Light&lt;/b> with &lt;b>any&lt;/b> с устройством. Это необходимо для доступа к цветам уведомлений. Не имеет значения, какое устройство вы выберете.&lt;br>&lt;br>Пожалуйста &lt;b>включите Wi-Fi и Bluetooth&lt;/b> прежде чем продолжить; затем вы можете снова отключить их.&lt;br>&lt;br>Если всплывающее окно не появляется, попробуйте убедиться, что &lt;b>сканирование ближайшего устройства&lt;/b> включено, и выполнить сопряжение с устройством Bluetooth.</string>
+    <string name="permission_battery">В следующем диалоговом окне разрешите &lt;b>Holey Light&lt;/b> остановить оптимизацию. Это необходимо для поддержки анимации уведомлений.</string>
+    <string name="permission_notifications">На следующем экране разрешите &lt;b>Holey Light&lt;/b> доступ к уведомлениям. Это необходимо для обнаружения уведомлений.</string>
+    <string name="permission_required">Необходимые разрешения</string>
+    <string name="settings_animation_colors_description">Настройка цвета уведомлений для каждого приложения (используйте черный цвет, чтобы скрыть)</string>
+    <string name="settings_animation_colors_title">Выбор цвета</string>
+    <string name="settings_animation_powersave_description">Использование анимации (Змейка), сокращает использование батареи</string>
+    <string name="settings_animation_powersave_title">Анимация (Мигание),для энергосбережения</string>
+    <string name="settings_animation_tune_description">Точный размер, положение и скорость</string>
+    <string name="settings_animation_tune_title">Настройки</string>
+    <string name="settings_category_animation_title">Анимация</string>
+    <string name="settings_category_chainfire_title">Chainfire</string>
+    <string name="settings_category_operation_title">Опции</string>
+    <string name="settings_category_seen_lockscreen_title">Пометить нужное: экран блокировки</string>
+    <string name="settings_category_seen_pickup_description">Стационарно в течение >10сек перед перемещением</string>
+    <string name="settings_category_seen_pickup_title">Пометить нужное: выбор</string>
+    <string name="settings_follow_twitter_description">Будьте в курсе моих разработок</string>
+    <string name="settings_follow_twitter_title">Мой Twitter</string>
+    <string name="settings_lockscreen_on_description">Показать индикатор уведомлений на экране блокировки; это может выглядеть не корректно, если разблокировка лица включена</string>
+    <string name="settings_lockscreen_on_title">Экран блокировки</string>
+    <string name="settings_playstore_description">Просмотреть все мои приложения, доступные в Google Play</string>
+    <string name="settings_playstore_title">Все мои приложения</string>
+    <string name="settings_screen_off_battery_description">Показывать индикатор уведомлений, когда экран выключен и работает от батареи, потребляет дополнительную мощность</string>
+    <string name="settings_screen_off_charging_description">Показывать индикатор уведомлений, когда экран выключен и заряжается</string>
+    <string name="settings_screen_on_description">Показывать индикатор уведомлений, когда телефон работает в обычном режиме</string>
+    <string name="settings_screen_on_title">Экран вкл</string>
+    <string name="settings_seen_on_lockscreen_description">Каждый раз, когда отображается экран блокировки</string>
+    <string name="settings_seen_on_lockscreen_title">На экране блокировки</string>
+    <string name="settings_seen_on_user_present_description">Каждый раз, когда разблокируется экран блокировки</string>
+    <string name="settings_seen_on_user_present_title">После разблокировки</string>
+    <string name="settings_seen_pickup_screen_off_battery_description">потребляет больше энергии</string>
+    <string name="settings_seen_pickup_screen_off_charging_description">Имеет смысл, когда вы обычно заряжаете свой телефон там, где его можно увидеть</string>
+    <string name="settings_seen_pickup_screen_on_battery_description">потребляет немного дополнительной энергии</string>
+    <string name="settings_seen_pickup_screen_on_charging_description">Имеет смысл, когда вы обычно заряжаете свой телефон там, где его можно увидеть</string>
+    <string name="tune_notice">Изменения требуют полного цикла анимации для обновления!</string>
+    <string name="tune_scale_base">Базовая шкалы: %ddp</string>
+    <string name="tune_scale_horizontal">Горизонтальная шкала: %ddp</string>
+    <string name="tune_shift_horizontal">Сдвиг по горизонтали: %ddp</string>
+    <string name="tune_shift_vertical">Сдвиг по вертикали: %ddp</string>
+    <string name="tune_speed">Скорость: %.1fx</string>
+</resources>
