@@ -86,10 +86,12 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     private static final String CUTOUT_AREA_TOP = "cutout_area_top";
     private static final String CUTOUT_AREA_RIGHT = "cutout_area_right";
     private static final String CUTOUT_AREA_BOTTOM = "cutout_area_bottom";
+
     private static final String DP_ADD_SCALE_BASE = "dp_add_scale_base_float";
     private static final String DP_ADD_SCALE_HORIZONTAL = "dp_add_scale_horizontal_float";
     private static final String DP_SHIFT_VERTICAL = "dp_shift_vertical_float";
     private static final String DP_SHIFT_HORIZONTAL = "dp_shift_horizontal_float";
+
     private static final String SPEED_FACTOR = "speed_factor";
 
     private static final String PACKAGE_COLOR = "package_color:";
@@ -396,5 +398,24 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public int getMode(boolean charging, boolean screenOn) {
         return (charging ? SHIFT_CHARGING : SHIFT_BATTERY) + (screenOn ? SHIFT_SCREEN_ON : SHIFT_SCREEN_OFF);
+    }
+
+    public void resetTuning() {
+        edit();
+        try {
+            for (String key : new String[] {
+                    DP_ADD_SCALE_BASE,
+                    DP_ADD_SCALE_HORIZONTAL,
+                    DP_SHIFT_VERTICAL,
+                    DP_SHIFT_HORIZONTAL,
+                    SPEED_FACTOR
+            }) {
+                if (prefs.contains(key)) {
+                    editor.remove(key);
+                }
+            }
+        } finally {
+            save(true);
+        }
     }
 }

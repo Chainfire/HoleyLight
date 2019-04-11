@@ -94,4 +94,8 @@
     <string name="tune_shift_vertical">Shift vertical: %.2fdp</string>
     <string name="tune_shift_horizontal">Shift horizontal: %.2fdp</string>
     <string name="tune_speed">Speed: %.1fx</string>
+
+    <!-- v0.50 -->
+
+    <string name="reset">Reset</string>
 </resources>

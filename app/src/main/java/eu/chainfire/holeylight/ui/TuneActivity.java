@@ -19,6 +19,7 @@
 package eu.chainfire.holeylight.ui;
 
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -107,5 +108,16 @@ public class TuneActivity extends AppCompatActivity implements Settings.OnSettin
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuItem menuItem = menu.add(R.string.reset);
+        menuItem.setOnMenuItemClickListener(item -> {
+            settings.resetTuning();
+            updateLabels();
+            return true;
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 }
