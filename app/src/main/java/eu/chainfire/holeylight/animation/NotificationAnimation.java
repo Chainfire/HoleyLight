@@ -61,7 +61,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private final int dpAddScaleHorizontal;
     private final int dpShiftVertical;
     private final int dpShiftHorizontal;
-    private volatile int dpAdd = 0;
+    private volatile float dpAdd = 0;
 
     private volatile LottieComposition lottieComposition;
     private volatile boolean play = false;
@@ -332,19 +332,19 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         return play || spritePlayer.isAnimating();
     }
 
-    public int getDpAddScaleBase() {
+    public float getDpAddScaleBase() {
         return settings.getDpAddScaleBase(dpAddScaleBase);
     }
 
-    public int getDpAddScaleHorizontal() {
+    public float getDpAddScaleHorizontal() {
         return settings.getDpAddScaleHorizontal(dpAddScaleHorizontal);
     }
 
-    public int getDpShiftVertical() {
+    public float getDpShiftVertical() {
         return settings.getDpShiftVertical(dpShiftVertical);
     }
 
-    public int getDpShiftHorizontal() {
+    public float getDpShiftHorizontal() {
         return settings.getDpShiftHorizontal(dpShiftHorizontal);
     }
 
@@ -352,11 +352,11 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         return settings.getSpeedFactor();
     }
 
-    public int getDpAdd() {
+    public float getDpAdd() {
         return dpAdd;
     }
 
-    public synchronized void setDpAdd(int dpAdd) {
+    public synchronized void setDpAdd(float dpAdd) {
         if (this.dpAdd != dpAdd) {
             this.dpAdd = dpAdd;
             applyDimensions();

@@ -59,9 +59,9 @@
     <string name="settings_seen_pickup_screen_on_battery_description">потребляет немного дополнительной энергии</string>
     <string name="settings_seen_pickup_screen_on_charging_description">Имеет смысл, когда вы обычно заряжаете свой телефон там, где его можно увидеть</string>
     <string name="tune_notice">Изменения требуют полного цикла анимации для обновления!</string>
-    <string name="tune_scale_base">Базовая шкалы: %ddp</string>
-    <string name="tune_scale_horizontal">Горизонтальная шкала: %ddp</string>
-    <string name="tune_shift_horizontal">Сдвиг по горизонтали: %ddp</string>
-    <string name="tune_shift_vertical">Сдвиг по вертикали: %ddp</string>
+    <string name="tune_scale_base">Базовая шкалы: %.2fdp</string>
+    <string name="tune_scale_horizontal">Горизонтальная шкала: %.2fdp</string>
+    <string name="tune_shift_horizontal">Сдвиг по горизонтали: %.2fdp</string>
+    <string name="tune_shift_vertical">Сдвиг по вертикали: %.2fdp</string>
     <string name="tune_speed">Скорость: %.1fx</string>
 </resources>

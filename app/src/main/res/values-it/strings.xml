@@ -74,9 +74,9 @@
     <string name="settings_follow_twitter_description">Resta aggiornato sui miei sviluppi</string>
 
     <string name="tune_notice">Le modifiche verranno applicate solo dopo un ciclo di animazione completo!</string>
-    <string name="tune_scale_base">Scala la base: %ddp</string>
-    <string name="tune_scale_horizontal">Scala in orizzontale: %ddp</string>
-    <string name="tune_shift_vertical">Sposta in verticale: %ddp</string>
-    <string name="tune_shift_horizontal">Sposta in orizzontale: %ddp</string>
+    <string name="tune_scale_base">Scala la base: %.2fdp</string>
+    <string name="tune_scale_horizontal">Scala in orizzontale: %.2fdp</string>
+    <string name="tune_shift_vertical">Sposta in verticale: %.2fdp</string>
+    <string name="tune_shift_horizontal">Sposta in orizzontale: %.2fdp</string>
     <string name="tune_speed">Velocità: %.1fx</string>
 </resources>

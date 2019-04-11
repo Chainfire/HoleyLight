@@ -89,9 +89,9 @@
     <string name="settings_follow_twitter_description">Stay up to date with my developments</string>
 
     <string name="tune_notice">Changes take a full animation cycle to update!</string>
-    <string name="tune_scale_base">Scale base: %ddp</string>
-    <string name="tune_scale_horizontal">Scale horizontal: %ddp</string>
-    <string name="tune_shift_vertical">Shift vertical: %ddp</string>
-    <string name="tune_shift_horizontal">Shift horizontal: %ddp</string>
+    <string name="tune_scale_base">Scale base: %.2fdp</string>
+    <string name="tune_scale_horizontal">Scale horizontal: %.2fdp</string>
+    <string name="tune_shift_vertical">Shift vertical: %.2fdp</string>
+    <string name="tune_shift_horizontal">Shift horizontal: %.2fdp</string>
     <string name="tune_speed">Speed: %.1fx</string>
 </resources>

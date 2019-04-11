@@ -86,10 +86,10 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     private static final String CUTOUT_AREA_TOP = "cutout_area_top";
     private static final String CUTOUT_AREA_RIGHT = "cutout_area_right";
     private static final String CUTOUT_AREA_BOTTOM = "cutout_area_bottom";
-    private static final String DP_ADD_SCALE_BASE = "dp_add_scale_base";
-    private static final String DP_ADD_SCALE_HORIZONTAL = "dp_add_scale_horizontal";
-    private static final String DP_SHIFT_VERTICAL = "dp_shift_vertical";
-    private static final String DP_SHIFT_HORIZONTAL = "dp_shift_horizontal";
+    private static final String DP_ADD_SCALE_BASE = "dp_add_scale_base_float";
+    private static final String DP_ADD_SCALE_HORIZONTAL = "dp_add_scale_horizontal_float";
+    private static final String DP_SHIFT_VERTICAL = "dp_shift_vertical_float";
+    private static final String DP_SHIFT_HORIZONTAL = "dp_shift_horizontal_float";
     private static final String SPEED_FACTOR = "speed_factor";
 
     private static final String PACKAGE_COLOR = "package_color:";
@@ -198,53 +198,53 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         return this;
     }
 
-    public int getDpAddScaleBase(int defaultValue) {
-        return prefs.getInt(DP_ADD_SCALE_BASE, defaultValue);
+    public float getDpAddScaleBase(float defaultValue) {
+        return prefs.getFloat(DP_ADD_SCALE_BASE, defaultValue);
     }
 
-    public void setDpAddScaleBase(int value) {
+    public void setDpAddScaleBase(float value) {
         edit();
         try {
-            editor.putInt(DP_ADD_SCALE_BASE, value);
+            editor.putFloat(DP_ADD_SCALE_BASE, value);
         } finally {
             save(true);
         }
     }
 
-    public int getDpAddScaleHorizontal(int defaultValue) {
-        return prefs.getInt(DP_ADD_SCALE_HORIZONTAL, defaultValue);
+    public float getDpAddScaleHorizontal(float defaultValue) {
+        return prefs.getFloat(DP_ADD_SCALE_HORIZONTAL, defaultValue);
     }
 
-    public void setDpAddScaleHorizontal(int value) {
+    public void setDpAddScaleHorizontal(float value) {
         edit();
         try {
-            editor.putInt(DP_ADD_SCALE_HORIZONTAL, value);
+            editor.putFloat(DP_ADD_SCALE_HORIZONTAL, value);
         } finally {
             save(true);
         }
     }
 
-    public int getDpShiftVertical(int defaultValue) {
-        return prefs.getInt(DP_SHIFT_VERTICAL, defaultValue);
+    public float getDpShiftVertical(float defaultValue) {
+        return prefs.getFloat(DP_SHIFT_VERTICAL, defaultValue);
     }
 
-    public void setDpShiftVertical(int value) {
+    public void setDpShiftVertical(float value) {
         edit();
         try {
-            editor.putInt(DP_SHIFT_VERTICAL, value);
+            editor.putFloat(DP_SHIFT_VERTICAL, value);
         } finally {
             save(true);
         }
     }
 
-    public int getDpShiftHorizontal(int defaultValue) {
-        return prefs.getInt(DP_SHIFT_HORIZONTAL, defaultValue);
+    public float getDpShiftHorizontal(float defaultValue) {
+        return prefs.getFloat(DP_SHIFT_HORIZONTAL, defaultValue);
     }
 
-    public void setDpShiftHorizontal(int value) {
+    public void setDpShiftHorizontal(float value) {
         edit();
         try {
-            editor.putInt(DP_SHIFT_HORIZONTAL, value);
+            editor.putFloat(DP_SHIFT_HORIZONTAL, value);
         } finally {
             save(true);
         }

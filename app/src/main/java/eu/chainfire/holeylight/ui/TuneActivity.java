@@ -70,21 +70,21 @@ public class TuneActivity extends AppCompatActivity implements Settings.OnSettin
 
     public void btnClick(View view) {
         if (view == findViewById(R.id.btnAddScaleBaseMinus)) {
-            settings.setDpAddScaleBase(animation.getDpAddScaleBase() - 1);
+            settings.setDpAddScaleBase(animation.getDpAddScaleBase() - 0.25f);
         } else if (view == findViewById(R.id.btnAddScaleBasePlus)) {
-            settings.setDpAddScaleBase(animation.getDpAddScaleBase() + 1);
+            settings.setDpAddScaleBase(animation.getDpAddScaleBase() + 0.25f);
         } else if (view == findViewById(R.id.btnAddScaleHorizontalMinus)) {
-            settings.setDpAddScaleHorizontal(animation.getDpAddScaleHorizontal() - 1);
+            settings.setDpAddScaleHorizontal(animation.getDpAddScaleHorizontal() - 0.25f);
         } else if (view == findViewById(R.id.btnAddScaleHorizontalPlus)) {
-            settings.setDpAddScaleHorizontal(animation.getDpAddScaleHorizontal() + 1);
+            settings.setDpAddScaleHorizontal(animation.getDpAddScaleHorizontal() + 0.25f);
         } else if (view == findViewById(R.id.btnShiftVerticalMinus)) {
-            settings.setDpShiftVertical(animation.getDpShiftVertical() - 1);
+            settings.setDpShiftVertical(animation.getDpShiftVertical() - 0.25f);
         } else if (view == findViewById(R.id.btnShiftVerticalPlus)) {
-            settings.setDpShiftVertical(animation.getDpShiftVertical() + 1);
+            settings.setDpShiftVertical(animation.getDpShiftVertical() + 0.25f);
         } else if (view == findViewById(R.id.btnShiftHorizontalMinus)) {
-            settings.setDpShiftHorizontal(animation.getDpShiftHorizontal() - 1);
+            settings.setDpShiftHorizontal(animation.getDpShiftHorizontal() - 0.25f);
         } else if (view == findViewById(R.id.btnShiftHorizontalPlus)) {
-            settings.setDpShiftHorizontal(animation.getDpShiftHorizontal() + 1);
+            settings.setDpShiftHorizontal(animation.getDpShiftHorizontal() + 0.25f);
         } else if (view == findViewById(R.id.btnSpeedMinus)) {
             settings.setSpeedFactor(animation.getSpeedFactor() - 0.1f);
         } else if (view == findViewById(R.id.btnSpeedPlus)) {
