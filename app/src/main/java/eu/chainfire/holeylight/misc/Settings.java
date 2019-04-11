@@ -418,4 +418,8 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
             save(true);
         }
     }
+
+    public boolean isHideAOD() {
+        return false;
+    }
 }

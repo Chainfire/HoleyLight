@@ -392,7 +392,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         return hideAOD;
     }
 
-    //TODO this doesn't actually work, the clock renders on top of AOD :')
+    //TODO for this to work, we need setAOD in Overlay fixed, and the user must have configured a clock-less image (otherwise the clock renders on top after a little while)
     public void setHideAOD(boolean hideAOD) {
         synchronized (getSynchronizer()) {
             if (this.hideAOD != hideAOD) {

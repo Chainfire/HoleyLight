@@ -25,6 +25,7 @@ import android.app.KeyguardManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -46,6 +47,7 @@ import eu.chainfire.holeylight.service.AccessibilityService;
 import eu.chainfire.holeylight.ui.DetectCutoutActivity;
 
 import static android.content.Context.KEYGUARD_SERVICE;
+import static android.content.Context.POWER_SERVICE;
 
 @SuppressWarnings({"WeakerAccess", "unused", "FieldCanBeLocal"})
 public class Overlay {
@@ -107,9 +109,14 @@ public class Overlay {
                     break;
                 case Intent.ACTION_SCREEN_ON:
                 case Intent.ACTION_USER_PRESENT:
-                case Intent.ACTION_SCREEN_OFF:
                 case Intent.ACTION_POWER_CONNECTED:
                 case Intent.ACTION_POWER_DISCONNECTED:
+                    evaluate();
+                    break;
+                case Intent.ACTION_SCREEN_OFF:
+                    if (settings.isHideAOD()) {
+                        cpuWakeLock.acquire(10000);
+                    }
                     evaluate();
                     break;
             }
@@ -128,7 +135,6 @@ public class Overlay {
     private int[] colors = new int[0];
     private boolean wanted = false;
     private boolean kill = false;
-    private boolean visible = false;
     private boolean lastState = false;
     private int[] lastColors = new int[0];
     private SpritePlayer.Mode lastMode = SpritePlayer.Mode.SWIRL;
@@ -136,6 +142,8 @@ public class Overlay {
     private boolean added = false;
     private Point resolution;
     private IBinder windowToken;
+    private PowerManager.WakeLock cpuWakeLock;
+    private ContentResolver resolver;
 
     private Overlay(Context context) {
         windowManager = (WindowManager)context.getSystemService(Activity.WINDOW_SERVICE);
@@ -143,6 +151,8 @@ public class Overlay {
         handler = new Handler();
         settings = Settings.getInstance(context);
         resolution = getResolution();
+        cpuWakeLock = ((PowerManager)context.getSystemService(POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, BuildConfig.APPLICATION_ID + ":aod");
+        resolver = context.getContentResolver();
     }
 
     private Point getResolution() {
@@ -199,6 +209,7 @@ public class Overlay {
                                 skips = 0;
                                 return true;
                             }
+
                             return false;
                         }
                     }
@@ -340,19 +351,28 @@ public class Overlay {
 
         Context context = spritePlayer.getContext();
 
-        visible = Display.isOn(context, true);
+        boolean visible = Display.isOn(context, true);
         boolean doze = Display.isDoze(context);
+        if (!visible && !doze && settings.isHideAOD()) {
+            visible = true;
+            doze = true;
+        }
         if (visible && !doze && keyguardManager.isKeyguardLocked()) {
-            visible = visible && settings.isEnabledOnLockscreen();
+            visible = settings.isEnabledOnLockscreen();
         }
         if (wanted && visible && (colors.length > 0)) {
             int dpAdd = (doze ? 1 : 0);
-            SpritePlayer.Mode mode = settings.getAnimationMode(context, settings.getMode(Battery.isCharging(context), visible && !doze));
+            SpritePlayer.Mode mode = settings.getAnimationMode(context, settings.getMode(Battery.isCharging(context), !doze));
             if (!lastState || colorsChanged() || mode != lastMode || (dpAdd != lastDpAdd)) {
                 spritePlayer.setMode(mode);
                 createOverlay();
-                animation.setHideAOD(doze); //TODO
-                animation.setDpAdd(dpAdd);
+                if (settings.isHideAOD() && doze) {
+                    animation.setHideAOD(true);
+                    setAOD(true);
+                } else {
+                    animation.setHideAOD(false);
+                }
+                animation.setDpAdd(dpAdd); //TODO this causes SpriteSheet recreating; with hideAOD this means a delay that cause AOD to show for a second or so; without this it is a fraction of a second or not at all
                 animation.play(colors, false, (mode != lastMode));
                 lastColors = colors;
                 lastState = true;
@@ -361,6 +381,9 @@ public class Overlay {
             }
         } else {
             if (lastState) {
+                if (settings.isHideAOD()) {
+                    setAOD(false);
+                }
                 if (animation.isPlaying()) {
                     boolean immediately = !visible || kill;
                     animation.stop(immediately);
@@ -390,7 +413,14 @@ public class Overlay {
         evaluate();
     }
 
-    public boolean isVisible() {
-        return visible;
+    private void setAOD(boolean enabled) {
+        // This doesn't work if targetApi >= 23. But setting it to 22 breaks getting LED colors
+        try {
+            android.provider.Settings.System.putInt(resolver, "aod_mode", enabled ? 1 : 0);
+            android.provider.Settings.System.putInt(resolver, "aod_tap_to_show_mode", 0);
+        } catch (Exception e) {
+            // no permissions
+            e.printStackTrace();
+        }
     }
 }
