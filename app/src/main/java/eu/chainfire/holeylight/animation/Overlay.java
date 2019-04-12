@@ -40,6 +40,7 @@ import android.view.Gravity;
 import android.view.WindowManager;
 
 import eu.chainfire.holeylight.BuildConfig;
+import eu.chainfire.holeylight.misc.AODControl;
 import eu.chainfire.holeylight.misc.Battery;
 import eu.chainfire.holeylight.misc.Display;
 import eu.chainfire.holeylight.misc.Settings;
@@ -375,7 +376,7 @@ public class Overlay {
                 createOverlay();
                 if (settings.isHideAOD() && doze) {
                     animation.setHideAOD(true);
-                    setAOD(true);
+                    AODControl.setAOD(spritePlayer.getContext(), true);
                 } else {
                     animation.setHideAOD(false);
                 }
@@ -389,7 +390,8 @@ public class Overlay {
         } else {
             if (lastState) {
                 if (settings.isHideAOD()) {
-                    setAOD(false);
+                    animation.setHideAOD(false);
+                    AODControl.setAOD(spritePlayer.getContext(), false);
                 }
                 if (animation.isPlaying()) {
                     boolean immediately = !visible || kill;
@@ -418,16 +420,5 @@ public class Overlay {
         wanted = false;
         kill = immediately;
         evaluate();
-    }
-
-    private void setAOD(boolean enabled) {
-        // This doesn't work if targetApi >= 23. But setting it to 22 breaks getting LED colors
-        try {
-            android.provider.Settings.System.putInt(resolver, "aod_mode", enabled ? 1 : 0);
-            android.provider.Settings.System.putInt(resolver, "aod_tap_to_show_mode", 0);
-        } catch (Exception e) {
-            // no permissions
-            e.printStackTrace();
-        }
     }
 }

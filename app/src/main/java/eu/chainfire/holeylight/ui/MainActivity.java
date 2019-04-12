@@ -191,6 +191,16 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
         checkPermissions();
     }
 
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+    @Override
+    public void finish() {
+        TestNotification.hide(this, TestNotification.NOTIFICATION_ID_MAIN);
+        super.finish();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

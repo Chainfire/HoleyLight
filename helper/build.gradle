@@ -1,0 +1,41 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 22
+    defaultConfig {
+        applicationId "eu.chainfire.holeylight.aodhelper"
+        minSdkVersion 22
+        targetSdkVersion 22
+        versionCode 51
+        versionName "0.51"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            if (variant.buildType.name == 'release') {
+                outputFileName = "HoleyLight-AODHelper" + "-v" + android.defaultConfig.versionName + "-" + (new Date()).format('yyyyMMddHHmmss') + ".apk"
+                //TODO the line below warns about deprecation, fix. Bloody Gradle and their breakage every other week.
+                variant.assemble.doLast {
+                    copy {
+                        from 'build/outputs/mapping/release'
+                        into 'proguard'
+                        include '**/mapping.txt'
+                    }
+                }
+            }
+        }
+    }
+    lintOptions {
+        // We're not allowed on Google Play, boohoo
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+}

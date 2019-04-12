@@ -1,0 +1,21 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+          package="eu.chainfire.holeylight.aodhelper">
+
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"
+                     tools:ignore="ProtectedPermissions"/>
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher_jh"
+        android:label="Holey Light AOD Helper"
+        android:supportsRtl="true"
+        tools:ignore="GoogleAppIndexingWarning">
+        <receiver android:name=".AODReceiver" android:exported="true"
+                  tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="eu.chainfire.holeylightaodhelper.SET_AOD"/>
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

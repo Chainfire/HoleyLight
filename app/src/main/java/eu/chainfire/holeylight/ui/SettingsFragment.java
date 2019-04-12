@@ -33,6 +33,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
 import eu.chainfire.holeylight.R;
+import eu.chainfire.holeylight.misc.AODControl;
 import eu.chainfire.holeylight.misc.Settings;
 
 @SuppressWarnings({"WeakerAccess"})
@@ -146,6 +147,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         prefScreenOffCharging = check(catOperation, R.string.settings_screen_off_charging_title, R.string.settings_screen_off_charging_description, Settings.ENABLED_SCREEN_OFF_CHARGING, settings.isEnabledWhileScreenOffCharging(), true);
         prefScreenOffBattery = check(catOperation, R.string.settings_screen_off_battery_title, R.string.settings_screen_off_battery_description, Settings.ENABLED_SCREEN_OFF_BATTERY, settings.isEnabledWhileScreenOffBattery(), false);
         prefLockscreenOn = check(catOperation, R.string.settings_lockscreen_on_title, R.string.settings_lockscreen_on_description, Settings.ENABLED_LOCKSCREEN, settings.isEnabledOnLockscreen(), true);
+        if (AODControl.haveHelperPackage(getContext(), true)) {
+            check(catOperation, R.string.temp_settings_hide_aod_title, R.string.temp_settings_hide_aod_description, Settings.HIDE_AOD, settings.isHideAOD(), true);
+        }
 
         PreferenceCategory catMarkAsSeen;
 

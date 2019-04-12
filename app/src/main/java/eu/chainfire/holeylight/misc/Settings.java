@@ -100,6 +100,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     private static final String CHANNEL_COLOR = "CHANNEL_COLOR:";
     private static final String CHANNEL_COLOR_FMT = CHANNEL_COLOR + "%s:%s";
 
+    public static final String HIDE_AOD = "hide_aod";
+    private static final boolean HIDE_AOD_DEFAULT = false;
+
     private static Settings instance;
     public static Settings getInstance(Context context) {
         synchronized (Settings.class) {
@@ -357,7 +360,6 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public SpritePlayer.Mode getAnimationMode(Context context, int mode) {
-        // testing, correct code below
         boolean powerSave = isAnimationPowerSave(mode);
         if (!powerSave) return SpritePlayer.Mode.SWIRL;
         if ((mode & SHIFT_SCREEN_OFF) == SHIFT_SCREEN_OFF) {
@@ -374,6 +376,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
             } catch (Exception e) {
                 // no action
             }
+            if (isHideAOD() && AODControl.haveHelperPackage(context, false)) aod_mode = 1;
             if (aod_mode > 0) {
                 if (aod_tap > 0) {
                     return SpritePlayer.Mode.SINGLE;
@@ -427,6 +430,6 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public boolean isHideAOD() {
-        return false;
+        return prefs.getBoolean(HIDE_AOD, HIDE_AOD_DEFAULT);
     }
 }

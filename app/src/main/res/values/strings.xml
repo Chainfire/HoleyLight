@@ -100,4 +100,12 @@
     <string name="reset">Reset</string>
     <string name="refresh">Refresh</string>
     <string name="settings_animation_colors_description_v2">Adjust per-channel notification colors (use full black to hide)</string>
+
+    <!-- v0.51 -->
+
+    <!-- temporary: don't bother translating these -->
+    <string translatable="false" name="temp_settings_hide_aod_title">Automatic AOD - WORK IN PROGRESS</string>
+    <string translatable="false" name="temp_settings_hide_aod_description">Requires AOD Helper package. You need to configure an image without a clock on AOD first. Takes control of AOD.</string>
+    <!-- /temporary -->
+
 </resources>
