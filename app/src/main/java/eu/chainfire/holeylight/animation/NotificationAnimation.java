@@ -276,9 +276,9 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
                 // Update internal views first
                 if (hideAOD) {
-                    spritePlayer.updateInternalViews((int)left, (int)top, (int)width, (int)height);
+                    spritePlayer.updateDisplayArea((int)left, (int)top, (int)width, (int)height);
                 } else {
-                    spritePlayer.updateInternalViews(0, 0, (int)width, (int)height);
+                    spritePlayer.updateDisplayArea(0, 0, (int)width, (int)height);
                 }
 
                 // Update parent view
@@ -392,7 +392,6 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         return hideAOD;
     }
 
-    //TODO for this to work, we need setAOD in Overlay fixed, and the user must have configured a clock-less image (otherwise the clock renders on top after a little while)
     public void setHideAOD(boolean hideAOD) {
         synchronized (getSynchronizer()) {
             if (this.hideAOD != hideAOD) {
