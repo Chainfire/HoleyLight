@@ -1,19 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string translatable="false" name="app_name">Holey Light</string>
+    <string translatable="false" name="app_details">Copyright © 2019 – Chainfire\nTwitter: @ChainfireXDA\nTocca per visitare la discussione (in inglese) su XDA</string>
+    <string translatable="false" name="app_website_url">https://forum.xda-developers.com/galaxy-s10/themes/app-holey-light-t3917675</string>
+
     <string name="permission_required">Permessi necessari</string>
-    <string name="permission_battery"><![CDATA[Nella prossima schermata per favore consenti ad <b>Holey Light</b> di fermare l\'uso dell\'ottimizzazione della batteria. Ciò è necessario per continuare a far funzionare l\'animazione della notifica.]]></string>
+    <string name="permission_battery"><![CDATA[Nella prossima schermata per favore consenti ad <b>Holey Light</b> di fermare l\'uso del l\'ottimizzazione della batteria. Ciò è necessario per continuare a far funzionare l\'animazione della notifica.]]></string>
     <string name="permission_associate"><![CDATA[Nella prossima schermata per favore collega <b>Holey Light</b> con un dispositivo <b>qualsiasi</b>. Ciò è necessario per essere in grado accedere ai colori delle notifiche. Non importa quale dispositivo scegliate.<br><br>Per favore <b>attiva il Wi-Fi ed il Bluetooth</b> prima di continuare: potrai nuovamente disattivarli in seguito.<br><br>Se non appare alcuna finestra popup, assicurati che <b>Ricerca dispositivi vicini</b> sia attivo e che lo sia altrettanto l\'associazione con un dispositivo Bluetooth.]]></string>
     <string name="permission_notifications"><![CDATA[Nella prossima schermata per favore consenti a <b>Holey Light</b> l\'accesso alle notifiche. Ciò è necessario per essere in grado di rilevare le notifiche.]]></string>
     <string name="permission_accessibility"><![CDATA[Nella prossima schermata per favore vai in <b>Servizi installati</b> ed attiva <b>Holey Light</b>. Ciò è necessario per mostrare l\'animazione della notifica. Se non dovesse funzionare come previsto allora prova a riavviare.]]></string>
 
-    <string name="notification_test_title">Holey Light: Prova</string>
+    <string name="notification_test_title">Holey Light: prova</string>
     <string name="notification_test_description">Notifica di prova, LED bianco</string>
 
+    <string translatable="false" name="notification_permissions_title">@string/app_name</string>
     <string name="notification_permissions_description">Alcuni permessi devono essere aggiornati. Tocca per procedere.</string>
 
     <string name="error">Errore</string>
     <string name="error_hide_notch"><![CDATA[<b>Holey Light</b> non può funzionare se hai attivato la barra nera superiore. Vai in <b>Impostazioni</b> - <b>Schermo</b> - <b>Applicazioni a schermo intero</b> e disattiva <b>Nascondi fotocamera anteriore</b>.]]></string>
-    <string name="error_unsupported_device"><![CDATA[Sembra che <b>Holey Light</b> non supporti il tuo smartphone. Se stai usando una variante dell\'<b>S10</b> riporta per favore nella discussione (in lingua inglese) su XDA questo codice:<br><br>[ <b>%s</b> ]]]></string>
+    <string name="error_unsupported_device"><![CDATA[<Sembra che <b>Holey Light</b> non supporti il tuo smartphone. Se stai usando una variante dell\'<b>S10</b> riporta per favore nella discussione (in lingua inglese) su XDA questo codice:<br><br>[ <b>%s</b> ]]]></string>
 
     <string name="help_basic_title">Aiuto</string>
     <string name="help_basic_descrption">Alcuni consigli di base</string>
@@ -40,16 +45,22 @@
     <string name="settings_category_operation_title">Operatività</string>
     <string name="settings_screen_on_title">Schermo acceso</string>
     <string name="settings_screen_on_description">Mostra la notifica luminosa quando si utilizza normalmente il telefono</string>
+    <string name="settings_screen_off_charging_title" translatable="false">@string/charging_screen_off</string>
     <string name="settings_screen_off_charging_description">Mostra la notifica luminosa quando lo schermo è spento ed è in corso la ricarica</string>
+    <string translatable="false" name="settings_screen_off_battery_title">@string/battery_screen_off</string>
     <string name="settings_screen_off_battery_description">Mostra la notifica luminosa quando lo schermo è spento e con alimentazione a batteria, consumando ulteriore carica</string>
     <string name="settings_lockscreen_on_title">Schermata di blocco</string>
     <string name="settings_lockscreen_on_description">Mostra la notifica luminosa nella schermata di blocco: potrebbe apparire strano se è attivo lo sblocco con riconoscimento del viso</string>
 
     <string name="settings_category_seen_pickup_title">Segna come già letto: se sollevato</string>
     <string name="settings_category_seen_pickup_description">Visualizza per &gt;10s prima di essere rimosso</string>
+    <string translatable="false" name="settings_seen_pickup_screen_on_charging_title">@string/charging_screen_on</string>
     <string name="settings_seen_pickup_screen_on_charging_description">Ha senso quando si ha il telefono in carica dove può essere visto</string>
+    <string translatable="false" name="settings_seen_pickup_screen_off_charging_title">@string/charging_screen_off</string>
     <string name="settings_seen_pickup_screen_off_charging_description">Ha senso quando si ha il telefono in carica dove può essere visto</string>
+    <string translatable="false" name="settings_seen_pickup_screen_on_battery_title">@string/battery_screen_on</string>
     <string name="settings_seen_pickup_screen_on_battery_description">Richiede un consumo aggiuntivo di batteria</string>
+    <string translatable="false" name="settings_seen_pickup_screen_off_battery_title">@string/battery_screen_off</string>
     <string name="settings_seen_pickup_screen_off_battery_description">Richiede un consumo aggiuntivo notevole di batteria</string>
 
     <string name="settings_category_seen_lockscreen_title">Segna come già letto: Schermata di blocco</string>
@@ -66,6 +77,10 @@
 
     <string name="settings_animation_powersave_title">Animazione a risparmio energetico</string>
     <string name="settings_animation_powersave_description">Utilizzare l\'animazione a risparmio energetico al posto della rotazione riduce significatamente il consumo della batteria</string>
+    <string translatable="false" name="settings_animation_powersave_screen_on_charging">@string/charging_screen_on</string>
+    <string translatable="false" name="settings_animation_powersave_screen_off_charging">@string/charging_screen_off</string>
+    <string translatable="false" name="settings_animation_powersave_screen_on_battery">@string/battery_screen_on</string>
+    <string translatable="false" name="settings_animation_powersave_screen_off_battery">@string/battery_screen_off</string>
 
     <string name="settings_category_chainfire_title">Chainfire</string>
     <string name="settings_playstore_title">Tutte le mie app</string>
@@ -73,10 +88,16 @@
     <string name="settings_follow_twitter_title">Seguimi su Twitter</string>
     <string name="settings_follow_twitter_description">Resta aggiornato sui miei sviluppi</string>
 
-    <string name="tune_notice">Le modifiche verranno applicate solo dopo un ciclo di animazione completo!</string>
+    <string name="tune_notice">Le modifiche verranno applicate solo dopo un ciclo completo di animazione!</string>
     <string name="tune_scale_base">Scala la base: %.2fdp</string>
-    <string name="tune_scale_horizontal">Scala in orizzontale: %.2fdp</string>
-    <string name="tune_shift_vertical">Sposta in verticale: %.2fdp</string>
-    <string name="tune_shift_horizontal">Sposta in orizzontale: %.2fdp</string>
+    <string name="tune_scale_horizontal">Scala orizzontalmente: %.2fdp</string>
+    <string name="tune_shift_vertical">Sposta verticalmente: %.2fdp</string>
+    <string name="tune_shift_horizontal">Sposta orizzontalmente: %.2fdp</string>
     <string name="tune_speed">Velocità: %.1fx</string>
+
+    <!-- v0.50 -->
+
+    <string name="reset">Ripristina</string>
+    <string name="refresh">Aggiorna</string>
+    <string name="settings_animation_colors_description_v2">Scegli per canale i colori delle notifiche (seleziona nero per nascondere)</string>
 </resources>
