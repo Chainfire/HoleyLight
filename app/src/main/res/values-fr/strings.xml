@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="permission_required">Permissions requises</string>
-    <string name="permission_battery"><![CDATA[Sur le prochain écran veuillez autoriser <b>Holey Light</b> l'arrêt d'optimisation de la batterie. Cela est nécessaire pour conserver l'animation de notification allumée.]]></string>
-    <string name="permission_associate"><![CDATA[Sur le prochain écranliez <b>Holey Light</b> avec <b>n'importe quel</b> appareil. Cela est nécessaire pour accéder les notifications colorées. Votre choix n'a aucune importance.<br><br>Veuillez <b>activer le Wifi et le Bluetooth</b> avant de continuer; mais vous pouvez les désactiver par la suite.<br><br>Si aucune popup n'apparaît, assurez vous que <b>La recherche des appareils proches</b> est activée.]]></string>
+    <string name="permission_battery"><![CDATA[Sur le prochain écran veuillez autoriser <b>Holey Light</b> l\'arrêt d\'optimisation de la batterie. Cela est nécessaire pour conserver l\'animation de notification allumée.]]></string>
+    <string name="permission_associate"><![CDATA[Sur le prochain écranliez <b>Holey Light</b> avec <b>n\'importe quel</b> appareil. Cela est nécessaire pour accéder les notifications colorées. Votre choix n\'a aucune importance.<br><br>Veuillez <b>activer le Wifi et le Bluetooth</b> avant de continuer; mais vous pouvez les désactiver par la suite.<br><br>Si aucune popup n\'apparaît, assurez vous que <b>La recherche des appareils proches</b> est activée.]]></string>
     <string name="permission_notifications"><![CDATA[Sur le prochain écran, veuillez autoriser <b>Holey Light</b> à accéder aux notifications. Cela est nécessaire pour détécter les notifications.]]></string>
     <string name="permission_accessibility"><![CDATA[Sur le prochain écran, allez dans <b>Services installés</b>, et activez <b>Holey Light</b>. Cela est nécessaire pour afficher les animation de notification. Si cela ne fonctionne pas essayez de redémarrer votre téléphone.]]></string>
 
@@ -12,19 +12,19 @@
     <string name="notification_permissions_description">Certaines permissions doivent être mises à jour. Touchez pour commencer.</string>
 
     <string name="error">Erreur</string>
-    <string name="error_hide_notch"><![CDATA[<b>Holey Light</b> ne fonctionne pas tant que l'appareil photo avant est masqué par la barre noire. Désactivez <b>Paramètres</b> - <b>Affichage</b> - <b>Applications en plein écran</b> - <b>Masquage appareil photo avant</b>.]]></string>
+    <string name="error_hide_notch"><![CDATA[<b>Holey Light</b> ne fonctionne pas tant que l\'appareil photo avant est masqué par la barre noire. Désactivez <b>Paramètres</b> - <b>Affichage</b> - <b>Applications en plein écran</b> - <b>Masquage appareil photo avant</b>.]]></string>
     <string name="error_unsupported_device"><![CDATA[<b>Holey Light</b> ne semble pas être disponible pour votre appareil. Si vous utilisez une variante du <b>S10</b> reportez ce code dans la discussion du forum XDA:<br><br>[ <b>%s</b> ]]]></string>
 
     <string name="help_basic_title">Aide</string>
     <string name="help_basic_descrption">Un conseil simple</string>
     <string name="help_basic_message"><![CDATA[
-        <b>Holey Light</b> s'intègre avec <b>Always On Display (AOD)</b> (Voir les paramètres Android) pour afficher les notifications lorsque l'écran est éteint,
+        <b>Holey Light</b> s\'intègre avec <b>Always On Display (AOD)</b> (Voir les paramètres Android) pour afficher les notifications lorsque l\'écran est éteint,
         donc AOD doit être activé pour que cela fonctionne.<br>
         <br>
-        Tous les modes AOD fonctionnent cependant il est <i>fortement</i> déconseillé d'utiliser <b>l'affichage permanent</b> lorsque vous dormez. Ceci afin d'éviter
+        Tous les modes AOD fonctionnent cependant il est <i>fortement</i> déconseillé d\'utiliser <b>l\'affichage permanent</b> lorsque vous dormez. Ceci afin d\'éviter
         que votre écran surchauffe.
         <br>
-        Bien que des efforts particuliers ont été fait afin de réduire l'utilisation de la batterie <b>Holey Light</b> <i>consomme plus</i> comparé au mode <b>AOD</b> seul.
+        Bien que des efforts particuliers ont été fait afin de réduire l\'utilisation de la batterie <b>Holey Light</b> <i>consomme plus</i> comparé au mode <b>AOD</b> seul.
     ]]></string>
 
     <string name="enabled">Activé</string>
@@ -38,23 +38,23 @@
     <string name="settings_category_operation_title">Opération</string>
     <string name="settings_screen_on_title">Ecran allumé</string>
     <string name="settings_screen_on_description">Afficher le voyant de notification lorsque le téléphone est en utilisation normale</string>
-    <string name="settings_screen_off_charging_description">Afficher le voyant de notification lorsque l'écran est éteint et le téléphone en chargement</string>
-    <string name="settings_screen_off_battery_description">Afficher le voyant de notification lorsque l'écrant est éteint et le téléphone sur batteries, consomme d'avantage de puissance</string>
+    <string name="settings_screen_off_charging_description">Afficher le voyant de notification lorsque l\'écran est éteint et le téléphone en chargement</string>
+    <string name="settings_screen_off_battery_description">Afficher le voyant de notification lorsque l\'écrant est éteint et le téléphone sur batteries, consomme d\'avantage de puissance</string>
     <string name="settings_lockscreen_on_title">Ecran verrouillé</string>
-    <string name="settings_lockscreen_on_description">Afficher le voyant de notification sur l'écran vérrouilé; cela peut sembler lorsque le détection de visage est activée</string>
+    <string name="settings_lockscreen_on_description">Afficher le voyant de notification sur l\'écran vérrouilé; cela peut sembler lorsque le détection de visage est activée</string>
 
     <string name="settings_category_seen_pickup_title">Marqué comme vu: Activité</string>
     <string name="settings_category_seen_pickup_description">Stationnaire pendant &gt;10s avant de bouger</string>
-    <string name="settings_seen_pickup_screen_on_charging_description">Pratique lorsque vous chargez votre téléphone et que vous l'avez à vue</string>
-    <string name="settings_seen_pickup_screen_off_charging_description">Pratique lorsque vous chargez votre téléphone et que vous l'avez à vue</string>
+    <string name="settings_seen_pickup_screen_on_charging_description">Pratique lorsque vous chargez votre téléphone et que vous l\'avez à vue</string>
+    <string name="settings_seen_pickup_screen_off_charging_description">Pratique lorsque vous chargez votre téléphone et que vous l\'avez à vue</string>
     <string name="settings_seen_pickup_screen_on_battery_description">Consomme un peu plus de puissance</string>
     <string name="settings_seen_pickup_screen_off_battery_description">Consomme relativement plus de puissance</string>
 
     <string name="settings_category_seen_lockscreen_title">Marqué comme vu: Ecran verrouillé</string>
-    <string name="settings_seen_on_lockscreen_title">Sur l'écran vérouillé</string>
-    <string name="settings_seen_on_lockscreen_description">Chaque fois que l'écran de déverrouillage est affiché</string>
+    <string name="settings_seen_on_lockscreen_title">Sur l\'écran vérouillé</string>
+    <string name="settings_seen_on_lockscreen_description">Chaque fois que l\'écran de déverrouillage est affiché</string>
     <string name="settings_seen_on_user_present_title">Après déverrouillage</string>
-    <string name="settings_seen_on_user_present_description">Chaque fois que l'écran est déverrouillé</string>
+    <string name="settings_seen_on_user_present_description">Chaque fois que l\'écran est déverrouillé</string>
 
     <string name="settings_category_animation_title">Animation</string>
     <string name="settings_animation_tune_title">Réglage</string>
@@ -62,15 +62,15 @@
     <string name="settings_animation_colors_title">Couleurs</string>
     <string name="settings_animation_colors_description">Ajustez la couleur de notification par application (utilisez le noir pour cacher)</string>
 
-    <string name="settings_animation_powersave_title"><Animation économie d'énergie></string>
-    <string name="settings_animation_powersave_description">Utiliser l'animation économiseuse d'énergie plutôt que le tourbillon, econmise les batteries</string>
+    <string name="settings_animation_powersave_title">Animation économie d\'énergie></string>
+    <string name="settings_animation_powersave_description">Utiliser l\'animation économiseuse d\'énergie plutôt que le tourbillon, econmise les batteries</string>
     <string name="settings_category_chainfire_title">Chainfire</string>
     <string name="settings_playstore_title">Toutes mes applications</string>
     <string name="settings_playstore_description">Voir toutes mes applications sur Google Play</string>
     <string name="settings_follow_twitter_title">Suivez moi sur Twitter</string>
     <string name="settings_follow_twitter_description">Restez à jour avec mes développements</string>
 
-    <string name="tune_notice">Les changements prennent un cycle d'animation complet pour se mettre à jour!</string>
+    <string name="tune_notice">Les changements prennent un cycle d\'animation complet pour se mettre à jour!</string>
     <string name="tune_scale_base">Echelle de base: %.2fdp</string>
     <string name="tune_scale_horizontal">Echelle horizontale: %.2fdp</string>
     <string name="tune_shift_vertical">Déplacement vertical: %.2fdp</string>
