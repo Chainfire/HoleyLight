@@ -19,7 +19,6 @@
 package eu.chainfire.holeylight.misc;
 
 import android.annotation.SuppressLint;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Rect;
@@ -31,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import androidx.preference.PreferenceManager;
+import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.SpritePlayer;
 
 @SuppressWarnings({"WeakerAccess", "unused", "UnusedReturnValue"})
@@ -39,15 +39,61 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         void onSettingsChanged();
     }
 
-    private static final int SHIFT_CHARGING = 0;
-    private static final int SHIFT_BATTERY = 2;
     private static final int SHIFT_SCREEN_ON = 0;
     private static final int SHIFT_SCREEN_OFF = 1;
+    private static final int SHIFT_CHARGING = 0;
+    private static final int SHIFT_BATTERY = 2;
 
-    public static final int CHARGING_SCREEN_ON = SHIFT_CHARGING + SHIFT_SCREEN_ON;
-    public static final int CHARGING_SCREEN_OFF = SHIFT_CHARGING + SHIFT_SCREEN_OFF;
-    public static final int BATTERY_SCREEN_ON = SHIFT_BATTERY + SHIFT_SCREEN_ON;
-    public static final int BATTERY_SCREEN_OFF = SHIFT_BATTERY + SHIFT_SCREEN_OFF;
+    public static final int SCREEN_ON_CHARGING = SHIFT_SCREEN_ON + SHIFT_CHARGING;
+    public static final int SCREEN_OFF_CHARGING = SHIFT_SCREEN_OFF + SHIFT_CHARGING;
+    public static final int SCREEN_ON_BATTERY = SHIFT_SCREEN_ON + SHIFT_BATTERY;
+    public static final int SCREEN_OFF_BATTERY = SHIFT_SCREEN_OFF + SHIFT_BATTERY;
+
+    public static final String[] SCREEN_AND_POWER_STATE = new String[] {
+            "screen_on_charging",
+            "screen_off_charging",
+            "screen_on_battery",
+            "screen_off_battery"
+    };
+
+    // SCREEN_AND_POWER_STATE indexed
+    public static final String[] ANIMATION_STYLE_DEFAULTS = new String[] {
+            "swirl",
+            "tsp",
+            "blink",
+            "tsp"
+    };
+
+    public static final String[] ANIMATION_STYLE_NAMES = new String[] {
+            "swirl",
+            "blink",
+            "pie",
+            "tsp"
+    };
+
+    // ANIMATION_STYLE_NAMES indexed
+    public static final SpritePlayer.Mode[] ANIMATION_STYLE_VALUES = new SpritePlayer.Mode[] {
+            SpritePlayer.Mode.SWIRL,
+            SpritePlayer.Mode.BLINK,
+            SpritePlayer.Mode.SINGLE,
+            SpritePlayer.Mode.TSP
+    };
+
+    // ANIMATION_STYLE_NAMES indexed
+    public static final int[] ANIMATION_STYLE_TITLES = new int[] {
+            R.string.settings_animation_style_swirl_title,
+            R.string.settings_animation_style_blink_title,
+            R.string.settings_animation_style_single_title,
+            R.string.settings_animation_style_tsp_title
+    };
+
+    // ANIMATION_STYLE_NAMES indexed
+    public static final int[] ANIMATION_STYLE_DESCRIPTIONS = new int[] {
+            R.string.settings_animation_style_swirl_description,
+            R.string.settings_animation_style_blink_description,
+            R.string.settings_animation_style_single_description,
+            R.string.settings_animation_style_tsp_description
+    };
 
     public static final String ENABLED_MASTER = "enabled_master";
     private static final boolean ENABLED_MASTER_DEFAULT = true;
@@ -55,25 +101,25 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final String ENABLED_SCREEN_ON = "enabled_screen_on";
     private static final boolean ENABLED_SCREEN_ON_DEFAULT = true;
 
-    public static final String ENABLED_SCREEN_OFF_CHARGING = "enabled_screen_off_charging";
+    public static final String ENABLED_SCREEN_OFF_CHARGING = "enabled_" + SCREEN_AND_POWER_STATE[SCREEN_OFF_CHARGING];
     private static final boolean ENABLED_SCREEN_OFF_CHARGING_DEFAULT = true;
 
-    public static final String ENABLED_SCREEN_OFF_BATTERY = "enabled_screen_off_battery";
+    public static final String ENABLED_SCREEN_OFF_BATTERY = "enabled_" + SCREEN_AND_POWER_STATE[SCREEN_OFF_BATTERY];
     private static final boolean ENABLED_SCREEN_OFF_BATTERY_DEFAULT = true;
 
     public static final String ENABLED_LOCKSCREEN = "enabled_lockscreen";
     private static final boolean ENABLED_LOCKSCREEN_DEFAULT = true;
 
-    public static final String SEEN_PICKUP_SCREEN_ON_CHARGING = "seen_pickup_screen_on_charging";
+    public static final String SEEN_PICKUP_SCREEN_ON_CHARGING = "seen_pickup_" + SCREEN_AND_POWER_STATE[SCREEN_ON_CHARGING];
     private static final boolean SEEN_PICKUP_SCREEN_ON_CHARGING_DEFAULT = false;
 
-    public static final String SEEN_PICKUP_SCREEN_OFF_CHARGING = "seen_pickup_screen_off_charging";
+    public static final String SEEN_PICKUP_SCREEN_OFF_CHARGING = "seen_pickup_" + SCREEN_AND_POWER_STATE[SCREEN_OFF_CHARGING];
     private static final boolean SEEN_PICKUP_SCREEN_OFF_CHARGING_DEFAULT = false;
 
-    public static final String SEEN_PICKUP_SCREEN_ON_BATTERY = "seen_pickup_screen_on_battery";
+    public static final String SEEN_PICKUP_SCREEN_ON_BATTERY = "seen_pickup_" + SCREEN_AND_POWER_STATE[SCREEN_ON_BATTERY];
     private static final boolean SEEN_PICKUP_SCREEN_ON_BATTERY_DEFAULT = false;
 
-    public static final String SEEN_PICKUP_SCREEN_OFF_BATTERY = "seen_pickup_screen_off_battery";
+    public static final String SEEN_PICKUP_SCREEN_OFF_BATTERY = "seen_pickup_" + SCREEN_AND_POWER_STATE[SCREEN_OFF_BATTERY];
     private static final boolean SEEN_PICKUP_SCREEN_OFF_BATTERY_DEFAULT = false;
 
     public static final String SEEN_ON_LOCKSCREEN = "seen_on_lockscreen";
@@ -82,9 +128,8 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final String SEEN_ON_USER_PRESENT = "seen_on_user_present";
     private static final boolean SEEN_ON_USER_PRESENT_DEFAULT = false;
 
-    public static final String ANIMATION_POWERSAVE = "animation_blinker";
-    private static final int ANIMATION_POWERSAVE_DEFAULT = (1 << BATTERY_SCREEN_OFF) | (1 << CHARGING_SCREEN_OFF);
-    
+    public static final String ANIMATION_STYLE_FMT = "animation_%s";
+
     private static final String CUTOUT_AREA_LEFT = "cutout_area_left";
     private static final String CUTOUT_AREA_TOP = "cutout_area_top";
     private static final String CUTOUT_AREA_RIGHT = "cutout_area_right";
@@ -359,50 +404,28 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         return (!effective || isEnabledWhileScreenOffAny()) && prefs.getBoolean(SEEN_ON_USER_PRESENT, SEEN_ON_USER_PRESENT_DEFAULT);
     }
 
-    public SpritePlayer.Mode getAnimationMode(Context context, int mode) {
-        boolean powerSave = isAnimationPowerSave(mode);
-        if (!powerSave) return SpritePlayer.Mode.SWIRL;
-        if ((mode & SHIFT_SCREEN_OFF) == SHIFT_SCREEN_OFF) {
-            int aod_mode = 0;
-            int aod_tap = 0;
-            int fingerprint_unlock = 0;
-            int fingerprint_icon = 0;
-            try {
-                ContentResolver resolver = context.getContentResolver();
-                aod_mode = android.provider.Settings.System.getInt(resolver, "aod_mode", 0);
-                aod_tap = android.provider.Settings.System.getInt(resolver, "aod_tap_to_show_mode", 0);
-                fingerprint_unlock = android.provider.Settings.Secure.getInt(resolver, "fingerprint_screen_lock", 0);
-                fingerprint_icon = android.provider.Settings.Secure.getInt(resolver, "fingerprint_adaptive_icon", 0);
-            } catch (Exception e) {
-                // no action
-            }
-            if (isHideAOD() && AODControl.haveHelperPackage(context, false)) aod_mode = 1;
-            if (aod_mode > 0) {
-                if (aod_tap > 0) {
-                    return SpritePlayer.Mode.SINGLE;
-                }
-            } else if (fingerprint_unlock > 0) {
-                if (fingerprint_icon > 0) {
-                    return SpritePlayer.Mode.SINGLE;
-                }
+    public SpritePlayer.Mode getAnimationMode(int mode) {
+        String key = String.format(Locale.ENGLISH, ANIMATION_STYLE_FMT, SCREEN_AND_POWER_STATE[mode]);
+        String value = prefs.getString(key, ANIMATION_STYLE_DEFAULTS[mode]);
+        for (int i = 0; i < ANIMATION_STYLE_NAMES.length; i++) {
+            if (ANIMATION_STYLE_NAMES[i].equals(value)) {
+                return ANIMATION_STYLE_VALUES[i];
             }
         }
-        return SpritePlayer.Mode.BLINK;
+        return null;
     }
 
-    public boolean isAnimationPowerSave(int mode) {
-        return (prefs.getInt(ANIMATION_POWERSAVE, ANIMATION_POWERSAVE_DEFAULT) & (1 << mode)) == (1 << mode);
-    }
-
-    public void setAnimationPowerSave(int mode, boolean enabled) {
-        edit();
-        try {
-            editor.putInt(ANIMATION_POWERSAVE, enabled ?
-                    prefs.getInt(ANIMATION_POWERSAVE, ANIMATION_POWERSAVE_DEFAULT) | (1 << mode) :
-                    prefs.getInt(ANIMATION_POWERSAVE, ANIMATION_POWERSAVE_DEFAULT) & ~(1 << mode)
-            );
-        } finally {
-            save(true);
+    public void setAnimationMode(int mode, SpritePlayer.Mode animationMode) {
+        String key = String.format(Locale.ENGLISH, ANIMATION_STYLE_FMT, SCREEN_AND_POWER_STATE[mode]);
+        for (int i = 0; i < ANIMATION_STYLE_VALUES.length; i++) {
+            if (ANIMATION_STYLE_VALUES[i] == animationMode) {
+                edit();
+                try {
+                    editor.putString(key, ANIMATION_STYLE_NAMES[i]);
+                } finally {
+                    save(true);
+                }
+            }
         }
     }
 

@@ -73,6 +73,8 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private volatile boolean playNext = false;
 
     private volatile boolean hideAOD = false;
+    private volatile SpritePlayer.Mode mode = SpritePlayer.Mode.SWIRL;
+    private volatile Rect tspRect = new Rect(0, 0, 0, 0);
 
     public NotificationAnimation(Context context, SpritePlayer spritePlayer, OnNotificationAnimationListener onNotificationAnimationListener) {
         this.onNotificationAnimationListener = onNotificationAnimationListener;
@@ -205,7 +207,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
     private void setColor(int color) {
         synchronized (getSynchronizer()) {
-            if (spritePlayer.getMode() == SpritePlayer.Mode.SINGLE) {
+            if ((spritePlayer.getMode() == SpritePlayer.Mode.SINGLE) || (spritePlayer.getMode() == SpritePlayer.Mode.TSP)) {
                 spritePlayer.setColors(colors);
             } else {
                 spritePlayer.setColors(new int[] { color });
@@ -238,37 +240,61 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
             if (cameraCutout.isValid() && (lottieComposition != null)) {
                 int rotation = ((WindowManager) spritePlayer.getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
-
                 float realDpToPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, spritePlayer.getContext().getResources().getDisplayMetrics());
+                spritePlayer.setDpToPx(realDpToPx);
 
                 Point resolution = cameraCutout.getCurrentResolution();
 
-                // something weird is going on with Lottie's px->dp if current resolution doesn't match native resolution
-                float scale = (float) resolution.x / (float) cameraCutout.getNativeResolution().x;
-                float LottieDpToPx = (1.0f / scale) * realDpToPx;
+                float left;
+                float top;
+                float width;
+                float height;
 
-                Rect r = cameraCutout.getCutout().getArea();
-                Rect b = lottieComposition.getBounds();
+                if (mode == SpritePlayer.Mode.TSP) {
+                    // TSP saves the entire width
+                    tspRect.left = 0;
+                    tspRect.right = resolution.x;
 
-                float height = (b.height() / LottieDpToPx);
-                float width = (b.width() / LottieDpToPx);
-                float left = r.exactCenterX() - (width / 2.0f) + (getDpShiftHorizontal() * realDpToPx);
-                float top = r.exactCenterY() - (height / 2.0f) + (getDpShiftVertical() * realDpToPx);
+                    // Square
+                    if (tspRect.width() >= tspRect.height()) {
+                        left = tspRect.centerX() - (tspRect.height() / 2f);
+                        top = tspRect.top;
+                        width = tspRect.height();
+                        height = tspRect.height();
+                    } else {
+                        left = tspRect.left;
+                        top = tspRect.centerY() - (tspRect.width() / 2f);
+                        width = tspRect.width();
+                        height = tspRect.width();
+                    }
+                } else {
+                    // something weird is going on with Lottie's px->dp if current resolution doesn't match native resolution
+                    float scale = (float) resolution.x / (float) cameraCutout.getNativeResolution().x;
+                    float LottieDpToPx = (1.0f / scale) * realDpToPx;
 
-                // you'd assume as these animations come straight from Samsung's ROMs that they'd work perfectly
-                // out of the box, but oh no...
-                float addVertical = (getDpAddScaleBase() + dpAdd) * realDpToPx;
-                float addHorizontal = (addVertical * ((float)b.width() / (float)b.height())) + (getDpAddScaleHorizontal() * realDpToPx);
-                float scaledWidth = width + addHorizontal;
-                float scaledHeight = height + addVertical;
-                left -= (scaledWidth - width) / 2.0f;
-                top -= (scaledHeight - height) / 2.0f;
-                width = scaledWidth;
-                height = scaledHeight;
+                    Rect r = cameraCutout.getCutout().getArea();
+                    Rect b = lottieComposition.getBounds();
 
-                if (rotation == 2) { // upside down
-                    left = resolution.x - (int)(left + width);
-                    top = resolution.y - (int)(top + height);
+                    height = (b.height() / LottieDpToPx);
+                    width = (b.width() / LottieDpToPx);
+                    left = r.exactCenterX() - (width / 2.0f) + (getDpShiftHorizontal() * realDpToPx);
+                    top = r.exactCenterY() - (height / 2.0f) + (getDpShiftVertical() * realDpToPx);
+
+                    // you'd assume as these animations come straight from Samsung's ROMs that they'd work perfectly
+                    // out of the box, but oh no...
+                    float addVertical = (getDpAddScaleBase() + dpAdd) * realDpToPx;
+                    float addHorizontal = (addVertical * ((float)b.width() / (float)b.height())) + (getDpAddScaleHorizontal() * realDpToPx);
+                    float scaledWidth = width + addHorizontal;
+                    float scaledHeight = height + addVertical;
+                    left -= (scaledWidth - width) / 2.0f;
+                    top -= (scaledHeight - height) / 2.0f;
+                    width = scaledWidth;
+                    height = scaledHeight;
+
+                    if (rotation == 2) { // upside down
+                        left = resolution.x - (int)(left + width);
+                        top = resolution.y - (int)(top + height);
+                    }
                 }
 
                 // we're only going to allow portrait and reverse-portrait
@@ -317,6 +343,9 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
             if ((colors == null) || (colors.length == 0)) {
                 stop(true);
                 return;
+            }
+            if ((mode == SpritePlayer.Mode.SINGLE) || (mode == SpritePlayer.Mode.TSP)) {
+                immediately = true;
             }
             if (spritePlayer.isAnimating() && !immediately) {
                 this.colorsNext = colors;
@@ -396,6 +425,26 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         synchronized (getSynchronizer()) {
             if (this.hideAOD != hideAOD) {
                 this.hideAOD = hideAOD;
+                applyDimensions();
+            }
+        }
+    }
+
+    public void setMode(SpritePlayer.Mode mode) {
+        if (mode != this.mode) {
+            boolean apply = (mode == SpritePlayer.Mode.TSP) || (this.mode == SpritePlayer.Mode.TSP);
+            this.mode = mode;
+            spritePlayer.setMode(mode);
+            if (apply) {
+                applyDimensions();
+            }
+        }
+    }
+
+    public void updateTSPRect(Rect rect) {
+        if (!rect.equals(tspRect)) {
+            tspRect.set(rect);
+            if (mode == SpritePlayer.Mode.TSP) {
                 applyDimensions();
             }
         }

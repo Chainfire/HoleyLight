@@ -31,6 +31,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -109,6 +110,9 @@ public class Overlay {
                     }
                     break;
                 case Intent.ACTION_SCREEN_ON:
+                    animation.updateTSPRect(new Rect(0, 0, 0, 0));
+                    evaluate();
+                    break;
                 case Intent.ACTION_USER_PRESENT:
                 case Intent.ACTION_POWER_CONNECTED:
                 case Intent.ACTION_POWER_DISCONNECTED:
@@ -116,6 +120,7 @@ public class Overlay {
                     break;
                 case Intent.ACTION_SCREEN_OFF:
                     if (settings.isHideAOD()) {
+                        // without AOD we might immediately go to sleep, give us some time to setup
                         cpuWakeLock.acquire(10000);
                     }
                     evaluate();
@@ -370,17 +375,17 @@ public class Overlay {
         );
         if (wantedEffective && visible && (colors.length > 0)) {
             int dpAdd = (doze ? 1 : 0);
-            SpritePlayer.Mode mode = settings.getAnimationMode(context, settings.getMode(charging, !doze));
+            SpritePlayer.Mode mode = settings.getAnimationMode(settings.getMode(charging, !doze));
             if (!lastState || colorsChanged() || mode != lastMode || (dpAdd != lastDpAdd)) {
-                spritePlayer.setMode(mode);
+                animation.setMode(mode);
                 createOverlay();
-                if (settings.isHideAOD() && doze) {
+                if (settings.isHideAOD() && (doze)) {
                     animation.setHideAOD(true);
                     AODControl.setAOD(spritePlayer.getContext(), true);
                 } else {
                     animation.setHideAOD(false);
                 }
-                animation.setDpAdd(dpAdd); //TODO this causes SpriteSheet recreating; with hideAOD this means a delay that cause AOD to show for a second or so; without this it is a fraction of a second or not at all
+                animation.setDpAdd(dpAdd);
                 animation.play(colors, false, (mode != lastMode));
                 lastColors = colors;
                 lastState = true;
@@ -420,5 +425,11 @@ public class Overlay {
         wanted = false;
         kill = immediately;
         evaluate();
+    }
+
+    public void updateTSPRect(Rect rect) {
+        if (Display.isOff(spritePlayer.getContext(), true)) {
+            animation.updateTSPRect(rect);
+        }
     }
 }

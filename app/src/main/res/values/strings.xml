@@ -75,12 +75,12 @@
     <string name="settings_animation_colors_title">Colors</string>
     <string name="settings_animation_colors_description">Adjust per-package notification colors (use full black to hide)</string>
 
-    <string name="settings_animation_powersave_title">Power saving animation</string>
-    <string name="settings_animation_powersave_description">Use power saving animation instead of swirl, significantly reduces battery use</string>
-    <string translatable="false" name="settings_animation_powersave_screen_on_charging">@string/charging_screen_on</string>
-    <string translatable="false" name="settings_animation_powersave_screen_off_charging">@string/charging_screen_off</string>
-    <string translatable="false" name="settings_animation_powersave_screen_on_battery">@string/battery_screen_on</string>
-    <string translatable="false" name="settings_animation_powersave_screen_off_battery">@string/battery_screen_off</string>
+<!-- obsolete --><string name="settings_animation_powersave_title">Power saving animation</string>
+<!-- obsolete --><string name="settings_animation_powersave_description">Use power saving animation instead of swirl, significantly reduces battery use</string>
+<!-- obsolete --><string translatable="false" name="settings_animation_powersave_screen_on_charging">@string/charging_screen_on</string>
+<!-- obsolete --><string translatable="false" name="settings_animation_powersave_screen_off_charging">@string/charging_screen_off</string>
+<!-- obsolete --><string translatable="false" name="settings_animation_powersave_screen_on_battery">@string/battery_screen_on</string>
+<!-- obsolete --><string translatable="false" name="settings_animation_powersave_screen_off_battery">@string/battery_screen_off</string>
 
     <string name="settings_category_chainfire_title">Chainfire</string>
     <string name="settings_playstore_title">All my apps</string>
@@ -107,5 +107,24 @@
     <string translatable="false" name="temp_settings_hide_aod_title">Automatic AOD - WORK IN PROGRESS</string>
     <string translatable="false" name="temp_settings_hide_aod_description">Requires AOD Helper package. You need to configure an image without a clock on AOD first. Takes control of AOD.</string>
     <!-- /temporary -->
+    
+    <!-- v0.52 -->
+    <string translatable="false" name="settings_animation_screen_on_charging_title">@string/charging_screen_on</string>
+    <string name="settings_animation_screen_on_charging_description">Animation style when the screen is on and charging\n[ %s ]</string>
+    <string translatable="false" name="settings_animation_screen_off_charging_title">@string/charging_screen_off</string>
+    <string name="settings_animation_screen_off_charging_description">Animation style when the screen is off and charging\n[ %s ]</string>
+    <string translatable="false" name="settings_animation_screen_on_battery_title">@string/battery_screen_on</string>
+    <string name="settings_animation_screen_on_battery_description">Animation style when the screen is on and on battery power\n[ %s ]</string>
+    <string translatable="false" name="settings_animation_screen_off_battery_title">@string/battery_screen_off</string>
+    <string name="settings_animation_screen_off_battery_description">Animation style when the screen is off and on battery power\n[ %s ]</string>
 
+    <string name="settings_animation_style_dialog_title">Choose animation style</string>
+    <string name="settings_animation_style_swirl_title">Swirl</string>
+    <string name="settings_animation_style_blink_title">Blink</string>
+    <string name="settings_animation_style_single_title">Pie</string>
+    <string name="settings_animation_style_tsp_title">Unholey Light</string>
+    <string name="settings_animation_style_swirl_description">Up to 5.5% battery/hour</string>
+    <string name="settings_animation_style_blink_description">Up to 3.5% battery/hour</string>
+    <string name="settings_animation_style_single_description">Up to 3.5% battery/hour</string>
+    <string name="settings_animation_style_tsp_description">Below 1% battery/hour</string>
 </resources>

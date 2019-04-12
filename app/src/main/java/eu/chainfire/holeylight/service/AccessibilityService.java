@@ -18,16 +18,65 @@
 
 package eu.chainfire.holeylight.service;
 
+import android.graphics.Rect;
 import android.os.IBinder;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.accessibility.AccessibilityWindowInfo;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 import eu.chainfire.holeylight.animation.Overlay;
 
 public class AccessibilityService extends android.accessibilityservice.AccessibilityService {
     @Override
-    public void onAccessibilityEvent(AccessibilityEvent accessibilityEvent) {
+    public void onAccessibilityEvent(AccessibilityEvent event) {
+        // The image displayed in AOD is inside a ViewPager, and runs inside the SystemUI package.
+        //
+        // The dimensions returns are not an exact match if you monitor TSP in logcat, but its
+        // only a few pixels off (probably because AOD moves the images around a few pixels
+        // to prevent burn-in), that's why we add a margin too.
+        //
+        // The area of the ViewPager is saved to the screen when it goes into DOZE_SUSPEND mode,
+        // and requires no power nor CPU to keep displaying it.
+        //
+        // Of course it is possible we're getting the wrong ViewPager inside some random Android
+        // activity, so we make sure elsewhere the system is actually in doze mode before using it.
+
+        if (event.getPackageName() == null) return;
+        if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) return;
+        if (event.getPackageName() == null) return;
+        if (!event.getPackageName().toString().equals("com.android.systemui")) return;
+
+        List<AccessibilityWindowInfo> windows = getWindows();
+        for (AccessibilityWindowInfo window : windows) {
+            AccessibilityNodeInfo root = window.getRoot();
+
+            if (
+                    (root == null) ||
+                    (root.getChildCount() == 0) ||
+                    (root.getPackageName() == null) ||
+                    (!root.getPackageName().toString().equals("com.android.systemui"))
+            ) continue;
+
+            root.refresh();
+
+            for (int i = 0; i < root.getChildCount(); i++) {
+                AccessibilityNodeInfo node = root.getChild(i);
+                if (
+                        (node.getClassName() == null) ||
+                        (!node.getClassName().equals("android.support.v4.view.ViewPager"))
+                ) continue;
+
+                node.refresh();
+
+                Rect bounds = new Rect();
+                node.getBoundsInScreen(bounds);
+
+                Overlay.getInstance(this).updateTSPRect(bounds);
+            }
+        }
     }
 
     @Override

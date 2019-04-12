@@ -31,6 +31,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.SystemClock;
 import android.view.Choreographer;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -42,7 +43,7 @@ import androidx.annotation.NonNull;
 
 @SuppressWarnings({ "deprecation", "FieldCanBeLocal", "unused", "UnusedReturnValue" })
 public class SpritePlayer extends RelativeLayout {
-    public enum Mode { SWIRL, BLINK, SINGLE }
+    public enum Mode { SWIRL, BLINK, SINGLE, TSP }
 
     public interface OnSpriteSheetNeededListener {
         SpriteSheet onSpriteSheetNeeded(int width, int height, Mode mode);
@@ -61,31 +62,36 @@ public class SpritePlayer extends RelativeLayout {
     private final Handler handlerRender;
     private final Handler handlerLoader;
     private final Handler handlerMain;
-    private Choreographer choreographer;
+    private volatile Choreographer choreographer;
 
     private final SurfaceView surfaceView;
 
-    private OnSpriteSheetNeededListener onSpriteSheetNeededListener = null;
-    private OnAnimationListener onAnimationListener = null;
+    private volatile OnSpriteSheetNeededListener onSpriteSheetNeededListener = null;
+    private volatile OnAnimationListener onAnimationListener = null;
 
-    private int frame = -1;
-    private SpriteSheet spriteSheetSwirl = null;
-    private SpriteSheet spriteSheetBlink = null;
-    private SpriteSheet spriteSheetSingle = null;
-    private int spriteSheetLoading = 0;
+    private final Paint paint = new Paint();
+
+    private volatile int frame = -1;
+    private volatile SpriteSheet spriteSheetSwirl = null;
+    private volatile SpriteSheet spriteSheetBlink = null;
+    private volatile SpriteSheet spriteSheetSingle = null;
+    private volatile int spriteSheetLoading = 0;
     private volatile Point lastSpriteSheetRequest = new Point(0, 0);
-    private Rect dest = new Rect();
-    private Rect destDouble = new Rect();
-    private Paint paint = new Paint();
-    private boolean surfaceInvalidated = true;
-    private boolean draw = false;
-    private boolean wanted = false;
-    private int width = -1;
-    private int height = -1;
-    private int[] colors = null;
-    private float speed = 1.0f;
-    private Mode drawMode = Mode.SWIRL;
-    private boolean drawBackground = false;
+    private volatile Rect dest = new Rect();
+    private volatile Rect destDouble = new Rect();
+    private volatile boolean surfaceInvalidated = true;
+    private volatile boolean draw = false;
+    private volatile boolean wanted = false;
+    private volatile int width = -1;
+    private volatile int height = -1;
+    private volatile int[] colors = null;
+    private volatile float speed = 1.0f;
+    private volatile Mode drawMode = Mode.SWIRL;
+    private volatile boolean drawBackground = false;
+    private volatile long modeStart = 0L;
+    private volatile boolean surfaceReady = false;
+
+    private volatile float dpToPx = 1;
 
     public SpritePlayer(Context context) {
         super(context);
@@ -110,6 +116,7 @@ public class SpritePlayer extends RelativeLayout {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
         surfaceView = new SurfaceView(context);
+        surfaceView.setZOrderOnTop(true);
         surfaceView.getHolder().setFormat(PixelFormat.RGBA_8888);
         surfaceView.getHolder().addCallback(surfaceCallback);
         surfaceView.setVisibility(View.VISIBLE);
@@ -147,6 +154,7 @@ public class SpritePlayer extends RelativeLayout {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
             surfaceInvalidated = true;
+            surfaceReady = true;
         }
 
         @Override
@@ -160,6 +168,7 @@ public class SpritePlayer extends RelativeLayout {
 
         @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
+            surfaceReady = false;
             cancelNextFrame();
         }
     };
@@ -175,14 +184,42 @@ public class SpritePlayer extends RelativeLayout {
         return false;
     }
 
-    private void renderFrame(Canvas canvas, SpriteSheet spriteSheet, int frame) {
+    @SuppressWarnings("all")
+    private void renderFrame(Canvas canvas, SpriteSheet spriteSheet, int frame, float startAngle, float radiusDecrease) {
         if (drawBackground) {
             canvas.drawColor(Color.BLACK, PorterDuff.Mode.SRC);
         } else if (!canvas.isHardwareAccelerated()) {
             // on hardware accelerated canvas the content is already cleared
             canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         }
-        if (spriteSheet != null) {
+        if (drawMode == Mode.TSP) {
+            paint.setColorFilter(null);
+            paint.setXfermode(null);
+
+            float left = radiusDecrease;
+            float top = radiusDecrease;
+            float width = this.width - (radiusDecrease * 2f);
+            float height = this.height - (radiusDecrease * 2f);
+            float right = left + width;
+            float bottom = top + height;
+            float cx = left + (width / 2f);
+            float cy = top + (height / 2f);
+            float radius = (width / 2f) - (8f * dpToPx);
+
+            float anglePerColor = 360f / colors.length;
+            for (int i = 0; i < colors.length; i++) {
+                paint.setColor(colors[i]);
+                canvas.drawArc(left, top, right, bottom, startAngle + 270 + (anglePerColor * i), anglePerColor, true, paint);
+            }
+
+            if (drawBackground) {
+                paint.setColor(Color.BLACK);
+            } else {
+                paint.setColor(Color.TRANSPARENT);
+                paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            }
+            canvas.drawCircle(cx, cy, radius, paint);
+        } else if (spriteSheet != null) {
             paint.setXfermode(null);
             paint.setColor(Color.WHITE);
             SpriteSheet.Sprite sprite = spriteSheet.getFrame(frame);
@@ -202,7 +239,6 @@ public class SpritePlayer extends RelativeLayout {
 
                 paint.setXfermode(new PorterDuffXfermode(drawBackground ? PorterDuff.Mode.MULTIPLY : PorterDuff.Mode.SRC_ATOP));
 
-                float startAngle = 0;
                 float anglePerColor = 360f / colors.length;
                 for (int i = 0; i < colors.length; i++) {
                     // we use double size here because the arc may cut off the larger S10+ animation otherwise
@@ -221,14 +257,56 @@ public class SpritePlayer extends RelativeLayout {
         @Override
         public void doFrame(long frameTimeNanos) {
             synchronized (sync) {
+                // Software canvas 2x quicker than hardware during tests
                 SpriteSheet spriteSheet = getSpriteSheet();
-                if (draw) {
-                    if (spriteSheet == null) {
-                        // Software canvas 2x quicker than hardware during tests
+                if (draw && surfaceReady) {
+                    // AOD changes position every 10 minutes to prevent burn-in, so that's
+                    // as good a base as any to base our own burn-in protection on.
+                    // We rotate our colors throughout the circle, and change the radius
+                    final int cycle_ms =  10 * 60 * 1000;
+                    long diff = SystemClock.elapsedRealtime() - modeStart;
+                    float cycle_part = (diff % cycle_ms) / (float)cycle_ms;
+
+                    if (drawMode == Mode.TSP) {
+                        boolean draw;
+                        if (startTimeNanos == 0) {
+                            draw = true;
+                        } else {
+                            draw = (frameTimeNanos - startTimeNanos >= 8000000000L);
+                        }
+                        draw |= surfaceInvalidated;
+                        surfaceInvalidated = false;
+
+                        if (onAnimationListener != null) {
+                            onAnimationListener.onAnimationFrameStart(draw); // intentionally ignore result
+                        }
+                        if (draw) {
+                            Canvas canvas = surfaceView.getHolder().lockCanvas();
+                            if (canvas != null) {
+                                try {
+                                    renderFrame(canvas, null, 0, cycle_part * 360f, cycle_part * 16f * dpToPx);
+                                } finally {
+                                    try {
+                                        surfaceView.getHolder().unlockCanvasAndPost(canvas);
+                                    } catch (IllegalStateException e) {
+                                        // no action
+                                    }
+                                }
+                            }
+                            startTimeNanos = frameTimeNanos;
+                        }
+                        if (onAnimationListener != null) {
+                            onAnimationListener.onAnimationFrameEnd(draw);
+                        }
+                    } else if (spriteSheet == null) { // still loading
+                        if (onAnimationListener != null) {
+                            onAnimationListener.onAnimationFrameStart(true); // intentionally ignore result
+                        }
+
                         Canvas canvas = surfaceView.getHolder().lockCanvas();
                         if (canvas != null) {
                             try {
-                                renderFrame(canvas, null, 0);
+                                renderFrame(canvas, null, 0, 0f, 0f);
                             } finally {
                                 try {
                                     surfaceView.getHolder().unlockCanvasAndPost(canvas);
@@ -237,7 +315,11 @@ public class SpritePlayer extends RelativeLayout {
                                 }
                             }
                         }
-                    } else {
+
+                        if (onAnimationListener != null) {
+                            onAnimationListener.onAnimationFrameEnd(true);
+                        }
+                    } else { // ready
                         if (frame == -1) {
                             startTimeNanos = frameTimeNanos;
                             frame = 0;
@@ -256,11 +338,10 @@ public class SpritePlayer extends RelativeLayout {
                             lastFrameDrawn = drawFrame;
                             lastColors = colors;
 
-                            // Software canvas 2x quicker than hardware during tests
                             Canvas canvas = surfaceView.getHolder().lockCanvas();
                             if (canvas != null) {
                                 try {
-                                    renderFrame(canvas, spriteSheet, drawFrame);
+                                    renderFrame(canvas, spriteSheet, drawFrame, cycle_part * 360f, 0f);
                                 } finally {
                                     try {
                                         surfaceView.getHolder().unlockCanvasAndPost(canvas);
@@ -281,22 +362,35 @@ public class SpritePlayer extends RelativeLayout {
                         }
                     }
                 }
-                if (draw) callNextFrame();
+                if (draw) callNextFrame(!surfaceReady);
             }
         }
     };
 
+    private Runnable tspFrame = () -> frameCallback.doFrame(System.nanoTime());
+
     private void cancelNextFrame() {
+        handlerRender.removeCallbacks(tspFrame);
         choreographer.removeFrameCallback(frameCallback);
     }
 
-    private void callNextFrame() {
+    private void callNextFrame(boolean immediately) {
         cancelNextFrame();
-        choreographer.postFrameCallback(frameCallback);
+        if (immediately) surfaceInvalidated = true;
+        if (drawMode == Mode.TSP) {
+            handlerRender.postDelayed(tspFrame, immediately ? 0 : 250);
+        } else {
+            choreographer.postFrameCallback(frameCallback);
+        }
     }
 
     private void callOnSpriteSheetNeeded(int width, int height) {
         synchronized (sync) {
+            if (drawMode == Mode.TSP) {
+                surfaceInvalidated = true;
+                evaluate();
+                return;
+            }
             if (onSpriteSheetNeededListener == null) return;
             if (
                 (spriteSheetSwirl != null) && (spriteSheetSwirl.getWidth() == width) && (spriteSheetSwirl.getHeight() == height) &&
@@ -305,7 +399,9 @@ public class SpritePlayer extends RelativeLayout {
             ) return;
             if ((lastSpriteSheetRequest.x == width) && (lastSpriteSheetRequest.y == height)) return;
             lastSpriteSheetRequest.set(width, height);
-            resetSpriteSheet(null);
+            if (spriteSheetLoading == 0) {
+                resetSpriteSheet(null);
+            }
             dest.set(0, 0, width, height);
             destDouble.set(dest.centerX() - width, dest.centerY() - height, dest.centerX() + width, dest.centerY() + height);
             spriteSheetLoading++;
@@ -325,6 +421,10 @@ public class SpritePlayer extends RelativeLayout {
                         spriteSheetLoading--;
                         surfaceInvalidated = true;
                         evaluate();
+                    }
+                } else {
+                    synchronized (sync) {
+                        spriteSheetLoading--;
                     }
                 }
             });
@@ -414,14 +514,17 @@ public class SpritePlayer extends RelativeLayout {
     public void setColors(int[] colors) {
         synchronized (sync) {
             this.colors = colors;
-            surfaceInvalidated = true;
+            callNextFrame(true);
         }
     }
 
     private void startUpdating() {
         synchronized (sync) {
+            if (!draw) {
+                modeStart = SystemClock.elapsedRealtime();
+            }
             draw = true;
-            callNextFrame();
+            callNextFrame(true);
         }
     }
 
@@ -434,7 +537,9 @@ public class SpritePlayer extends RelativeLayout {
 
     private void evaluate() {
         synchronized (sync) {
-            if (wanted && ((getSpriteSheet() != null) || (spriteSheetLoading > 0)) && (getWindowVisibility() == View.VISIBLE) && (getVisibility() == View.VISIBLE)) {
+            boolean v1 = getWindowVisibility() == View.VISIBLE;
+            boolean v2 = getVisibility() == View.VISIBLE;
+            if (wanted && ((getSpriteSheet() != null) || (spriteSheetLoading > 0) || drawMode == Mode.TSP) && (getWindowVisibility() == View.VISIBLE) && (getVisibility() == View.VISIBLE)) {
                 startUpdating();
             } else {
                 stopUpdating();
@@ -476,6 +581,7 @@ public class SpritePlayer extends RelativeLayout {
         synchronized (sync) {
             if (mode != drawMode) {
                 frame = -1;
+                modeStart = SystemClock.elapsedRealtime();
                 drawMode = mode;
                 surfaceInvalidated = true;
                 evaluate();
@@ -523,5 +629,9 @@ public class SpritePlayer extends RelativeLayout {
 
     public Object getSynchronizer() {
         return sync;
+    }
+
+    public void setDpToPx(float dpToPx) {
+        this.dpToPx = dpToPx;
     }
 }
