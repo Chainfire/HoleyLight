@@ -136,4 +136,6 @@
 
     <string name="colors_header_active">Currently active</string>
     <string name="colors_header_inactive">Not currently active</string>
+
+    <string name="permission_accessibility_v2"><![CDATA[In the next screen, please go to <b>Installed services</b>, and enable <b>Holey Light</b>. This is required to be able to show notifications, and be able to tap into AOD. If this doesn\'t work right, try rebooting.]]></string>
 </resources>

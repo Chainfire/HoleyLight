@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
             case ACCESSIBILITY_SERVICE:
                 currentDialog = newAlert(false)
                         .setTitle(getString(R.string.permission_required) + " 3/4")
-                        .setMessage(Html.fromHtml(getString(R.string.permission_accessibility)))
+                        .setMessage(Html.fromHtml(getString(R.string.permission_accessibility_v2)))
                         .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                             Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
                             startActivity(intent);
