@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string translatable="false" name="app_name">Holey Light</string>
+    <string translatable="false" name="app_details">Copyright © 2019 – Chainfire\nTwitter: @ChainfireXDA\nToque para visitar o tópico no XDA</string>
+    <string translatable="false" name="app_website_url">https://forum.xda-developers.com/galaxy-s10/themes/app-holey-light-t3917675</string>
+
+    <string name="permission_required">Permissões necessárias</string>
+    <string name="permission_battery"><![CDATA[In the next dialog, please allow <b>Holey Light</b> to stop optimizing battery usage. This is required to keep the notification animation running.]]></string>
+    <string name="permission_associate"><![CDATA[In the next dialog, please link <b>Holey Light</b> with <b>any</b> device. This is required to be able to access notifications colors. It does not seem to matter which device you choose.<br><br>Please <b>turn on Wi-Fi and Bluetooth</b> before continuing; you can turn them off again afterwards.<br><br>If no popup comes up, try making sure <b>Nearby device scanning</b> is enabled, and pairing with a Bluetooth device.]]></string>
+    <string name="permission_notifications"><![CDATA[In the next screen, please allow <b>Holey Light</b> notification access. This is required to be able to detect notifications.]]></string>
+    <string name="permission_accessibility"><![CDATA[In the next screen, please go to <b>Installed services</b>, and enable <b>Holey Light</b>. This is required to show the notification animation. If this doesn\'t work right, try rebooting.]]></string>
+
+    <string name="notification_test_title">Holey Light: Teste</string>
+    <string name="notification_test_description">Notificação de teste, LED branco</string>
+
+    <string translatable="false" name="notification_permissions_title">@string/app_name</string>
+    <string name="notification_permissions_description">Algumas permissões precisam ser atualizadas. Toque para começar.</string>
+
+    <string name="error">Erro</string>
+    <string name="error_hide_notch"><![CDATA[<b>Holey Light</b> cannot function while the notch is hidden. Uncheck <b>Settings</b> - <b>Display</b> - <b>Full screen apps</b> - <b>Hide front camera</b>.]]></string>
+    <string name="error_unsupported_device"><![CDATA[<b>Holey Light</b> does not appear support your device. If you are using an <b>S10</b> variant please report this code to the XDA thread:<br><br>[ <b>%s</b> ]]]></string>
+
+    <string name="help_basic_title">Ajuda</string>
+    <string name="help_basic_descrption">Alguns conselhos básicos</string>
+    <string name="help_basic_message"><![CDATA[
+        <b>Holey Light</b> piggybacks on <b>Always On Display (AOD)</b> (see Android Settings) to show notifications when the screen is off,
+        so AOD must be enabled for those modes to work.<br>
+        <br>
+        AOD\'s <b>Show Always</b>, <b>Tap to show</b> and <b>Show as scheduled</b> modes are all supported. If you\'re not using <b>Tap to show</b>
+        mode, it is <i>strongly</i> advised to enable the <b>schedule</b> to turn off AOD while you are sleeping. This may help prevent
+        screen burn-in!<br>
+        <br>
+        While a lot of effort has been put into reducing battery use as much as possible, <b>Holey Light</b> <i>does</i> use additionally battery
+        compared to only using <b>AOD</b>.
+    ]]></string>
+
+    <string name="enabled">Habilitado</string>
+    <string name="disabled">Desabilitado</string>
+
+    <string name="charging_screen_on">Carregando: Tela ligada</string>
+    <string name="charging_screen_off">Carregando: Tela desligada</string>
+    <string name="battery_screen_on">Bateria: Tela ligada</string>
+    <string name="battery_screen_off">Bateria: Tela desligada</string>
+
+    <string name="settings_category_operation_title">Operação</string>
+    <string name="settings_screen_on_title">Tela ligada</string>
+    <string name="settings_screen_on_description">Mostrar luz de notificação enquanto o telefone está em uso normal</string>
+    <string name="settings_screen_off_charging_title" translatable="false">@string/charging_screen_off</string>
+    <string name="settings_screen_off_charging_description">Mostrar luz de notificação enquanto a tela está desligada e carregando</string>
+    <string translatable="false" name="settings_screen_off_battery_title">@string/battery_screen_off</string>
+    <string name="settings_screen_off_battery_description">Mostrar luz de notificação enquanto a tela estiver desligada e com a energia da bateria, consumindo energia adicional</string>
+    <string name="settings_lockscreen_on_title">Tela de bloqueio</string>
+    <string name="settings_lockscreen_on_description">Mostrar luz de notificação na tela de bloqueio; isso pode parecer estranho se o desbloqueio facial estiver ativado</string>
+
+    <string name="settings_category_seen_pickup_title">Marcar como visto: Selecionar</string>
+    <string name="settings_category_seen_pickup_description">Estacionado por &gt;10s antes de mover</string>
+    <string translatable="false" name="settings_seen_pickup_screen_on_charging_title">@string/charging_screen_on</string>
+    <string name="settings_seen_pickup_screen_on_charging_description">Faz sentido quando você costuma carregar seu telefone onde você pode vê-lo</string>
+    <string translatable="false" name="settings_seen_pickup_screen_off_charging_title">@string/charging_screen_off</string>
+    <string name="settings_seen_pickup_screen_off_charging_description">Faz sentido quando você costuma carregar seu telefone onde você pode vê-lo</string>
+    <string translatable="false" name="settings_seen_pickup_screen_on_battery_title">@string/battery_screen_on</string>
+    <string name="settings_seen_pickup_screen_on_battery_description">Consome um pouco mais de bateria</string>
+    <string translatable="false" name="settings_seen_pickup_screen_off_battery_title">@string/battery_screen_off</string>
+    <string name="settings_seen_pickup_screen_off_battery_description">Consome bateria adicional significativa</string>
+
+    <string name="settings_category_seen_lockscreen_title">Marcar como visto: Tela de bloqueio</string>
+    <string name="settings_seen_on_lockscreen_title">Na tela de bloqueio</string>
+    <string name="settings_seen_on_lockscreen_description">Cada vez que a tela de bloqueio é mostrada</string>
+    <string name="settings_seen_on_user_present_title">Após o desbloqueio</string>
+    <string name="settings_seen_on_user_present_description">Cada vez que a tela de bloqueio é desbloqueada</string>
+
+    <string name="settings_category_animation_title">Animação</string>
+    <string name="settings_animation_tune_title">Ajuste</string>
+    <string name="settings_animation_tune_description">Ajuste fino de tamanho, posição e velocidade</string>
+    <string name="settings_animation_colors_title">Cores</string>
+    <string name="settings_animation_colors_description">Ajustar as cores de notificação por pacote (use preto para ocultar)</string>
+
+    <string name="settings_animation_powersave_title">Animação de economia de energia</string>
+    <string name="settings_animation_powersave_description">Use animação de economia de energia em vez de redemoinho, isso reduz significativamente o uso da bateria</string>
+    <string translatable="false" name="settings_animation_powersave_screen_on_charging">@string/charging_screen_on</string>
+    <string translatable="false" name="settings_animation_powersave_screen_off_charging">@string/charging_screen_off</string>
+    <string translatable="false" name="settings_animation_powersave_screen_on_battery">@string/battery_screen_on</string>
+    <string translatable="false" name="settings_animation_powersave_screen_off_battery">@string/battery_screen_off</string>
+
+    <string name="settings_category_chainfire_title">Chainfire</string>
+    <string name="settings_playstore_title">Todos os meus apps</string>
+    <string name="settings_playstore_description">Veja todos os meus apps disponíveis no Google Play</string>
+    <string name="settings_follow_twitter_title">Siga-me no Twitter</string>
+    <string name="settings_follow_twitter_description">Mantenha-se atualizado sobre os meus desenvolvimentos</string>
+
+    <string name="tune_notice">As alterações levam um ciclo de animação completo para atualizar!</string>
+    <string name="tune_scale_base">Escala base: %.2fdp</string>
+    <string name="tune_scale_horizontal">Escala horizontal: %.2fdp</string>
+    <string name="tune_shift_vertical">Deslocamento vertical: %.2fdp</string>
+    <string name="tune_shift_horizontal">Deslocamento horizontal: %.2fdp</string>
+    <string name="tune_speed">Velocidade: %.1fx</string>
+
+    <!-- v0.50 -->
+
+    <string name="reset">Resetar</string>
+    <string name="refresh">\Atualizar</string>
+    <string name="settings_animation_colors_description_v2">Ajustar as cores de notificação por canal (use preto para ocultar)</string>
+
+    <!-- v0.51 -->
+
+    <!-- temporary: don't bother translating these -->
+    <string translatable="false" name="temp_settings_hide_aod_title">AOD Automático - TRABALHO EM PROGRESSO</string>
+    <string translatable="false" name="temp_settings_hide_aod_description">Requer pacote AOD Helper. Você primeiro precisa configurar uma imagem sem um relógio no AOD. Assuma o controle do AOD.</string>
+    <!-- /temporary -->
+
+
+
+    <!-- TODO -->
+    <string name="translation_by">brenopapito</string>
+</resources>
