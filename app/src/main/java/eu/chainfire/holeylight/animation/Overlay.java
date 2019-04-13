@@ -370,38 +370,35 @@ public class Overlay {
         boolean lockscreen = on && keyguardManager.isKeyguardLocked();
         boolean charging = Battery.isCharging(context);
 
-        SpritePlayer.Mode mode = settings.getAnimationMode(settings.getMode(charging, !doze));
+        int mode = settings.getMode(charging, !doze);
+        SpritePlayer.Mode renderMode = settings.getAnimationMode(mode);
 
         // We don't have the helper package that properly turns off AOD (passive hide) when we want
         // to hide it, but we still want AOD to be invisible: active hide
-        boolean activeHide = (colors.length == 0) && doze && (settings.isHideAOD() || spritePlayer.isTSPMode(mode)) && !AODControl.haveHelperPackage(context, false);
+        boolean activeHide = (colors.length == 0) && doze && (settings.isHideAOD() || spritePlayer.isTSPMode(renderMode)) && !AODControl.haveHelperPackage(context, false);
         if (activeHide) {
-            mode = SpritePlayer.Mode.TSP_HIDE;
+            renderMode = SpritePlayer.Mode.TSP_HIDE;
         }
 
-        boolean wantedEffective = (wanted || activeHide) && (
-                (on && !lockscreen && settings.isEnabledWhileScreenOn()) ||
-                (on && lockscreen && settings.isEnabledOnLockscreen()) ||
-                (!on && charging && settings.isEnabledWhileScreenOffCharging()) ||
-                (!on && !charging && settings.isEnabledWhileScreenOffBattery())
-        );
+        boolean lockscreenOk = on && (!lockscreen || settings.isEnabledOnLockscreen());
+        boolean wantedEffective = (wanted || activeHide) && settings.isEnabledWhile(mode) && lockscreenOk;
 
-        if (wantedEffective && visible && ((colors.length > 0) || activeHide)) {
+        if (visible && wantedEffective && ((colors.length > 0) || activeHide)) {
             int dpAdd = (doze ? 1 : 0);
-            if (!lastState || colorsChanged() || mode != lastMode || (dpAdd != lastDpAdd)) {
-                animation.setMode(mode);
+            if (!lastState || colorsChanged() || renderMode != lastMode || (dpAdd != lastDpAdd)) {
+                animation.setMode(renderMode);
                 createOverlay();
                 if (settings.isHideAOD() && doze) {
                     animation.setHideAOD(true);
                     AODControl.setAOD(spritePlayer.getContext(), true);
                 } else {
-                    animation.setHideAOD(spritePlayer.isTSPMode(mode));
+                    animation.setHideAOD(spritePlayer.isTSPMode(renderMode));
                 }
                 animation.setDpAdd(dpAdd);
-                animation.play(activeHide ? new int[] { Color.BLACK } : colors, false, (mode != lastMode));
+                animation.play(activeHide ? new int[] { Color.BLACK } : colors, false, (renderMode != lastMode));
                 lastColors = colors;
                 lastState = true;
-                lastMode = mode;
+                lastMode = renderMode;
                 lastDpAdd = dpAdd;
             }
         } else {

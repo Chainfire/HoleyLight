@@ -81,6 +81,7 @@ public class NotificationListenerService extends android.service.notification.No
     private KeyguardManager keyguardManager = null;
     private int[] currentColors = new int[0];
     private boolean enabled = true;
+    private long settingsKey = 0L;
     private boolean isUserPresent = false;
     private MotionSensor.MotionState lastMotionState = MotionSensor.MotionState.UNKNOWN;
     private long stationary_for_ms = 0;
@@ -147,9 +148,10 @@ public class NotificationListenerService extends android.service.notification.No
 
     @Override
     public void onSettingsChanged() {
-        boolean newEnabled = settings.isEnabled();
-        if (newEnabled != enabled) {
-            enabled = newEnabled;
+        enabled = settings.isEnabled();
+        long newKey = settings.refreshNotificationsKey();
+        if (newKey != settingsKey) {
+            settingsKey = newKey;
             apply();
         }
         if (connected) handleLEDNotifications();

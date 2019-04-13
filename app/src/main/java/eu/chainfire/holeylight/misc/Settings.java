@@ -57,6 +57,22 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     };
 
     // SCREEN_AND_POWER_STATE indexed
+    public static final boolean[] ENABLED_WHILE_DEFAULTS = new boolean[] {
+            true,
+            true,
+            true,
+            true
+    };
+
+    public static final String ENABLED_WHILE_FMT = "enabled_%s";
+
+    public static final String ENABLED_MASTER = "enabled_master";
+    private static final boolean ENABLED_MASTER_DEFAULT = true;
+
+    public static final String ENABLED_LOCKSCREEN = "enabled_lockscreen";
+    private static final boolean ENABLED_LOCKSCREEN_DEFAULT = true;
+
+    // SCREEN_AND_POWER_STATE indexed
     public static final String[] ANIMATION_STYLE_DEFAULTS = new String[] {
             "swirl",
             "tsp",
@@ -95,20 +111,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
             R.string.settings_animation_style_tsp_description
     };
 
-    public static final String ENABLED_MASTER = "enabled_master";
-    private static final boolean ENABLED_MASTER_DEFAULT = true;
-
-    public static final String ENABLED_SCREEN_ON = "enabled_screen_on";
-    private static final boolean ENABLED_SCREEN_ON_DEFAULT = true;
-
-    public static final String ENABLED_SCREEN_OFF_CHARGING = "enabled_" + SCREEN_AND_POWER_STATE[SCREEN_OFF_CHARGING];
-    private static final boolean ENABLED_SCREEN_OFF_CHARGING_DEFAULT = true;
-
-    public static final String ENABLED_SCREEN_OFF_BATTERY = "enabled_" + SCREEN_AND_POWER_STATE[SCREEN_OFF_BATTERY];
-    private static final boolean ENABLED_SCREEN_OFF_BATTERY_DEFAULT = true;
-
-    public static final String ENABLED_LOCKSCREEN = "enabled_lockscreen";
-    private static final boolean ENABLED_LOCKSCREEN_DEFAULT = true;
+    public static final String ANIMATION_STYLE_FMT = "animation_%s";
 
     public static final String SEEN_PICKUP_SCREEN_ON_CHARGING = "seen_pickup_" + SCREEN_AND_POWER_STATE[SCREEN_ON_CHARGING];
     private static final boolean SEEN_PICKUP_SCREEN_ON_CHARGING_DEFAULT = false;
@@ -127,8 +130,6 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public static final String SEEN_ON_USER_PRESENT = "seen_on_user_present";
     private static final boolean SEEN_ON_USER_PRESENT_DEFAULT = false;
-
-    public static final String ANIMATION_STYLE_FMT = "animation_%s";
 
     private static final String CUTOUT_AREA_LEFT = "cutout_area_left";
     private static final String CUTOUT_AREA_TOP = "cutout_area_top";
@@ -331,24 +332,35 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
+    public String isEnabledWhileKey(int mode) {
+        return String.format(Locale.ENGLISH, ENABLED_WHILE_FMT, SCREEN_AND_POWER_STATE[mode]);
+    }
+
+    public boolean isEnabledWhile(int mode) {
+        return isEnabled() && prefs.getBoolean(isEnabledWhileKey(mode), ENABLED_WHILE_DEFAULTS[mode]);
+    }
+
     public boolean isEnabledWhileScreenOn() {
-        return isEnabled() && prefs.getBoolean(ENABLED_SCREEN_ON, ENABLED_SCREEN_ON_DEFAULT);
+        return isEnabledWhile(Settings.SCREEN_ON_CHARGING) || isEnabledWhile(Settings.SCREEN_ON_BATTERY);
     }
 
-    public boolean isEnabledWhileScreenOffAny() {
-        return isEnabledWhileScreenOffCharging() || isEnabledWhileScreenOffBattery();
-    }
-
-    public boolean isEnabledWhileScreenOffCharging() {
-        return isEnabled() && prefs.getBoolean(ENABLED_SCREEN_OFF_CHARGING, ENABLED_SCREEN_OFF_CHARGING_DEFAULT);
-    }
-
-    public boolean isEnabledWhileScreenOffBattery() {
-        return isEnabled() && prefs.getBoolean(ENABLED_SCREEN_OFF_BATTERY, ENABLED_SCREEN_OFF_BATTERY_DEFAULT);
+    public boolean isEnabledWhileScreenOff() {
+        return isEnabledWhile(Settings.SCREEN_OFF_CHARGING) || isEnabledWhile(Settings.SCREEN_OFF_BATTERY);
     }
 
     public boolean isEnabledOnLockscreen() {
         return isEnabledWhileScreenOn() && prefs.getBoolean(ENABLED_LOCKSCREEN, ENABLED_LOCKSCREEN_DEFAULT);
+    }
+
+    public long refreshNotificationsKey() {
+        long ret = isEnabled() ? 1 : 0;
+        int shift = 1;
+        for (int i = 0; i < SCREEN_AND_POWER_STATE.length; i++) {
+            ret += (isEnabledWhile(i) ? 1 : 0) << shift;
+            shift++;
+        }
+        ret += (isEnabledOnLockscreen() ? 1 : 0) << shift;
+        return ret;
     }
 
     public int getColorForPackageAndChannel(String packageName, String channelName, int defaultValue) {
@@ -385,7 +397,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public boolean isSeenPickupScreenOffCharging(boolean effective) {
-        return (!effective || isEnabledWhileScreenOffCharging()) && prefs.getBoolean(SEEN_PICKUP_SCREEN_OFF_CHARGING, SEEN_PICKUP_SCREEN_OFF_CHARGING_DEFAULT);
+        return (!effective || isEnabledWhile(Settings.SCREEN_OFF_CHARGING)) && prefs.getBoolean(SEEN_PICKUP_SCREEN_OFF_CHARGING, SEEN_PICKUP_SCREEN_OFF_CHARGING_DEFAULT);
     }
 
     public boolean isSeenPickupScreenOnBattery(boolean effective) {
@@ -393,15 +405,15 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public boolean isSeenPickupScreenOffBattery(boolean effective) {
-        return (!effective || isEnabledWhileScreenOffBattery()) && prefs.getBoolean(SEEN_PICKUP_SCREEN_OFF_BATTERY, SEEN_PICKUP_SCREEN_OFF_BATTERY_DEFAULT);
+        return (!effective || isEnabledWhile(Settings.SCREEN_OFF_BATTERY)) && prefs.getBoolean(SEEN_PICKUP_SCREEN_OFF_BATTERY, SEEN_PICKUP_SCREEN_OFF_BATTERY_DEFAULT);
     }
 
     public boolean isSeenOnLockscreen(boolean effective) {
-        return (!effective || isEnabledWhileScreenOffAny()) && prefs.getBoolean(SEEN_ON_LOCKSCREEN, SEEN_ON_LOCKSCREEN_DEFAULT);
+        return (!effective || isEnabledWhileScreenOff()) && prefs.getBoolean(SEEN_ON_LOCKSCREEN, SEEN_ON_LOCKSCREEN_DEFAULT);
     }
 
     public boolean isSeenOnUserPresent(boolean effective) {
-        return (!effective || isEnabledWhileScreenOffAny()) && prefs.getBoolean(SEEN_ON_USER_PRESENT, SEEN_ON_USER_PRESENT_DEFAULT);
+        return (!effective || isEnabledWhileScreenOff()) && prefs.getBoolean(SEEN_ON_USER_PRESENT, SEEN_ON_USER_PRESENT_DEFAULT);
     }
 
     public SpritePlayer.Mode getAnimationMode(int mode) {

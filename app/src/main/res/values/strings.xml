@@ -43,9 +43,9 @@
     <string name="battery_screen_off">Battery: Screen off</string>
 
     <string name="settings_category_operation_title">Operation</string>
-    <string name="settings_screen_on_title">Screen on</string>
-    <string name="settings_screen_on_description">Show notification light while the phone is in normal use</string>
-    <string name="settings_screen_off_charging_title" translatable="false">@string/charging_screen_off</string>
+<!-- obsolete --><string name="settings_screen_on_title">Screen on</string>
+<!-- obsolete --><string name="settings_screen_on_description">Show notification light while the phone is in normal use</string>
+    <string translatable="false" name="settings_screen_off_charging_title">@string/charging_screen_off</string>
     <string name="settings_screen_off_charging_description">Show notification light while the screen is off and charging</string>
     <string translatable="false" name="settings_screen_off_battery_title">@string/battery_screen_off</string>
     <string name="settings_screen_off_battery_description">Show notification light while the screen is off and on battery power, consuming additional power</string>
@@ -140,4 +140,9 @@
     <string name="settings_animation_colors_description_v3">Adjust notification color per package and channel</string>
 
     <string name="permission_accessibility_v2"><![CDATA[In the next screen, please go to <b>Installed services</b>, and enable <b>Holey Light</b>. This is required to be able to show notifications, and be able to tap into AOD. If this doesn\'t work right, try rebooting.]]></string>
+
+    <string translatable="false" name="settings_screen_on_charging_title">@string/charging_screen_on</string>
+    <string name="settings_screen_on_charging_description">Show notification light while the screen is on and charging</string>
+    <string translatable="false" name="settings_screen_on_battery_title">@string/battery_screen_on</string>
+    <string name="settings_screen_on_battery_description">Show notification light while the screen is on and on battery power</string>
 </resources>

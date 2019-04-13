@@ -41,8 +41,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private SharedPreferences prefs = null;
     private Settings settings = null;
 
-    private CheckBoxPreference prefScreenOn = null;
+    private CheckBoxPreference prefScreenOnCharging = null;
     private CheckBoxPreference prefScreenOffCharging = null;
+    private CheckBoxPreference prefScreenOnBattery = null;
     private CheckBoxPreference prefScreenOffBattery = null;
     private Preference prefAnimationScreenOnCharging = null;
     private Preference prefAnimationScreenOnBattery = null;
@@ -153,9 +154,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         root.addPreference(basicHelp);
 
         PreferenceCategory catOperation = category(root, R.string.settings_category_operation_title, 0);
-        prefScreenOn = check(catOperation, R.string.settings_screen_on_title, R.string.settings_screen_on_description, Settings.ENABLED_SCREEN_ON, settings.isEnabledWhileScreenOn(), true);
-        prefScreenOffCharging = check(catOperation, R.string.settings_screen_off_charging_title, R.string.settings_screen_off_charging_description, Settings.ENABLED_SCREEN_OFF_CHARGING, settings.isEnabledWhileScreenOffCharging(), true);
-        prefScreenOffBattery = check(catOperation, R.string.settings_screen_off_battery_title, R.string.settings_screen_off_battery_description, Settings.ENABLED_SCREEN_OFF_BATTERY, settings.isEnabledWhileScreenOffBattery(), false);
+        prefScreenOnCharging = check(catOperation, R.string.settings_screen_on_charging_title, R.string.settings_screen_on_charging_description, settings.isEnabledWhileKey(Settings.SCREEN_ON_CHARGING), settings.isEnabledWhile(Settings.SCREEN_ON_CHARGING), true);
+        prefScreenOffCharging = check(catOperation, R.string.settings_screen_off_charging_title, R.string.settings_screen_off_charging_description, settings.isEnabledWhileKey(Settings.SCREEN_OFF_CHARGING), settings.isEnabledWhile(Settings.SCREEN_OFF_CHARGING), true);
+        prefScreenOnBattery = check(catOperation, R.string.settings_screen_on_battery_title, R.string.settings_screen_on_battery_description, settings.isEnabledWhileKey(Settings.SCREEN_ON_BATTERY), settings.isEnabledWhile(Settings.SCREEN_ON_BATTERY), true);
+        prefScreenOffBattery = check(catOperation, R.string.settings_screen_off_battery_title, R.string.settings_screen_off_battery_description, settings.isEnabledWhileKey(Settings.SCREEN_OFF_BATTERY), settings.isEnabledWhile(Settings.SCREEN_OFF_BATTERY), false);
         prefLockscreenOn = check(catOperation, R.string.settings_lockscreen_on_title, R.string.settings_lockscreen_on_description, Settings.ENABLED_LOCKSCREEN, settings.isEnabledOnLockscreen(), true);
         check(catOperation, R.string.temp_settings_hide_aod_title, R.string.temp_settings_hide_aod_description, Settings.HIDE_AOD, settings.isHideAOD(), true);
 
@@ -267,25 +269,26 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     @SuppressWarnings({ "unused", "ConstantConditions" })
     private void updatePrefs(String key) {
-        if (prefScreenOn != null) {
-            prefScreenOn.setEnabled(settings.isEnabled());
+        if (prefScreenOnCharging != null) {
+            prefScreenOnCharging.setEnabled(settings.isEnabled());
             prefScreenOffCharging.setEnabled(settings.isEnabled());
+            prefScreenOnBattery.setEnabled(settings.isEnabled());
             prefScreenOffBattery.setEnabled(settings.isEnabled());
             prefLockscreenOn.setEnabled(settings.isEnabledWhileScreenOn());
-            prefSeenPickupScreenOnCharging.setEnabled(settings.isEnabledWhileScreenOn());
-            prefSeenPickupScreenOffCharging.setEnabled(settings.isEnabledWhileScreenOffCharging());
-            prefSeenPickupScreenOnBattery.setEnabled(settings.isEnabledWhileScreenOn());
-            prefSeenPickupScreenOffBattery.setEnabled(settings.isEnabledWhileScreenOffBattery());
-            prefSeenOnLockscreen.setEnabled(settings.isEnabledWhileScreenOffAny());
-            prefSeenOnUserPresent.setEnabled(settings.isEnabledWhileScreenOffAny());
+            prefSeenPickupScreenOnCharging.setEnabled(settings.isEnabledWhile(Settings.SCREEN_ON_CHARGING));
+            prefSeenPickupScreenOffCharging.setEnabled(settings.isEnabledWhile(Settings.SCREEN_OFF_CHARGING));
+            prefSeenPickupScreenOnBattery.setEnabled(settings.isEnabledWhile(Settings.SCREEN_ON_BATTERY));
+            prefSeenPickupScreenOffBattery.setEnabled(settings.isEnabledWhile(Settings.SCREEN_OFF_BATTERY));
+            prefSeenOnLockscreen.setEnabled(settings.isEnabledWhileScreenOff());
+            prefSeenOnUserPresent.setEnabled(settings.isEnabledWhileScreenOff());
 
-            prefAnimationScreenOnCharging.setEnabled(settings.isEnabledWhileScreenOn());
+            prefAnimationScreenOnCharging.setEnabled(settings.isEnabledWhile(Settings.SCREEN_ON_CHARGING));
             prefAnimationScreenOnCharging.setSummary(getString(R.string.settings_animation_screen_on_charging_description, getAnimationStyleTitle(Settings.SCREEN_ON_CHARGING)));
-            prefAnimationScreenOffCharging.setEnabled(settings.isEnabledWhileScreenOffCharging());
+            prefAnimationScreenOffCharging.setEnabled(settings.isEnabledWhile(Settings.SCREEN_OFF_CHARGING));
             prefAnimationScreenOffCharging.setSummary(getString(R.string.settings_animation_screen_off_charging_description, getAnimationStyleTitle(Settings.SCREEN_OFF_CHARGING)));
-            prefAnimationScreenOnBattery.setEnabled(settings.isEnabledWhileScreenOn());
+            prefAnimationScreenOnBattery.setEnabled(settings.isEnabledWhile(Settings.SCREEN_ON_BATTERY));
             prefAnimationScreenOnBattery.setSummary(getString(R.string.settings_animation_screen_on_battery_description, getAnimationStyleTitle(Settings.SCREEN_ON_BATTERY)));
-            prefAnimationScreenOffBattery.setEnabled(settings.isEnabledWhileScreenOffBattery());
+            prefAnimationScreenOffBattery.setEnabled(settings.isEnabledWhile(Settings.SCREEN_OFF_BATTERY));
             prefAnimationScreenOffBattery.setSummary(getString(R.string.settings_animation_screen_off_battery_description, getAnimationStyleTitle(Settings.SCREEN_OFF_BATTERY)));
         }
     }
