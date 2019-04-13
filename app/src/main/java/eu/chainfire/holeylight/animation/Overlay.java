@@ -370,9 +370,14 @@ public class Overlay {
         boolean lockscreen = on && keyguardManager.isKeyguardLocked();
         boolean charging = Battery.isCharging(context);
 
+        SpritePlayer.Mode mode = settings.getAnimationMode(settings.getMode(charging, !doze));
+
         // We don't have the helper package that properly turns off AOD (passive hide) when we want
         // to hide it, but we still want AOD to be invisible: active hide
-        boolean activeHide = (colors.length == 0) && doze && settings.isHideAOD() && !AODControl.haveHelperPackage(context, false);
+        boolean activeHide = (colors.length == 0) && doze && (settings.isHideAOD() || spritePlayer.isTSPMode(mode)) && !AODControl.haveHelperPackage(context, false);
+        if (activeHide) {
+            mode = SpritePlayer.Mode.TSP_HIDE;
+        }
 
         boolean wantedEffective = (wanted || activeHide) && (
                 (on && !lockscreen && settings.isEnabledWhileScreenOn()) ||
@@ -383,7 +388,6 @@ public class Overlay {
 
         if (wantedEffective && visible && ((colors.length > 0) || activeHide)) {
             int dpAdd = (doze ? 1 : 0);
-            SpritePlayer.Mode mode = activeHide ? SpritePlayer.Mode.TSP_HIDE : settings.getAnimationMode(settings.getMode(charging, !doze));
             if (!lastState || colorsChanged() || mode != lastMode || (dpAdd != lastDpAdd)) {
                 animation.setMode(mode);
                 createOverlay();
@@ -391,7 +395,7 @@ public class Overlay {
                     animation.setHideAOD(true);
                     AODControl.setAOD(spritePlayer.getContext(), true);
                 } else {
-                    animation.setHideAOD(false);
+                    animation.setHideAOD(spritePlayer.isTSPMode(mode));
                 }
                 animation.setDpAdd(dpAdd);
                 animation.play(activeHide ? new int[] { Color.BLACK } : colors, false, (mode != lastMode));
@@ -402,6 +406,9 @@ public class Overlay {
             }
         } else {
             if (lastState) {
+                if (spritePlayer.isTSPMode(lastMode)) {
+                    animation.setHideAOD(false);
+                }
                 if (settings.isHideAOD()) {
                     animation.setHideAOD(false);
                     AODControl.setAOD(spritePlayer.getContext(), false);
