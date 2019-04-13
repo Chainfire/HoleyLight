@@ -22,6 +22,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -104,10 +105,11 @@ public class ColorActivity extends AppCompatActivity {
 
     @SuppressWarnings({"WeakerAccess"})
     private class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
-        //TODO Refactor header/item into different ViewHolder classes, etc
+        //TODO Refactor help/header/item into different ViewHolder classes, etc
 
-        private static final int VIEW_TYPE_HEADER = 0;
-        private static final int VIEW_TYPE_ITEM = 1;
+        private static final int VIEW_TYPE_HELP = 0;
+        private static final int VIEW_TYPE_HEADER = 1;
+        private static final int VIEW_TYPE_ITEM = 2;
 
         private final List<AppItem> items;
 
@@ -120,6 +122,10 @@ public class ColorActivity extends AppCompatActivity {
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view;
             switch (viewType) {
+                case VIEW_TYPE_HELP:
+                    view = LayoutInflater.from(parent.getContext())
+                            .inflate(R.layout.item_color_help, parent, false);
+                    return new ViewHolder(view);
                 case VIEW_TYPE_HEADER:
                     view = LayoutInflater.from(parent.getContext())
                             .inflate(R.layout.item_color_header, parent, false);
@@ -135,7 +141,9 @@ public class ColorActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
             holder.appItem = items.get(position);
-            if (holder.appItem.viewType == VIEW_TYPE_HEADER) {
+            if (holder.appItem.viewType == VIEW_TYPE_HELP) {
+                holder.tvTitleOrPackage.setText(Html.fromHtml(getString(R.string.colors_help)));
+            } else if (holder.appItem.viewType == VIEW_TYPE_HEADER) {
                 holder.tvTitleOrPackage.setText(holder.appItem.title);
             } else if (holder.appItem.viewType == VIEW_TYPE_ITEM) {
                 holder.ivIcon.setImageDrawable(holder.appItem.icon);
@@ -289,6 +297,7 @@ public class ColorActivity extends AppCompatActivity {
             Collections.sort(inactiveItems, sorter);
 
             items.clear();
+            items.add(new AppItem("", null, null, null, 0, VIEW_TYPE_HELP));
             items.add(new AppItem(getString(R.string.colors_header_active), null, null, null, 0, VIEW_TYPE_HEADER));
             items.addAll(activeItems);
             items.add(new AppItem(getString(R.string.colors_header_inactive), null, null, null, 0, VIEW_TYPE_HEADER));

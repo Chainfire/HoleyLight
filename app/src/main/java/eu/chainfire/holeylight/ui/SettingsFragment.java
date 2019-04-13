@@ -167,7 +167,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             startActivity(new Intent(getActivity(), TuneActivity.class));
             return false;
         });
-        pref(catAnimation, R.string.settings_animation_colors_title, R.string.settings_animation_colors_description_v2, null, true, preference -> {
+        pref(catAnimation, R.string.settings_animation_colors_title, R.string.settings_animation_colors_description_v3, null, true, preference -> {
             startActivity(new Intent(getActivity(), ColorActivity.class));
             return false;
         });

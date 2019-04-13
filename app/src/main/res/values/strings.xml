@@ -8,7 +8,7 @@
     <string name="permission_battery"><![CDATA[In the next dialog, please allow <b>Holey Light</b> to stop optimizing battery usage. This is required to keep the notification animation running.]]></string>
     <string name="permission_associate"><![CDATA[In the next dialog, please link <b>Holey Light</b> with <b>any</b> device. This is required to be able to access notifications colors. It does not seem to matter which device you choose.<br><br>Please <b>turn on Wi-Fi and Bluetooth</b> before continuing; you can turn them off again afterwards.<br><br>If no popup comes up, try making sure <b>Nearby device scanning</b> is enabled, and pairing with a Bluetooth device.]]></string>
     <string name="permission_notifications"><![CDATA[In the next screen, please allow <b>Holey Light</b> notification access. This is required to be able to detect notifications.]]></string>
-    <string name="permission_accessibility"><![CDATA[In the next screen, please go to <b>Installed services</b>, and enable <b>Holey Light</b>. This is required to show the notification animation. If this doesn\'t work right, try rebooting.]]></string>
+<!-- obsolete --><string translatable="false" name="permission_accessibility"><![CDATA[In the next screen, please go to <b>Installed services</b>, and enable <b>Holey Light</b>. This is required to show the notification animation. If this doesn\'t work right, try rebooting.]]></string>
 
     <string name="notification_test_title">Holey Light: Test</string>
     <string name="notification_test_description">Test notification, white LED</string>
@@ -73,10 +73,10 @@
     <string name="settings_animation_tune_title">Tune</string>
     <string name="settings_animation_tune_description">Fine-tune size, position, and speed</string>
     <string name="settings_animation_colors_title">Colors</string>
-    <string name="settings_animation_colors_description">Adjust per-package notification colors (use full black to hide)</string>
+<!-- obsolete --><string translatable="false" name="settings_animation_colors_description">Adjust per-package notification colors (use full black to hide)</string>
 
-<!-- obsolete --><string name="settings_animation_powersave_title">Power saving animation</string>
-<!-- obsolete --><string name="settings_animation_powersave_description">Use power saving animation instead of swirl, significantly reduces battery use</string>
+<!-- obsolete --><string translatable="false" name="settings_animation_powersave_title">Power saving animation</string>
+<!-- obsolete --><string translatable="false" name="settings_animation_powersave_description">Use power saving animation instead of swirl, significantly reduces battery use</string>
 <!-- obsolete --><string translatable="false" name="settings_animation_powersave_screen_on_charging">@string/charging_screen_on</string>
 <!-- obsolete --><string translatable="false" name="settings_animation_powersave_screen_off_charging">@string/charging_screen_off</string>
 <!-- obsolete --><string translatable="false" name="settings_animation_powersave_screen_on_battery">@string/battery_screen_on</string>
@@ -99,7 +99,7 @@
 
     <string name="reset">Reset</string>
     <string name="refresh">Refresh</string>
-    <string name="settings_animation_colors_description_v2">Adjust per-channel notification colors (use full black to hide)</string>
+<!-- obsolete --><string translatable="false" name="settings_animation_colors_description_v2">Adjust per-channel notification colors (use full black to hide)</string>
 
     <!-- v0.51 -->
 
@@ -136,6 +136,8 @@
 
     <string name="colors_header_active">Currently active</string>
     <string name="colors_header_inactive">Not currently active</string>
+    <string name="colors_help"><![CDATA[<i>Applications</i> can have multiple <i>channels</i>. Each <i>channel</i> is listed individually here. Entries are added only once a new notification is <i>seen</i>. You <b>cannot</b> add entries manually, because <i>channel</i> names can\'t be known beforehand. Set an entry completely <b>black</b> to disable that notification.]]></string>
+    <string name="settings_animation_colors_description_v3">Adjust notification color per package and channel</string>
 
     <string name="permission_accessibility_v2"><![CDATA[In the next screen, please go to <b>Installed services</b>, and enable <b>Holey Light</b>. This is required to be able to show notifications, and be able to tap into AOD. If this doesn\'t work right, try rebooting.]]></string>
 </resources>
