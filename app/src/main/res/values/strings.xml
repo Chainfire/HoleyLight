@@ -119,10 +119,10 @@
     <string name="settings_animation_screen_off_battery_description">Animation style when the screen is off and on battery power\n[ %s ]</string>
 
     <string name="settings_animation_style_dialog_title">Choose animation style</string>
-    <string name="settings_animation_style_swirl_title">Swirl</string>
-    <string name="settings_animation_style_blink_title">Blink</string>
-    <string name="settings_animation_style_single_title">Pie</string>
-    <string name="settings_animation_style_tsp_title">Unholey Light</string>
+    <string name="settings_animation_style_swirl_title">Swirl (camera)</string>
+    <string name="settings_animation_style_blink_title">Blink (camera)</string>
+    <string name="settings_animation_style_single_title">Pie (camera)</string>
+    <string name="settings_animation_style_tsp_title">Unholey Light (screen center)</string>
     <string name="settings_animation_style_swirl_description">Up to 5.5% battery/hour</string>
     <string name="settings_animation_style_blink_description">Up to 3.5% battery/hour</string>
     <string name="settings_animation_style_single_description">Up to 3.5% battery/hour</string>
