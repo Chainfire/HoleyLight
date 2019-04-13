@@ -65,6 +65,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             for (int i = 0; i < root.getChildCount(); i++) {
                 AccessibilityNodeInfo node = root.getChild(i);
                 if (
+                        (node == null) ||
                         (node.getClassName() == null) ||
                         (!node.getClassName().equals("android.support.v4.view.ViewPager"))
                 ) continue;
@@ -73,6 +74,8 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
 
                 Rect bounds = new Rect();
                 node.getBoundsInScreen(bounds);
+
+                android.util.Log.d("HoleyLight/Access", "AOD_TSP " + bounds.toString());
 
                 Overlay.getInstance(this).updateTSPRect(bounds);
             }
