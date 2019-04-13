@@ -33,16 +33,13 @@ import eu.chainfire.holeylight.misc.Slog;
 public class AccessibilityService extends android.accessibilityservice.AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        // The image displayed in AOD is inside a ViewPager, and runs inside the SystemUI package.
+        // AOD runs inside the SystemUI package. The main image (or clock) is displayed inside
+        // a ViewPager, and notification icons below that in ImageViews.
         //
-        // The dimensions returns are not an exact match if you monitor TSP in logcat, but its
-        // only a few pixels off (probably because AOD moves the images around a few pixels
-        // to prevent burn-in), that's why we add a margin too.
+        // The area of the combined ViewPager and ImageViews is saved to the screen when it goes
+        // into DOZE_SUSPEND mode, and requires no power nor CPU to keep displaying it.
         //
-        // The area of the ViewPager is saved to the screen when it goes into DOZE_SUSPEND mode,
-        // and requires no power nor CPU to keep displaying it.
-        //
-        // Of course it is possible we're getting the wrong ViewPager inside some random Android
+        // Of course it is possible we're getting the wrong views inside some random Android
         // activity, so we make sure elsewhere the system is actually in doze mode before using it.
 
         if (event.getPackageName() == null) return;
@@ -63,22 +60,40 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
 
             root.refresh();
 
+            Rect outerBounds = new Rect(-1, -1, -1, -1);
+
             for (int i = 0; i < root.getChildCount(); i++) {
                 AccessibilityNodeInfo node = root.getChild(i);
                 if (
                         (node == null) ||
                         (node.getClassName() == null) ||
-                        (!node.getClassName().equals("android.support.v4.view.ViewPager"))
+                        (
+                            (!node.getClassName().equals("android.support.v4.view.ViewPager")) &&
+                            (!node.getClassName().equals("android.widget.ImageView"))
+                        )
                 ) continue;
 
                 node.refresh();
 
                 Rect bounds = new Rect();
                 node.getBoundsInScreen(bounds);
+                
+                if ((outerBounds.left == -1) || (bounds.left < outerBounds.left)) outerBounds.left = bounds.left;
+                if ((outerBounds.top == -1) || (bounds.top < outerBounds.top)) outerBounds.top = bounds.top;
+                if ((outerBounds.right == -1) || (bounds.right > outerBounds.right)) outerBounds.right = bounds.right;
+                if ((outerBounds.bottom == -1) || (bounds.bottom > outerBounds.bottom)) outerBounds.bottom = bounds.bottom;
 
-                Slog.d("AOD_TSP", "Access " + bounds.toString());
+                Slog.d("AOD_TSP", "Node " + node.getClassName().toString() + " " + bounds.toString());
+            }
 
-                Overlay.getInstance(this).updateTSPRect(bounds);
+            if (
+                    (outerBounds.left > -1) &&
+                    (outerBounds.top > -1) &&
+                    (outerBounds.right > -1) &&
+                    (outerBounds.bottom > -1)
+            ) {
+                Slog.d("AOD_TSP", "Access " + outerBounds.toString());
+                Overlay.getInstance(this).updateTSPRect(outerBounds);
             }
         }
     }
