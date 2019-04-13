@@ -33,6 +33,7 @@ import com.airbnb.lottie.LottieCompositionFactory;
 import androidx.core.view.WindowInsetsCompat;
 import eu.chainfire.holeylight.misc.CameraCutout;
 import eu.chainfire.holeylight.misc.Settings;
+import eu.chainfire.holeylight.misc.Slog;
 
 @SuppressWarnings({ "unused", "WeakerAccess" })
 public class NotificationAnimation implements Settings.OnSettingsChangedListener {
@@ -241,7 +242,6 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
             if (cameraCutout.isValid() && (lottieComposition != null)) {
                 int rotation = ((WindowManager) spritePlayer.getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
                 float realDpToPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, spritePlayer.getContext().getResources().getDisplayMetrics());
-                spritePlayer.setDpToPx(realDpToPx);
 
                 Point resolution = cameraCutout.getCurrentResolution();
 
@@ -300,28 +300,32 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                 // we're only going to allow portrait and reverse-portrait
                 spritePlayer.setVisibility((rotation % 2) == 0 ? View.VISIBLE : View.INVISIBLE);
 
+                Rect update = new Rect();
+
                 // Update internal views first
                 if (hideAOD) {
-                    spritePlayer.updateDisplayArea((int)left, (int)top, (int)width, (int)height);
+                    update.set((int)left, (int)top, (int)(left + width), (int)(top + height));
                 } else {
-                    spritePlayer.updateDisplayArea(0, 0, (int)width, (int)height);
+                    update.set(0, 0, (int)width, (int)height);
                 }
+
+                Slog.d("Anim", "Apply/View " + update.toString());
+                spritePlayer.updateDisplayArea(update);
 
                 // Update parent view
                 WindowManager.LayoutParams params = (WindowManager.LayoutParams)spritePlayer.getLayoutParams();
                 if (hideAOD) {
-                    params.x = 0;
-                    params.y = 0;
-                    params.width = resolution.x;
-                    params.height = resolution.y;
+                    update.set(0, 0, resolution.x, resolution.y);
                     spritePlayer.setBackgroundColor(Color.BLACK);
                 } else {
-                    params.x = (int)left;
-                    params.y = (int)top;
-                    params.width = (int)width;
-                    params.height = (int)height;
+                    update.set((int)left, (int)top, (int)(left + width), (int)(top + height));
                     spritePlayer.setBackgroundColor(Color.TRANSPARENT);
                 }
+                params.x = update.left;
+                params.y = update.top;
+                params.width = update.width();
+                params.height = update.height();
+                Slog.d("Anim", "Apply/Container " + update.toString());
                 spritePlayer.setLayoutParams(params);
                 spritePlayer.setDrawBackground(hideAOD);
 
@@ -331,6 +335,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                 if (!spritePlayer.isAnimating() && play) {
                     spritePlayer.playAnimation();
                 }
+                spritePlayer.invalidateDisplayArea();
                 if (onNotificationAnimationListener != null) {
                     onNotificationAnimationListener.onDimensionsApplied(spritePlayer);
                 }
@@ -442,7 +447,9 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     }
 
     public void updateTSPRect(Rect rect) {
-        if (!rect.equals(tspRect)) {
+        boolean apply = !rect.equals(tspRect);
+        Slog.d("AOD_TSP", "Anim " + rect.toString() + " apply:" + String.valueOf(apply));
+        if (apply) {
             tspRect.set(rect);
             if (mode == SpritePlayer.Mode.TSP) {
                 applyDimensions();

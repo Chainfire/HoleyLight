@@ -28,6 +28,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import eu.chainfire.holeylight.animation.Overlay;
+import eu.chainfire.holeylight.misc.Slog;
 
 public class AccessibilityService extends android.accessibilityservice.AccessibilityService {
     @Override
@@ -75,7 +76,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                 Rect bounds = new Rect();
                 node.getBoundsInScreen(bounds);
 
-                android.util.Log.d("HoleyLight/Access", "AOD_TSP " + bounds.toString());
+                Slog.d("AOD_TSP", "Access " + bounds.toString());
 
                 Overlay.getInstance(this).updateTSPRect(bounds);
             }

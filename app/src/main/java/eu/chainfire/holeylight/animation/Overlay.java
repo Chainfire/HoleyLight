@@ -45,6 +45,7 @@ import eu.chainfire.holeylight.misc.AODControl;
 import eu.chainfire.holeylight.misc.Battery;
 import eu.chainfire.holeylight.misc.Display;
 import eu.chainfire.holeylight.misc.Settings;
+import eu.chainfire.holeylight.misc.Slog;
 import eu.chainfire.holeylight.service.AccessibilityService;
 import eu.chainfire.holeylight.ui.DetectCutoutActivity;
 
@@ -121,7 +122,7 @@ public class Overlay {
                 case Intent.ACTION_SCREEN_OFF:
                     if (settings.isHideAOD()) {
                         // without AOD we might immediately go to sleep, give us some time to setup
-                        cpuWakeLock.acquire(10000);
+                        pokeWakeLocks(10000);
                     }
                     evaluate();
                     break;
@@ -131,6 +132,8 @@ public class Overlay {
 
     private final WindowManager windowManager;
     private final KeyguardManager keyguardManager;
+    private final PowerManager.WakeLock cpuWakeLock;
+    private final PowerManager.WakeLock drawWakeLock;
     private final Handler handler;
     private final Settings settings;
 
@@ -148,17 +151,27 @@ public class Overlay {
     private boolean added = false;
     private Point resolution;
     private IBinder windowToken;
-    private PowerManager.WakeLock cpuWakeLock;
     private ContentResolver resolver;
 
     private Overlay(Context context) {
         windowManager = (WindowManager)context.getSystemService(Activity.WINDOW_SERVICE);
         keyguardManager = (KeyguardManager)context.getSystemService(KEYGUARD_SERVICE);
+        cpuWakeLock = ((PowerManager)context.getSystemService(POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, BuildConfig.APPLICATION_ID + ":cpu");
+        drawWakeLock = ((PowerManager)context.getSystemService(POWER_SERVICE)).newWakeLock(0x00000080 | 0x40000000, BuildConfig.APPLICATION_ID + ":draw"); /* DRAW_WAKE_LOCK | UNIMPORTANT_FOR_LOGGING */
         handler = new Handler();
         settings = Settings.getInstance(context);
         resolution = getResolution();
-        cpuWakeLock = ((PowerManager)context.getSystemService(POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, BuildConfig.APPLICATION_ID + ":aod");
         resolver = context.getContentResolver();
+    }
+
+    private void pokeWakeLocks(int timeout_ms) {
+        cpuWakeLock.acquire(timeout_ms);
+
+        // This allows us to update the screen while in doze mode. Both
+        // according to the docs and what I've read from AOSP code say this
+        // isn't possible because we don't have the right permissions,
+        // nevertheless, it seems to work on the S10.
+        drawWakeLock.acquire(timeout_ms);
     }
 
     private Point getResolution() {
@@ -176,7 +189,6 @@ public class Overlay {
 
             initParams();
             animation = new NotificationAnimation(context, spritePlayer, new NotificationAnimation.OnNotificationAnimationListener() {
-                private PowerManager.WakeLock wakeLock = null;
                 private int skips = 0;
 
                 @Override
@@ -226,19 +238,7 @@ public class Overlay {
                 public void onAnimationFrameEnd(SpritePlayer view, boolean draw) {
                     if (Display.isDoze(spritePlayer.getContext())) {
                         if (draw) {
-                            // This allows us to update the screen while in doze mode. Both
-                            // according to the docs and what I've read from AOSP code say this
-                            // isn't possible because we don't have the right permissions,
-                            // nevertheless, it seems to work on the S10.
-                            if (wakeLock == null) {
-                                wakeLock = ((PowerManager)spritePlayer.getContext().getSystemService(Context.POWER_SERVICE)).newWakeLock(0x00000080 | 0x40000000, BuildConfig.APPLICATION_ID + ":draw"); /* DRAW_WAKE_LOCK | UNIMPORTANT_FOR_LOGGING */
-                                wakeLock.setReferenceCounted(false);
-                            }
-                            try {
-                                wakeLock.acquire(250);
-                            } catch (Throwable t) {
-                                t.printStackTrace();
-                            }
+                            pokeWakeLocks(250);
                         }
                     }
                 }
@@ -428,7 +428,10 @@ public class Overlay {
     }
 
     public void updateTSPRect(Rect rect) {
-        if (Display.isOff(spritePlayer.getContext(), true)) {
+        boolean apply = Display.isOff(spritePlayer.getContext(), true);
+        Slog.d("AOD_TSP", "Overlay " + rect.toString() + " apply:" + String.valueOf(apply));
+        if (apply) {
+            pokeWakeLocks(250);
             animation.updateTSPRect(rect);
         }
     }

@@ -32,6 +32,7 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.SystemClock;
+import android.util.TypedValue;
 import android.view.Choreographer;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -70,6 +71,7 @@ public class SpritePlayer extends RelativeLayout {
     private volatile OnAnimationListener onAnimationListener = null;
 
     private final Paint paint = new Paint();
+    private final float dpToPx;
 
     private volatile int frame = -1;
     private volatile SpriteSheet spriteSheetSwirl = null;
@@ -91,10 +93,10 @@ public class SpritePlayer extends RelativeLayout {
     private volatile long modeStart = 0L;
     private volatile boolean surfaceReady = false;
 
-    private volatile float dpToPx = 1;
-
     public SpritePlayer(Context context) {
         super(context);
+
+        dpToPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getContext().getResources().getDisplayMetrics());
 
         handlerThreadRender = new HandlerThread("SpritePlayer#Render");
         handlerThreadRender.start();
@@ -537,8 +539,6 @@ public class SpritePlayer extends RelativeLayout {
 
     private void evaluate() {
         synchronized (sync) {
-            boolean v1 = getWindowVisibility() == View.VISIBLE;
-            boolean v2 = getVisibility() == View.VISIBLE;
             if (wanted && ((getSpriteSheet() != null) || (spriteSheetLoading > 0) || drawMode == Mode.TSP) && (getWindowVisibility() == View.VISIBLE) && (getVisibility() == View.VISIBLE)) {
                 startUpdating();
             } else {
@@ -600,6 +600,10 @@ public class SpritePlayer extends RelativeLayout {
         }
     }
 
+    public void updateDisplayArea(Rect rect) {
+        updateDisplayArea(rect.left, rect.top, rect.width(), rect.height());
+    }
+
     public void updateDisplayArea(int x, int y, int width, int height) {
         synchronized (sync) {
             RelativeLayout.LayoutParams params;
@@ -618,6 +622,15 @@ public class SpritePlayer extends RelativeLayout {
         }
     }
 
+    public void invalidateDisplayArea() {
+        synchronized (sync) {
+            if (draw) {
+                surfaceInvalidated = true;
+                callNextFrame(true);
+            }
+        }
+    }
+
     public void setDrawBackground(boolean drawBackground) {
         synchronized (sync) {
             if (this.drawBackground != drawBackground) {
@@ -629,9 +642,5 @@ public class SpritePlayer extends RelativeLayout {
 
     public Object getSynchronizer() {
         return sync;
-    }
-
-    public void setDpToPx(float dpToPx) {
-        this.dpToPx = dpToPx;
     }
 }
