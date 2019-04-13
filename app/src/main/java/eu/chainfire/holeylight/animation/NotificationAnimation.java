@@ -208,7 +208,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
     private void setColor(int color) {
         synchronized (getSynchronizer()) {
-            if ((spritePlayer.getMode() == SpritePlayer.Mode.SINGLE) || (spritePlayer.getMode() == SpritePlayer.Mode.TSP)) {
+            if (spritePlayer.isMultiColorMode(mode)) {
                 spritePlayer.setColors(colors);
             } else {
                 spritePlayer.setColors(new int[] { color });
@@ -259,8 +259,8 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                     int squareSize = Math.min((int)(resolution.x * 0.6f), Math.min(tspRect.width(), tspRect.height()));
 
                     // Apply
-                    left = tspRect.centerX() - (squareSize / 2);
-                    top = tspRect.centerY() - (squareSize / 2);
+                    left = tspRect.centerX() - (squareSize / 2f);
+                    top = tspRect.centerY() - (squareSize / 2f);
                     width = squareSize;
                     height = squareSize;
                 } else {
@@ -346,7 +346,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                 stop(true);
                 return;
             }
-            if ((mode == SpritePlayer.Mode.SINGLE) || (mode == SpritePlayer.Mode.TSP)) {
+            if (spritePlayer.isMultiColorMode(mode)) {
                 immediately = true;
             }
             if (spritePlayer.isAnimating() && !immediately) {
@@ -434,7 +434,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
     public void setMode(SpritePlayer.Mode mode) {
         if (mode != this.mode) {
-            boolean apply = (mode == SpritePlayer.Mode.TSP) || (this.mode == SpritePlayer.Mode.TSP);
+            boolean apply = spritePlayer.isTSPMode(mode) || spritePlayer.isTSPMode(this.mode);
             this.mode = mode;
             spritePlayer.setMode(mode);
             if (apply) {
@@ -448,7 +448,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         Slog.d("AOD_TSP", "Anim " + rect.toString() + " apply:" + String.valueOf(apply));
         if (apply) {
             tspRect.set(rect);
-            if (mode == SpritePlayer.Mode.TSP) {
+            if (spritePlayer.isTSPMode(mode)) {
                 applyDimensions();
             }
         }

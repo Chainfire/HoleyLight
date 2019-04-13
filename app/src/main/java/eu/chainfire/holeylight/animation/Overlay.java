@@ -29,6 +29,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -344,16 +345,17 @@ public class Overlay {
         return false;
     }
 
-    private Runnable evaluateLoop = new Runnable() {
-        @Override
-        public void run() {
-            evaluate();
-            if (wanted) handler.postDelayed(this, 1000);
-        }
-    };
+    private Runnable evaluateLoop = this::evaluate;
 
     private void evaluate() {
-        if (spritePlayer == null) return;
+        if (spritePlayer == null) {
+            if (wanted) handler.postDelayed(evaluateLoop, 500);
+            return;
+        }
+
+        if (colors.length == 0) {
+            wanted = false;
+        }
 
         Context context = spritePlayer.getContext();
 
@@ -367,26 +369,32 @@ public class Overlay {
         }
         boolean lockscreen = on && keyguardManager.isKeyguardLocked();
         boolean charging = Battery.isCharging(context);
-        boolean wantedEffective = wanted && (
+
+        // We don't have the helper package that properly turns off AOD (passive hide) when we want
+        // to hide it, but we still want AOD to be invisible: active hide
+        boolean activeHide = (colors.length == 0) && doze && settings.isHideAOD() && !AODControl.haveHelperPackage(context, false);
+
+        boolean wantedEffective = (wanted || activeHide) && (
                 (on && !lockscreen && settings.isEnabledWhileScreenOn()) ||
                 (on && lockscreen && settings.isEnabledOnLockscreen()) ||
                 (!on && charging && settings.isEnabledWhileScreenOffCharging()) ||
                 (!on && !charging && settings.isEnabledWhileScreenOffBattery())
         );
-        if (wantedEffective && visible && (colors.length > 0)) {
+
+        if (wantedEffective && visible && ((colors.length > 0) || activeHide)) {
             int dpAdd = (doze ? 1 : 0);
-            SpritePlayer.Mode mode = settings.getAnimationMode(settings.getMode(charging, !doze));
+            SpritePlayer.Mode mode = activeHide ? SpritePlayer.Mode.TSP_HIDE : settings.getAnimationMode(settings.getMode(charging, !doze));
             if (!lastState || colorsChanged() || mode != lastMode || (dpAdd != lastDpAdd)) {
                 animation.setMode(mode);
                 createOverlay();
-                if (settings.isHideAOD() && (doze)) {
+                if (settings.isHideAOD() && doze) {
                     animation.setHideAOD(true);
                     AODControl.setAOD(spritePlayer.getContext(), true);
                 } else {
                     animation.setHideAOD(false);
                 }
                 animation.setDpAdd(dpAdd);
-                animation.play(colors, false, (mode != lastMode));
+                animation.play(activeHide ? new int[] { Color.BLACK } : colors, false, (mode != lastMode));
                 lastColors = colors;
                 lastState = true;
                 lastMode = mode;
@@ -406,17 +414,14 @@ public class Overlay {
                 lastState = false;
             }
         }
+
+        if (wantedEffective) handler.postDelayed(evaluateLoop, 500);
     }
 
     public void show(int[] colors) {
         handler.removeCallbacks(evaluateLoop);
         this.colors = colors;
-        if ((colors == null) || (colors.length == 0)) {
-            wanted = false;
-        } else {
-            wanted = true;
-            handler.postDelayed(evaluateLoop, 500);
-        }
+        wanted = true;
         evaluate();
     }
 

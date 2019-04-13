@@ -44,7 +44,7 @@ import androidx.annotation.NonNull;
 
 @SuppressWarnings({ "deprecation", "FieldCanBeLocal", "unused", "UnusedReturnValue" })
 public class SpritePlayer extends RelativeLayout {
-    public enum Mode { SWIRL, BLINK, SINGLE, TSP }
+    public enum Mode { SWIRL, BLINK, SINGLE, TSP, TSP_HIDE }
 
     public interface OnSpriteSheetNeededListener {
         SpriteSheet onSpriteSheetNeeded(int width, int height, Mode mode);
@@ -194,33 +194,38 @@ public class SpritePlayer extends RelativeLayout {
             // on hardware accelerated canvas the content is already cleared
             canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         }
-        if (drawMode == Mode.TSP) {
-            paint.setColorFilter(null);
-            paint.setXfermode(null);
+        if (isTSPMode()) {
+            // TSP_HIDE is a no_op, background drawn already, we only handle it at all because
+            // rendering here causes the rest of the screen to be updated as well
 
-            float left = radiusDecrease;
-            float top = radiusDecrease;
-            float width = this.width - (radiusDecrease * 2f);
-            float height = this.height - (radiusDecrease * 2f);
-            float right = left + width;
-            float bottom = top + height;
-            float cx = left + (width / 2f);
-            float cy = top + (height / 2f);
-            float radius = (width / 2f) - (8f * dpToPx);
+            if (drawMode == Mode.TSP) {
+                paint.setColorFilter(null);
+                paint.setXfermode(null);
 
-            float anglePerColor = 360f / colors.length;
-            for (int i = 0; i < colors.length; i++) {
-                paint.setColor(colors[i]);
-                canvas.drawArc(left, top, right, bottom, startAngle + 270 + (anglePerColor * i), anglePerColor, true, paint);
+                float left = radiusDecrease;
+                float top = radiusDecrease;
+                float width = this.width - (radiusDecrease * 2f);
+                float height = this.height - (radiusDecrease * 2f);
+                float right = left + width;
+                float bottom = top + height;
+                float cx = left + (width / 2f);
+                float cy = top + (height / 2f);
+                float radius = (width / 2f) - (8f * dpToPx);
+
+                float anglePerColor = 360f / colors.length;
+                for (int i = 0; i < colors.length; i++) {
+                    paint.setColor(colors[i]);
+                    canvas.drawArc(left, top, right, bottom, startAngle + 270 + (anglePerColor * i), anglePerColor, true, paint);
+                }
+
+                if (drawBackground) {
+                    paint.setColor(Color.BLACK);
+                } else {
+                    paint.setColor(Color.TRANSPARENT);
+                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+                }
+                canvas.drawCircle(cx, cy, radius, paint);
             }
-
-            if (drawBackground) {
-                paint.setColor(Color.BLACK);
-            } else {
-                paint.setColor(Color.TRANSPARENT);
-                paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-            }
-            canvas.drawCircle(cx, cy, radius, paint);
         } else if (spriteSheet != null) {
             paint.setXfermode(null);
             paint.setColor(Color.WHITE);
@@ -269,7 +274,7 @@ public class SpritePlayer extends RelativeLayout {
                     long diff = SystemClock.elapsedRealtime() - modeStart;
                     float cycle_part = (diff % cycle_ms) / (float)cycle_ms;
 
-                    if (drawMode == Mode.TSP) {
+                    if (isTSPMode()) {
                         boolean draw;
                         if (startTimeNanos == 0) {
                             draw = true;
@@ -379,7 +384,7 @@ public class SpritePlayer extends RelativeLayout {
     private void callNextFrame(boolean immediately) {
         cancelNextFrame();
         if (immediately) surfaceInvalidated = true;
-        if (drawMode == Mode.TSP) {
+        if (isTSPMode()) {
             handlerRender.postDelayed(tspFrame, immediately ? 0 : 250);
         } else {
             choreographer.postFrameCallback(frameCallback);
@@ -388,7 +393,7 @@ public class SpritePlayer extends RelativeLayout {
 
     private void callOnSpriteSheetNeeded(int width, int height) {
         synchronized (sync) {
-            if (drawMode == Mode.TSP) {
+            if (isTSPMode()) {
                 surfaceInvalidated = true;
                 evaluate();
                 return;
@@ -539,7 +544,7 @@ public class SpritePlayer extends RelativeLayout {
 
     private void evaluate() {
         synchronized (sync) {
-            if (wanted && ((getSpriteSheet() != null) || (spriteSheetLoading > 0) || drawMode == Mode.TSP) && (getWindowVisibility() == View.VISIBLE) && (getVisibility() == View.VISIBLE)) {
+            if (wanted && ((getSpriteSheet() != null) || (spriteSheetLoading > 0) || isTSPMode()) && (getWindowVisibility() == View.VISIBLE) && (getVisibility() == View.VISIBLE)) {
                 startUpdating();
             } else {
                 stopUpdating();
@@ -642,5 +647,21 @@ public class SpritePlayer extends RelativeLayout {
 
     public Object getSynchronizer() {
         return sync;
+    }
+
+    public boolean isTSPMode() {
+        return isTSPMode(drawMode);
+    }
+
+    public boolean isTSPMode(Mode mode) {
+        return (mode == Mode.TSP) || (mode == Mode.TSP_HIDE);
+    }
+
+    public boolean isMultiColorMode() {
+        return isMultiColorMode(drawMode);
+    }
+
+    public boolean isMultiColorMode(Mode mode) {
+        return (mode == Mode.SINGLE) || isTSPMode(mode);
     }
 }

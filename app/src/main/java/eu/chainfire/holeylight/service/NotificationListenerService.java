@@ -45,6 +45,7 @@ import eu.chainfire.holeylight.misc.Display;
 import eu.chainfire.holeylight.misc.MotionSensor;
 import eu.chainfire.holeylight.misc.Settings;
 
+@SuppressWarnings("WeakerAccess")
 public class NotificationListenerService extends android.service.notification.NotificationListenerService implements Settings.OnSettingsChangedListener {
     private static NotificationListenerService instance = null;
     public static NotificationListenerService getInstance() {
@@ -338,7 +339,7 @@ public class NotificationListenerService extends android.service.notification.No
     }
 
     private void apply() {
-        if ((currentColors.length > 0) && (enabled)) {
+        if (enabled) {
             overlay.show(currentColors);
         } else {
             overlay.hide(!enabled);
