@@ -255,18 +255,14 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                     tspRect.left = 0;
                     tspRect.right = resolution.x;
 
-                    // Square
-                    if (tspRect.width() >= tspRect.height()) {
-                        left = tspRect.centerX() - (tspRect.height() / 2f);
-                        top = tspRect.top;
-                        width = tspRect.height();
-                        height = tspRect.height();
-                    } else {
-                        left = tspRect.left;
-                        top = tspRect.centerY() - (tspRect.width() / 2f);
-                        width = tspRect.width();
-                        height = tspRect.width();
-                    }
+                    // Limit render square size to 60% of width (resolution)
+                    int squareSize = Math.min((int)(resolution.x * 0.6f), Math.min(tspRect.width(), tspRect.height()));
+
+                    // Apply
+                    left = tspRect.centerX() - (squareSize / 2);
+                    top = tspRect.centerY() - (squareSize / 2);
+                    width = squareSize;
+                    height = squareSize;
                 } else {
                     // something weird is going on with Lottie's px->dp if current resolution doesn't match native resolution
                     float scale = (float) resolution.x / (float) cameraCutout.getNativeResolution().x;
@@ -315,7 +311,8 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                 // Update parent view
                 WindowManager.LayoutParams params = (WindowManager.LayoutParams)spritePlayer.getLayoutParams();
                 if (hideAOD) {
-                    update.set(0, 0, resolution.x, resolution.y);
+                    // 75% height, to leave room for the fully charged notification and the fingerprint animation
+                    update.set(0, 0, resolution.x, (int)(resolution.y * 0.75f));
                     spritePlayer.setBackgroundColor(Color.BLACK);
                 } else {
                     update.set((int)left, (int)top, (int)(left + width), (int)(top + height));
