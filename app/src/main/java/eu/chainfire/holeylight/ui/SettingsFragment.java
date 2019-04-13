@@ -127,14 +127,20 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         } catch (Exception e) {
             // no action
         }
-        
-        Preference copyright = pref(null, R.string.app_name, R.string.app_details, "copyright", true, preference -> {
+
+        String details = getString(R.string.app_details);
+        if (getString(R.string.translation_by).length() > 0) {
+            details += "\n" + getString(R.string.translation) + " " + getString(R.string.translation_by);
+        }
+
+        Preference copyright = pref(null, R.string.app_name, 0, "copyright", true, preference -> {
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(getString(R.string.app_website_url)));
             startActivity(i);
             return false;
         });
         copyright.setTitle(title);
+        copyright.setSummary(details);
         root.addPreference(copyright);
 
         Preference basicHelp = pref(null, R.string.help_basic_title, R.string.help_basic_descrption, null, true, preference -> {

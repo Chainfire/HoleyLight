@@ -82,4 +82,9 @@
     <string name="reset">Mise à zéro</string>
     <string name="refresh">Rafraîchir</string>
     <string name="settings_animation_colors_description_v2">Ajuster les couleurs de notification par canal (noir pour cacher)</string>
+
+
+
+    <!-- TODO -->
+    <string name="translation_by">Zophar78</string>
 </resources>

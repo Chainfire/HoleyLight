@@ -64,4 +64,9 @@
     <string name="tune_shift_horizontal">Сдвиг по горизонтали: %.2fdp</string>
     <string name="tune_shift_vertical">Сдвиг по вертикали: %.2fdp</string>
     <string name="tune_speed">Скорость: %.1fx</string>
+
+
+
+    <!-- TODO -->
+    <string name="translation_by">RequeLine</string>
 </resources>

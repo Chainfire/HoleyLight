@@ -100,4 +100,9 @@
     <string name="reset">Ripristina</string>
     <string name="refresh">Aggiorna</string>
     <string name="settings_animation_colors_description_v2">Scegli per canale i colori delle notifiche (seleziona nero per nascondere)</string>
+
+
+
+    <!-- TODO -->
+    <string name="translation_by">Cr4z33</string>
 </resources>

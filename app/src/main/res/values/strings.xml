@@ -109,6 +109,12 @@
     <!-- /temporary -->
     
     <!-- v0.52 -->
+
+    <string name="translation">Translation by:</string>
+
+    <!-- Your name (or xda/twitter/reddit/github/etc username) here -->
+    <string name="translation_by"></string>
+
     <string translatable="false" name="settings_animation_screen_on_charging_title">@string/charging_screen_on</string>
     <string name="settings_animation_screen_on_charging_description">Animation style when the screen is on and charging\n[ %s ]</string>
     <string translatable="false" name="settings_animation_screen_off_charging_title">@string/charging_screen_off</string>
