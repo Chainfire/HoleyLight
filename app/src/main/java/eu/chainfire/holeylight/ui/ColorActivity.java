@@ -32,6 +32,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +43,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.misc.Settings;
+import eu.chainfire.holeylight.service.NotificationListenerService;
 import top.defaults.colorpicker.ColorPickerPopup;
 
 public class ColorActivity extends AppCompatActivity {
@@ -102,6 +104,11 @@ public class ColorActivity extends AppCompatActivity {
 
     @SuppressWarnings({"WeakerAccess"})
     private class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
+        //TODO Refactor header/item into different ViewHolder classes, etc
+
+        private static final int VIEW_TYPE_HEADER = 0;
+        private static final int VIEW_TYPE_ITEM = 1;
+
         private final List<AppItem> items;
 
         public AppAdapter() {
@@ -111,50 +118,67 @@ public class ColorActivity extends AppCompatActivity {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_color, parent, false);
-            return new ViewHolder(view);
+            View view;
+            switch (viewType) {
+                case VIEW_TYPE_HEADER:
+                    view = LayoutInflater.from(parent.getContext())
+                            .inflate(R.layout.item_color_header, parent, false);
+                    return new ViewHolder(view);
+                case VIEW_TYPE_ITEM:
+                    view = LayoutInflater.from(parent.getContext())
+                            .inflate(R.layout.item_color, parent, false);
+                    return new ViewHolder(view);
+            }
+            return null;
         }
 
         @Override
         public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
             holder.appItem = items.get(position);
-            holder.ivIcon.setImageDrawable(holder.appItem.icon);
-            holder.tvTitleOrPackage.setText(holder.appItem.title != null ? holder.appItem.title : holder.appItem.packageName);
-            holder.tvTitleOrPackage.setText(holder.appItem.title);
-            holder.tvChannel.setText(holder.appItem.channelName);
-            holder.ivColor.setBackgroundColor(holder.appItem.color);
-            holder.view.setOnClickListener(v -> {
-                final AppItem item = holder.appItem;
-                (new ColorPickerPopup.Builder(ColorActivity.this))
-                        .initialColor(holder.appItem.color)
-                        .enableAlpha(false)
-                        .enableBrightness(true)
-                        .okTitle(getString(android.R.string.ok))
-                        .cancelTitle(getString(android.R.string.cancel))
-                        .showIndicator(true)
-                        .showValue(false)
-                        .build()
-                        .show(new ColorPickerPopup.ColorPickerObserver() {
-                            @Override
-                            public void onColorPicked(int color) {
-                                settings.setColorForPackageAndChannel(item.packageName, item.channelName, color, false);
-                                item.color = color;
+            if (holder.appItem.viewType == VIEW_TYPE_HEADER) {
+                holder.tvTitleOrPackage.setText(holder.appItem.title);
+            } else if (holder.appItem.viewType == VIEW_TYPE_ITEM) {
+                holder.ivIcon.setImageDrawable(holder.appItem.icon);
+                holder.tvTitleOrPackage.setText(holder.appItem.title != null ? holder.appItem.title : holder.appItem.packageName);
+                holder.tvChannel.setText(holder.appItem.channelName);
+                holder.ivColor.setBackgroundColor(holder.appItem.color);
+                holder.view.setOnClickListener(v -> {
+                    final AppItem item = holder.appItem;
+                    (new ColorPickerPopup.Builder(ColorActivity.this))
+                            .initialColor(holder.appItem.color)
+                            .enableAlpha(false)
+                            .enableBrightness(true)
+                            .okTitle(getString(android.R.string.ok))
+                            .cancelTitle(getString(android.R.string.cancel))
+                            .showIndicator(true)
+                            .showValue(false)
+                            .build()
+                            .show(new ColorPickerPopup.ColorPickerObserver() {
+                                @Override
+                                public void onColorPicked(int color) {
+                                    settings.setColorForPackageAndChannel(item.packageName, item.channelName, color, false);
+                                    item.color = color;
 
-                                // force overlay reload
-                                boolean startEnabled = settings.isEnabled();
-                                settings.setEnabled(!startEnabled);
-                                settings.setEnabled(startEnabled);
+                                    // force overlay reload
+                                    boolean startEnabled = settings.isEnabled();
+                                    settings.setEnabled(!startEnabled);
+                                    settings.setEnabled(startEnabled);
 
-                                notifyDataSetChanged();
-                            }
-                        });
-            });
+                                    notifyDataSetChanged();
+                                }
+                            });
+                });
+            }
         }
 
         @Override
         public int getItemCount() {
             return items.size();
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            return items.get(position).viewType;
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
@@ -167,11 +191,16 @@ public class ColorActivity extends AppCompatActivity {
 
             public ViewHolder(View view) {
                 super(view);
+
                 this.view = view;
                 ivIcon = view.findViewById(R.id.icon);
-                tvTitleOrPackage = view.findViewById(R.id.titleOrPackage);
                 tvChannel = view.findViewById(R.id.channel);
                 ivColor = view.findViewById(R.id.color);
+
+                TextView tv;
+                tv = view.findViewById(R.id.titleOrPackage);
+                if (tv == null) tv = view.findViewById(R.id.title);
+                tvTitleOrPackage = tv;
             }
 
             @NonNull
@@ -199,7 +228,14 @@ public class ColorActivity extends AppCompatActivity {
 
         @SuppressWarnings("ConstantConditions")
         public void loadAppItems(Map<String, Integer> packagesChannelsAndColors) {
-            List<AppItem> results = new ArrayList<>();
+            List<NotificationListenerService.ActiveNotification> active = null;
+            NotificationListenerService service = NotificationListenerService.getInstance();
+            if (service != null) {
+                active = service.getCurrentlyActiveNotifications();
+            }
+
+            List<AppItem> activeItems = new ArrayList<>();
+            List<AppItem> inactiveItems = new ArrayList<>();
             PackageManager pm = getPackageManager();
             for (String pkgChan : packagesChannelsAndColors.keySet()) {
                 int sep = pkgChan.indexOf(':');
@@ -207,20 +243,32 @@ public class ColorActivity extends AppCompatActivity {
                     String pkg = pkgChan.substring(0, sep);
                     String chan = pkgChan.substring(sep + 1);
                     try {
+                        NotificationListenerService.ActiveNotification found = null;
+                        if (active != null) {
+                            for (NotificationListenerService.ActiveNotification not : active) {
+                                if (not.getPackageName().equals(pkg) && not.getChannelName().equals(chan)) {
+                                    found = not;
+                                    break;
+                                }
+                            }
+                        }
+
+                        List<AppItem> target = found != null ? activeItems : inactiveItems;
                         ApplicationInfo info = pm.getApplicationInfo(pkg, 0);
-                        results.add(new AppItem(
+                        target.add(new AppItem(
                                 getLabel(pm, info),
                                 pkg,
                                 chan,
                                 getIcon(pm, info),
-                                packagesChannelsAndColors.get(pkgChan)
+                                packagesChannelsAndColors.get(pkgChan),
+                                VIEW_TYPE_ITEM
                         ));
                     } catch (PackageManager.NameNotFoundException e) {
                         e.printStackTrace();
                     }
                 }
             }
-            Collections.sort(results, (a, b) -> {
+            Comparator<AppItem> sorter = (a, b) -> {
                 int sort;
                 if ((a.title == null) && (b.title == null)) {
                     sort = a.packageName.compareToIgnoreCase(b.packageName);
@@ -235,9 +283,16 @@ public class ColorActivity extends AppCompatActivity {
                     sort = a.channelName.compareToIgnoreCase(b.channelName);
                 }
                 return sort;
-            });
+            };
+
+            Collections.sort(activeItems, sorter);
+            Collections.sort(inactiveItems, sorter);
+
             items.clear();
-            items.addAll(results);
+            items.add(new AppItem(getString(R.string.colors_header_active), null, null, null, 0, VIEW_TYPE_HEADER));
+            items.addAll(activeItems);
+            items.add(new AppItem(getString(R.string.colors_header_inactive), null, null, null, 0, VIEW_TYPE_HEADER));
+            items.addAll(inactiveItems);
             notifyDataSetChanged();
         }
 
@@ -247,8 +302,9 @@ public class ColorActivity extends AppCompatActivity {
             public final String channelName;
             public final Drawable icon;
             public int color;
+            public final int viewType;
 
-            public AppItem(String title, String packageName, String channelName, Drawable icon, int color) {
+            public AppItem(String title, String packageName, String channelName, Drawable icon, int color, int viewType) {
                 if ((title != null) && title.equals(packageName)) {
                     title = null;
                 }
@@ -257,6 +313,7 @@ public class ColorActivity extends AppCompatActivity {
                 this.channelName = channelName;
                 this.icon = icon;
                 this.color = color;
+                this.viewType = viewType;
             }
         }
     }

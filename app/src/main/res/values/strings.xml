@@ -127,4 +127,7 @@
     <string name="settings_animation_style_blink_description">Up to 3.5% battery/hour</string>
     <string name="settings_animation_style_single_description">Up to 3.5% battery/hour</string>
     <string name="settings_animation_style_tsp_description">Below 1% battery/hour</string>
+
+    <string name="colors_header_active">Currently active</string>
+    <string name="colors_header_inactive">Not currently active</string>
 </resources>

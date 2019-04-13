@@ -46,6 +46,33 @@ import eu.chainfire.holeylight.misc.MotionSensor;
 import eu.chainfire.holeylight.misc.Settings;
 
 public class NotificationListenerService extends android.service.notification.NotificationListenerService implements Settings.OnSettingsChangedListener {
+    private static NotificationListenerService instance = null;
+    public static NotificationListenerService getInstance() {
+        return instance;
+    }
+
+    public static class ActiveNotification {
+        private final String packageName;
+        private final String channelName;
+
+        public ActiveNotification(String packageName, String channelName) {
+            this.packageName = packageName;
+            this.channelName = channelName;
+        }
+
+        public String getPackageName() {
+            return packageName;
+        }
+
+        public String getChannelName() {
+            return channelName;
+        }
+    }
+
+    public synchronized List<ActiveNotification> getCurrentlyActiveNotifications() {
+        return new ArrayList<>(activeNotifications);
+    }
+
     private Settings settings = null;
     private Overlay overlay = null;
     private NotificationTracker tracker = null;
@@ -58,6 +85,7 @@ public class NotificationListenerService extends android.service.notification.No
     private long stationary_for_ms = 0;
     private boolean connected = false;
     private Handler handler;
+    private List<ActiveNotification> activeNotifications = new ArrayList<>();
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -130,6 +158,7 @@ public class NotificationListenerService extends android.service.notification.No
     public void onListenerConnected() {
         super.onListenerConnected();
         log("onListenerConnected");
+        instance = this;
         connected = true;
         tracker.clear();
         isUserPresent = Display.isOn(this, false) && !keyguardManager.isKeyguardLocked();
@@ -141,6 +170,7 @@ public class NotificationListenerService extends android.service.notification.No
     @Override
     public void onListenerDisconnected() {
         log("onListenerDisconnected");
+        instance = null;
         connected = false;
         stopMotionSensor();
         unregisterReceiver(broadcastReceiver);
@@ -210,6 +240,7 @@ public class NotificationListenerService extends android.service.notification.No
         log("handleLEDNotifications");
 
         List<Integer> colors = new ArrayList<>();
+        activeNotifications.clear();
 
         try {
             StatusBarNotification[] sbns = tracker.prune(getActiveNotifications());
@@ -258,6 +289,8 @@ public class NotificationListenerService extends android.service.notification.No
                         }
                     }
                 }
+
+                activeNotifications.add(new ActiveNotification(sbn.getPackageName(), channelName));
 
                 // Save to prefs, or get overriden value from prefs
                 c = settings.getColorForPackageAndChannel(sbn.getPackageName(), channelName, c);
