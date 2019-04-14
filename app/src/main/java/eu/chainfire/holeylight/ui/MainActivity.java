@@ -90,6 +90,8 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
         });
     }
 
+    private Runnable checkPermissionsRunnable = this::checkPermissions;
+
     @SuppressWarnings("deprecation")
     private void checkPermissions() {
         switch (Permissions.detect(this)) {
@@ -175,12 +177,14 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
     protected void onStart() {
         super.onStart();
         Permissions.unnotify(this);
-        checkPermissions();
+        handler.removeCallbacks(checkPermissionsRunnable);
+        handler.postDelayed(checkPermissionsRunnable, 1000);
         TestNotification.show(this, TestNotification.NOTIFICATION_ID_MAIN);
     }
 
     @Override
     protected void onStop() {
+        handler.removeCallbacks(checkPermissionsRunnable);
         TestNotification.hide(this, TestNotification.NOTIFICATION_ID_MAIN);
         super.onStop();
     }
