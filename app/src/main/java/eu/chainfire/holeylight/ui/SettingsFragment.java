@@ -18,6 +18,7 @@
 
 package eu.chainfire.holeylight.ui;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -55,7 +56,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private Preference prefSeenPickup = null;
     private CheckBoxPreference prefSeenOnLockscreen = null;
     private CheckBoxPreference prefSeenOnUserPresent = null;
-    private Preference prefHideAOD = null;
+    private CheckBoxPreference prefHideAOD = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -151,15 +152,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         copyright.setSummary(details);
         root.addPreference(copyright);
 
-        Preference basicHelp = pref(null, R.string.help_basic_title, R.string.help_basic_descrption, null, true, preference -> {
-            (new AlertDialog.Builder(getContext()))
-                    .setTitle(R.string.help_basic_title)
-                    .setMessage(Html.fromHtml(getString(R.string.help_basic_message)))
-                    .setPositiveButton(android.R.string.ok, null)
-                    .show();
-           return false;
+        Preference setupWizard = pref(null, R.string.setup_wizard_title, R.string.setup_wizard_description, null, true, preference -> {
+            settings.setSetupWizardComplete(false);
+            Activity activity = getActivity();
+            if (activity instanceof MainActivity) {
+                ((MainActivity)activity).setupWizard();
+            }
+            return false;
         });
-        root.addPreference(basicHelp);
+        root.addPreference(setupWizard);
 
         PreferenceCategory catOperation = category(root, R.string.settings_category_operation_title_v2, 0);
 
@@ -360,6 +361,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             prefSeenOnUserPresent.setEnabled(settings.isEnabledWhileScreenOff());
 
             prefHideAOD.setEnabled(settings.isEnabledWhileScreenOff());
+            prefHideAOD.setChecked(settings.isHideAOD());
+
+            if (key != null) {
+                Activity activity = getActivity();
+                if (activity instanceof MainActivity) {
+                    ((MainActivity)activity).validateSettings();
+                }
+            }
         }
     }
 }

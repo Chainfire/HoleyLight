@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.companion.AssociationRequest;
 import android.companion.CompanionDeviceManager;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.net.Uri;
@@ -39,6 +40,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
+import eu.chainfire.holeylight.animation.SpritePlayer;
+import eu.chainfire.holeylight.misc.AODControl;
 import eu.chainfire.holeylight.misc.Permissions;
 import eu.chainfire.holeylight.misc.Settings;
 
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
     private Settings settings = null;
     private SwitchCompat switchMaster = null;
     private Dialog currentDialog = null;
+    private boolean checkPermissionsOnResume = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,12 +82,15 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
 
     private AlertDialog.Builder newAlert(boolean finishOnDismiss) {
         if (currentDialog != null) {
+            currentDialog.setCancelable(true);
             currentDialog.dismiss();
             currentDialog = null;
         }
         return (new AlertDialog.Builder(this))
                 .setOnDismissListener(dialog -> {
-                    currentDialog = null;
+                    if (currentDialog == dialog) {
+                        currentDialog = null;
+                    }
                     if (finishOnDismiss) {
                         MainActivity.this.finish();
                     }
@@ -94,23 +101,25 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
 
     @SuppressWarnings("deprecation")
     private void checkPermissions() {
+        if (setupWizard()) return;
+
         switch (Permissions.detect(this)) {
             case DEVICE_SUPPORT:
-                currentDialog = newAlert(true)
+                (currentDialog = newAlert(true)
                         .setTitle(R.string.error)
                         .setMessage(Html.fromHtml(getString(R.string.error_unsupported_device, Build.DEVICE)))
                         .setPositiveButton(android.R.string.ok, null)
-                        .show();
+                        .show()).setCanceledOnTouchOutside(false);
                 break;
             case UNHIDE_NOTCH:
-                currentDialog = newAlert(true)
+                (currentDialog = newAlert(true)
                         .setTitle(R.string.error)
                         .setMessage(Html.fromHtml(getString(R.string.error_hide_notch)))
                         .setPositiveButton(android.R.string.ok, null)
-                        .show();
+                        .show()).setCanceledOnTouchOutside(false);
                 break;
             case COMPANION_DEVICE:
-                currentDialog = newAlert(false)
+                (currentDialog = newAlert(false)
                         .setTitle(getString(R.string.permission_required) + " 1/4")
                         .setMessage(Html.fromHtml(getString(R.string.permission_associate)))
                         .setPositiveButton(android.R.string.ok, (dialog, which) -> {
@@ -135,42 +144,209 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
                                 }
                             }, handler);
                         })
-                        .show();
+                        .show()).setCanceledOnTouchOutside(false);
                 break;
             case NOTIFICATION_SERVICE:
-                currentDialog = newAlert(false)
+                (currentDialog = newAlert(false)
                         .setTitle(getString(R.string.permission_required) + " 2/4")
                         .setMessage(Html.fromHtml(getString(R.string.permission_notifications)))
                         .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                             Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
                             startActivity(intent);
                         })
-                        .show();
+                        .show()).setCanceledOnTouchOutside(false);
                 break;
             case ACCESSIBILITY_SERVICE:
-                currentDialog = newAlert(false)
+                (currentDialog = newAlert(false)
                         .setTitle(getString(R.string.permission_required) + " 3/4")
                         .setMessage(Html.fromHtml(getString(R.string.permission_accessibility_v2)))
                         .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                             Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
                             startActivity(intent);
                         })
-                        .show();
+                        .show()).setCanceledOnTouchOutside(false);
                 break;
             case BATTERY_OPTIMIZATION_EXEMPTION:
-                currentDialog = newAlert(false)
+                (currentDialog = newAlert(false)
                         .setTitle(getString(R.string.permission_required) + " 4/4")
                         .setMessage(Html.fromHtml(getString(R.string.permission_battery)))
                         .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            checkPermissionsOnResume = true;
                             @SuppressLint("BatteryLife") Intent intent = new Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
                             intent.setData(Uri.parse("package:" + BuildConfig.APPLICATION_ID));
                             startActivity(intent);
                         })
-                        .show();
+                        .show()).setCanceledOnTouchOutside(false);
                 break;
             case NONE:
                 newAlert(false); // dismiss leftovers
+                validateSettings();
         }
+    }
+
+    @SuppressWarnings({ "deprecation", "UnusedReturnValue" })
+    public boolean validateSettings() {
+        if (!Settings.getInstance(this).isSetupWizardComplete()) return false;
+        if (Permissions.detect(this) != Permissions.Needed.NONE) return false;
+
+        boolean aodRequired = settings.isEnabled() && (
+                settings.isEnabledWhile(Settings.SCREEN_OFF_CHARGING, true) ||
+                settings.isEnabledWhile(Settings.SCREEN_OFF_BATTERY, true)
+        );
+        boolean aodWithImageRequired = aodRequired && (
+                settings.isHideAOD() ||
+                (settings.getAnimationMode(Settings.SCREEN_OFF_CHARGING) == SpritePlayer.Mode.TSP) ||
+                (settings.getAnimationMode(Settings.SCREEN_OFF_BATTERY) == SpritePlayer.Mode.TSP)
+        );
+        if (aodRequired || aodWithImageRequired) {
+            ContentResolver resolver = getContentResolver();
+            aodRequired = (android.provider.Settings.System.getInt(resolver, "aod_mode", 0) == 0) && !AODControl.haveHelperPackage(this, true);
+            if (aodWithImageRequired) {
+                aodWithImageRequired = (android.provider.Settings.System.getString(resolver, "current_sec_aod_theme_package") == null);
+            }
+            if (aodRequired) {
+                (currentDialog = newAlert(false)
+                        .setTitle(R.string.notice_dialog_title)
+                        .setMessage(Html.fromHtml(getString(R.string.notice_aod_required_message)))
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .setPositiveButton(R.string.open_android_settings, (dialog, which) -> {
+                            try {
+                                Intent intent = new Intent(Intent.ACTION_MAIN);
+                                intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                                intent.setPackage("com.android.settings");
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        })
+                        .show()).setCanceledOnTouchOutside(false);
+                return true;
+            } else if (aodWithImageRequired) {
+                (currentDialog = newAlert(false)
+                        .setTitle(R.string.notice_dialog_title)
+                        .setMessage(Html.fromHtml(getString(R.string.notice_aod_with_image_required_message)))
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .setPositiveButton(R.string.open_theme_store, (dialog, which) -> {
+                            try {
+                                Intent intent = new Intent();
+                                intent.setPackage("com.samsung.android.themestore");
+                                intent.setData(Uri.parse("themestore://MainPage?contentsType=aods"));
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        })
+                        .show()).setCanceledOnTouchOutside(false);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @SuppressWarnings("deprecation")
+    private AlertDialog.Builder newSetupAlert(int message) {
+        return newAlert(false)
+                .setTitle(R.string.setup_wizard_title)
+                .setMessage(Html.fromHtml(getString(message)))
+                .setOnCancelListener((dialog) -> MainActivity.this.finish());
+    }
+
+    public boolean setupWizard() {
+        Settings settings = Settings.getInstance(this);
+        if (settings.isSetupWizardComplete()) return false;
+
+        // dialogs below are in reverse order of being shown
+
+        Runnable done = () ->
+            (currentDialog = newSetupAlert(R.string.setup_wizard_complete)
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                        settings.setSetupWizardComplete(true);
+                        handler.removeCallbacks(checkPermissionsRunnable);
+                        checkPermissions();
+                    })
+                    .show()).setCanceledOnTouchOutside(false);
+
+        Runnable hideAOD = () ->
+                (currentDialog = newSetupAlert(R.string.setup_wizard_hide_aod)
+                        .setPositiveButton(R.string.setup_wizard_option_hide_aod, (dialog, which) -> done.run())
+                        .setNegativeButton(R.string.setup_wizard_option_show_aod, (dialog, which) -> {
+                            settings.setHideAOD(false);
+                            done.run();
+                        })
+                        .show()).setCanceledOnTouchOutside(false);
+
+        Runnable chooseNotificationStyle = () ->
+            (currentDialog = newSetupAlert(R.string.setup_wizard_choose_notification_style)
+                    .setPositiveButton(R.string.animation_style_swirl_title, (dialog, which) -> {
+                        settings.edit();
+                        try {
+                            settings.setAnimationMode(Settings.SCREEN_OFF_CHARGING, SpritePlayer.Mode.SWIRL);
+                            settings.setAnimationMode(Settings.SCREEN_OFF_BATTERY, SpritePlayer.Mode.SWIRL);
+                        } finally {
+                            settings.save(true);
+                        }
+                        hideAOD.run();
+                    })
+                    .setNegativeButton(R.string.animation_style_blink_title, (dialog, which) -> {
+                        settings.edit();
+                        try {
+                            settings.setAnimationMode(Settings.SCREEN_OFF_CHARGING, SpritePlayer.Mode.BLINK);
+                            settings.setAnimationMode(Settings.SCREEN_OFF_BATTERY, SpritePlayer.Mode.BLINK);
+                        } finally {
+                            settings.save(true);
+                        }
+                        hideAOD.run();
+                    })
+                    .setNeutralButton(R.string.animation_style_tsp_title, (dialog, which) -> {
+                        settings.edit();
+                        try {
+                            settings.setAnimationMode(Settings.SCREEN_OFF_CHARGING, SpritePlayer.Mode.TSP);
+                            settings.setAnimationMode(Settings.SCREEN_OFF_BATTERY, SpritePlayer.Mode.TSP);
+                        } finally {
+                            settings.save(true);
+                        }
+                        done.run();
+                    })
+                    .show()).setCanceledOnTouchOutside(false);
+
+        Runnable runWhileScreenOff = () ->
+            (currentDialog = newSetupAlert(R.string.setup_wizard_run_while_screen_off)
+                    .setPositiveButton(R.string.yes, (dialog, which) -> {
+                        settings.edit();
+                        try {
+                            settings.setEnabledWhile(Settings.SCREEN_OFF_CHARGING, true);
+                            settings.setEnabledWhile(Settings.SCREEN_OFF_BATTERY, true);
+                        } finally {
+                            settings.save(true);
+                        }
+                        chooseNotificationStyle.run();
+                    })
+                    .setNegativeButton(R.string.no, (dialog, which) -> done.run())
+                    .show()).setCanceledOnTouchOutside(false);
+
+        settings.edit();
+        try {
+            settings.setEnabledWhile(Settings.SCREEN_ON_CHARGING, true);
+            settings.setEnabledWhile(Settings.SCREEN_OFF_CHARGING, false);
+            settings.setEnabledWhile(Settings.SCREEN_ON_BATTERY, true);
+            settings.setEnabledWhile(Settings.SCREEN_OFF_BATTERY, false);
+            settings.setAnimationMode(Settings.SCREEN_ON_CHARGING, SpritePlayer.Mode.SWIRL);
+            settings.setAnimationMode(Settings.SCREEN_OFF_CHARGING, SpritePlayer.Mode.TSP);
+            settings.setAnimationMode(Settings.SCREEN_ON_BATTERY, SpritePlayer.Mode.SWIRL);
+            settings.setAnimationMode(Settings.SCREEN_OFF_BATTERY, SpritePlayer.Mode.TSP);
+            settings.setHideAOD(true);
+        } finally {
+            settings.save(true);
+        }
+        Runnable welcome = () ->
+            (currentDialog = newSetupAlert(R.string.setup_wizard_welcome)
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> runWhileScreenOff.run())
+                    .show()).setCanceledOnTouchOutside(false);
+        welcome.run();
+
+        return true;
     }
 
     @Override
@@ -180,6 +356,16 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
         handler.removeCallbacks(checkPermissionsRunnable);
         handler.postDelayed(checkPermissionsRunnable, 1000);
         TestNotification.show(this, TestNotification.NOTIFICATION_ID_MAIN);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (checkPermissionsOnResume) {
+            checkPermissionsOnResume = false;
+            handler.removeCallbacks(checkPermissionsRunnable);
+            handler.postDelayed(checkPermissionsRunnable, 1000);
+        }
     }
 
     @Override

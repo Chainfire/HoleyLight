@@ -169,6 +169,8 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final String HIDE_AOD = "hide_aod";
     private static final boolean HIDE_AOD_DEFAULT = false;
 
+    private static final String SETUP_WIZARD_COMPLETE = "setup_wizard_complete";
+
     private static Settings instance;
     public static Settings getInstance(Context context) {
         synchronized (Settings.class) {
@@ -450,7 +452,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         return (!effective || isEnabledWhileScreenOff()) && prefs.getBoolean(SEEN_ON_USER_PRESENT, SEEN_ON_USER_PRESENT_DEFAULT);
     }
 
-    private String getAnimationModeKey(int mode) {
+    public String getAnimationModeKey(int mode) {
         return String.format(Locale.ENGLISH, ANIMATION_STYLE_FMT, SCREEN_AND_POWER_STATE[mode]);
     }
 
@@ -497,5 +499,27 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public boolean isHideAOD() {
         return prefs.getBoolean(HIDE_AOD, HIDE_AOD_DEFAULT);
+    }
+
+    public void setHideAOD(boolean hide) {
+        edit();
+        try {
+            editor.putBoolean(HIDE_AOD, hide);
+        } finally {
+            save(true);
+        }
+    }
+
+    public boolean isSetupWizardComplete() {
+        return prefs.getBoolean(SETUP_WIZARD_COMPLETE, false);
+    }
+
+    public void setSetupWizardComplete(boolean complete) {
+        edit();
+        try {
+            editor.putBoolean(SETUP_WIZARD_COMPLETE, complete);
+        } finally {
+            save(true);
+        }
     }
 }
