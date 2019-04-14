@@ -380,7 +380,7 @@ public class Overlay {
             renderMode = SpritePlayer.Mode.TSP_HIDE;
         }
 
-        boolean lockscreenOk = on && (!lockscreen || settings.isEnabledOnLockscreen());
+        boolean lockscreenOk = !on || !lockscreen || settings.isEnabledOnLockscreen();
         boolean wantedEffective = (wanted || activeHide) && settings.isEnabledWhile(mode) && lockscreenOk;
 
         if (visible && wantedEffective && ((colors.length > 0) || activeHide)) {

@@ -311,8 +311,8 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                 // Update parent view
                 WindowManager.LayoutParams params = (WindowManager.LayoutParams)spritePlayer.getLayoutParams();
                 if (hideAOD) {
-                    // 75% height, to leave room for the fully charged notification and the fingerprint animation
-                    update.set(0, 0, resolution.x, (int)(resolution.y * 0.75f));
+                    // Not 100% height, to leave room for the fully charged notification and the fingerprint animation
+                    update.set(0, 0, resolution.x, (int)(resolution.y * 0.77f));
                     spritePlayer.setBackgroundColor(Color.BLACK);
                 } else {
                     update.set((int)left, (int)top, (int)(left + width), (int)(top + height));
