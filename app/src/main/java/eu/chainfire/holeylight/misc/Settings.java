@@ -107,7 +107,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
             new AnimationStyle("swirl", SpritePlayer.Mode.SWIRL, R.string.animation_style_swirl_title, R.string.animation_style_location_camera, 5.5f),
             new AnimationStyle("blink", SpritePlayer.Mode.BLINK, R.string.animation_style_blink_title, R.string.animation_style_location_camera, 3.5f),
             new AnimationStyle("pie", SpritePlayer.Mode.SINGLE, R.string.animation_style_single_title, R.string.animation_style_location_camera, 3.5f),
-            new AnimationStyle("tsp", SpritePlayer.Mode.TSP, R.string.animation_style_tsp_title, R.string.animation_style_location_camera, -1f),
+            new AnimationStyle("tsp", SpritePlayer.Mode.TSP, R.string.animation_style_tsp_title, R.string.animation_style_location_screen_center, -1f),
     };
 
     public AnimationStyle getAnimationStyle(String name) {

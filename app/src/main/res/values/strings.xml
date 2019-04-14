@@ -140,6 +140,6 @@
     <string name="animation_style_tsp_title">Unholey Light</string>
     <string name="animation_style_location_camera">Camera</string>
     <string name="animation_style_location_screen_center">Screen center</string>
-    <string name="animation_style_percentage_up_to">Up to %.1f%%/hour</string>
-    <string name="animation_style_percentage_below">Below %.0f%%/hour</string>
+    <string name="animation_style_percentage_up_to">Up to %.1f%% battery/hour</string>
+    <string name="animation_style_percentage_below">Below %.0f%% battery/hour</string>
 </resources>
