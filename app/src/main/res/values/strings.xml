@@ -106,11 +106,9 @@
 
     <!-- v0.51 -->
 
-    <!-- temporary: don't bother translating these -->
-    <string translatable="false" name="temp_settings_hide_aod_title">Automatic AOD - WORK IN PROGRESS</string>
-    <string translatable="false" name="temp_settings_hide_aod_description">Requires AOD Helper package. You need to configure an image without a clock on AOD first. Takes control of AOD.</string>
-    <!-- /temporary -->
-    
+<!-- obsolete --><string translatable="false" name="temp_settings_hide_aod_title">Automatic AOD - WORK IN PROGRESS</string>
+<!-- obsolete --><string translatable="false" name="temp_settings_hide_aod_description">Requires AOD Helper package. You need to configure an image without a clock on AOD first. Takes control of AOD.</string>
+
     <!-- v0.55 -->
 
     <string name="translation">Translation by:</string>
@@ -149,4 +147,7 @@
     <string name="settings_category_seen_description">Treat notifications as dismissed</string>
     <string name="settings_seen_pickup_title">When picked up</string>
     <string translatable="false" name="settings_seen_pickup_description">@string/settings_category_seen_pickup_description</string>
+
+    <string name="settings_hide_aod_title">Hide AOD</string>
+    <string name="settings_hide_aod_description">When the screen is off, hide Always On Display and show only our animation</string>
 </resources>

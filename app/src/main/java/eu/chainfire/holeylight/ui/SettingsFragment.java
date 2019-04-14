@@ -55,6 +55,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private Preference prefSeenPickup = null;
     private CheckBoxPreference prefSeenOnLockscreen = null;
     private CheckBoxPreference prefSeenOnUserPresent = null;
+    private Preference prefHideAOD = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -214,7 +215,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         }
 
         prefLockscreenOn = check(catOperation, R.string.settings_lockscreen_on_title, R.string.settings_lockscreen_on_description, Settings.ENABLED_LOCKSCREEN, settings.isEnabledOnLockscreen(), true);
-        check(catOperation, R.string.temp_settings_hide_aod_title, R.string.temp_settings_hide_aod_description, Settings.HIDE_AOD, settings.isHideAOD(), true);
+
+        prefHideAOD = check(catOperation, R.string.settings_hide_aod_title, R.string.settings_hide_aod_description, Settings.HIDE_AOD, settings.isHideAOD(), true);
 
         PreferenceCategory catAnimation = category(root, R.string.settings_category_animation_title, 0);
         pref(catAnimation, R.string.settings_animation_tune_title, R.string.settings_animation_tune_description, null, true, preference -> {
@@ -356,6 +358,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
             prefSeenOnLockscreen.setEnabled(settings.isEnabledWhileScreenOff());
             prefSeenOnUserPresent.setEnabled(settings.isEnabledWhileScreenOff());
+
+            prefHideAOD.setEnabled(settings.isEnabledWhileScreenOff());
         }
     }
 }

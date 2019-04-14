@@ -362,7 +362,8 @@ public class Overlay {
         boolean on = Display.isOn(context, false);
         boolean doze = Display.isDoze(context);
         boolean visible = on || doze;
-        if (!visible && settings.isHideAOD()) {
+        boolean allowHideAOD = settings.isEnabledWhileScreenOff();
+        if (!visible && settings.isHideAOD() && allowHideAOD) {
             // we will be visible soon
             visible = true;
             doze = true;
@@ -375,7 +376,7 @@ public class Overlay {
 
         // We don't have the helper package that properly turns off AOD (passive hide) when we want
         // to hide it, but we still want AOD to be invisible: active hide
-        boolean activeHide = (colors.length == 0) && doze && (settings.isHideAOD() || spritePlayer.isTSPMode(renderMode)) && !AODControl.haveHelperPackage(context, false);
+        boolean activeHide = (colors.length == 0) && doze && allowHideAOD && (settings.isHideAOD() || spritePlayer.isTSPMode(renderMode)) && !AODControl.haveHelperPackage(context, false);
         if (activeHide) {
             renderMode = SpritePlayer.Mode.TSP_HIDE;
         }
@@ -388,7 +389,7 @@ public class Overlay {
             if (!lastState || colorsChanged() || renderMode != lastMode || (dpAdd != lastDpAdd)) {
                 animation.setMode(renderMode);
                 createOverlay();
-                if (settings.isHideAOD() && doze) {
+                if (settings.isHideAOD() && doze && allowHideAOD) {
                     animation.setHideAOD(true);
                     AODControl.setAOD(spritePlayer.getContext(), true);
                 } else {
