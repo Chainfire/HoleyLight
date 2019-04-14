@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- entries marked obsolete are no longer used and should not be translated,
+         entries with 'translatable="false"' also need no translation. -->
+
     <string translatable="false" name="app_name">Holey Light</string>
     <string translatable="false" name="app_details">Copyright © 2019 – Chainfire\nTwitter: @ChainfireXDA\nSources: github.com/Chainfire/HoleyLight\nTap to visit XDA thread</string>
     <string translatable="false" name="app_website_url">https://forum.xda-developers.com/galaxy-s10/themes/app-holey-light-t3917675</string>
@@ -42,9 +45,9 @@
     <string name="battery_screen_on">Battery: Screen on</string>
     <string name="battery_screen_off">Battery: Screen off</string>
 
-    <string name="settings_category_operation_title">Operation</string>
-<!-- obsolete --><string name="settings_screen_on_title">Screen on</string>
-<!-- obsolete --><string name="settings_screen_on_description">Show notification light while the phone is in normal use</string>
+<!-- obsolete --><string name="settings_category_operation_title">Operation</string>
+<!-- obsolete --><string translatable="false" name="settings_screen_on_title">Screen on</string>
+<!-- obsolete --><string translatable="false" name="settings_screen_on_description">Show notification light while the phone is in normal use</string>
     <string translatable="false" name="settings_screen_off_charging_title">@string/charging_screen_off</string>
     <string name="settings_screen_off_charging_description">Show notification light while the screen is off and charging</string>
     <string translatable="false" name="settings_screen_off_battery_title">@string/battery_screen_off</string>
@@ -108,31 +111,12 @@
     <string translatable="false" name="temp_settings_hide_aod_description">Requires AOD Helper package. You need to configure an image without a clock on AOD first. Takes control of AOD.</string>
     <!-- /temporary -->
     
-    <!-- v0.52 -->
+    <!-- v0.55 -->
 
     <string name="translation">Translation by:</string>
 
     <!-- Your name (or xda/twitter/reddit/github/etc username) here -->
     <string name="translation_by"></string>
-
-    <string translatable="false" name="settings_animation_screen_on_charging_title">@string/charging_screen_on</string>
-    <string name="settings_animation_screen_on_charging_description">Animation style when the screen is on and charging\n[ %s ]</string>
-    <string translatable="false" name="settings_animation_screen_off_charging_title">@string/charging_screen_off</string>
-    <string name="settings_animation_screen_off_charging_description">Animation style when the screen is off and charging\n[ %s ]</string>
-    <string translatable="false" name="settings_animation_screen_on_battery_title">@string/battery_screen_on</string>
-    <string name="settings_animation_screen_on_battery_description">Animation style when the screen is on and on battery power\n[ %s ]</string>
-    <string translatable="false" name="settings_animation_screen_off_battery_title">@string/battery_screen_off</string>
-    <string name="settings_animation_screen_off_battery_description">Animation style when the screen is off and on battery power\n[ %s ]</string>
-
-    <string name="settings_animation_style_dialog_title">Choose animation style</string>
-    <string name="settings_animation_style_swirl_title">Swirl (camera)</string>
-    <string name="settings_animation_style_blink_title">Blink (camera)</string>
-    <string name="settings_animation_style_single_title">Pie (camera)</string>
-    <string name="settings_animation_style_tsp_title">Unholey Light (screen center)</string>
-    <string name="settings_animation_style_swirl_description">Up to 5.5% battery/hour</string>
-    <string name="settings_animation_style_blink_description">Up to 3.5% battery/hour</string>
-    <string name="settings_animation_style_single_description">Up to 3.5% battery/hour</string>
-    <string name="settings_animation_style_tsp_description">Below 1% battery/hour</string>
 
     <string name="colors_header_active">Currently active</string>
     <string name="colors_header_inactive">Not currently active</string>
@@ -145,4 +129,17 @@
     <string name="settings_screen_on_charging_description">Show notification light while the screen is on and charging</string>
     <string translatable="false" name="settings_screen_on_battery_title">@string/battery_screen_on</string>
     <string name="settings_screen_on_battery_description">Show notification light while the screen is on and on battery power</string>
+
+    <string name="settings_category_operation_title_v2">When and how to display</string>
+    <string name="operation_mode_disabled_title">Disabled</string>
+    <string name="operation_mode_disabled_description">Do not show notifications</string>
+
+    <string name="animation_style_swirl_title">Swirl</string>
+    <string name="animation_style_blink_title">Blink</string>
+    <string name="animation_style_single_title">Pie</string>
+    <string name="animation_style_tsp_title">Unholey Light</string>
+    <string name="animation_style_location_camera">Camera</string>
+    <string name="animation_style_location_screen_center">Screen center</string>
+    <string name="animation_style_percentage_up_to">Up to %.1f%%/hour</string>
+    <string name="animation_style_percentage_below">Below %.0f%%/hour</string>
 </resources>

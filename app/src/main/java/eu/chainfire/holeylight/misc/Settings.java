@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Rect;
+import android.text.Html;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,6 +72,57 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public static final String ENABLED_LOCKSCREEN = "enabled_lockscreen";
     private static final boolean ENABLED_LOCKSCREEN_DEFAULT = true;
+    
+    public static class AnimationStyle {
+        public static final String HTML_FORMAT = "%s<br><small>%s</small>";
+        private static final String TITLE_FORMAT = "%s (%s)";
+
+        public final String name;
+        public final SpritePlayer.Mode mode;
+        public final int title;
+        public final int location;
+        public final float battery;
+
+        public AnimationStyle(String name, SpritePlayer.Mode mode, int title, int location, float battery) {
+            this.name = name;
+            this.mode = mode;
+            this.title = title;
+            this.location = location;
+            this.battery = battery;
+        }
+
+        @SuppressWarnings("deprecation")
+        public CharSequence getHtmlDisplay(Context context, boolean charging) {
+            if (charging) {
+                return Html.fromHtml(String.format(Locale.ENGLISH, HTML_FORMAT, context.getString(title), context.getString(location)));
+            } else {
+                String combinedTitle = String.format(TITLE_FORMAT, context.getString(title), context.getString(location).toLowerCase());
+                String description = context.getString(battery < 0 ? R.string.animation_style_percentage_below : R.string.animation_style_percentage_up_to, Math.abs(battery));
+                return Html.fromHtml(String.format(Locale.ENGLISH, HTML_FORMAT, combinedTitle, description));
+            }
+        }
+    }
+    
+    public final AnimationStyle[] ANIMATION_STYLES = new AnimationStyle[] {
+            new AnimationStyle("swirl", SpritePlayer.Mode.SWIRL, R.string.animation_style_swirl_title, R.string.animation_style_location_camera, 5.5f),
+            new AnimationStyle("blink", SpritePlayer.Mode.BLINK, R.string.animation_style_blink_title, R.string.animation_style_location_camera, 3.5f),
+            new AnimationStyle("pie", SpritePlayer.Mode.SINGLE, R.string.animation_style_single_title, R.string.animation_style_location_camera, 3.5f),
+            new AnimationStyle("tsp", SpritePlayer.Mode.TSP, R.string.animation_style_tsp_title, R.string.animation_style_location_camera, -1f),
+    };
+
+    public AnimationStyle getAnimationStyle(String name) {
+        for (AnimationStyle as : ANIMATION_STYLES) {
+            if (as.name.equals(name)) return as;
+        }
+        return null;
+    }
+
+    public AnimationStyle getAnimationStyle(SpritePlayer.Mode mode) {
+        for (AnimationStyle as : ANIMATION_STYLES) {
+            if (as.mode == mode) return as;
+        }
+        return null;
+    }
 
     // SCREEN_AND_POWER_STATE indexed
     public static final String[] ANIMATION_STYLE_DEFAULTS = new String[] {
@@ -78,37 +130,6 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
             "tsp",
             "blink",
             "tsp"
-    };
-
-    public static final String[] ANIMATION_STYLE_NAMES = new String[] {
-            "swirl",
-            "blink",
-            "pie",
-            "tsp"
-    };
-
-    // ANIMATION_STYLE_NAMES indexed
-    public static final SpritePlayer.Mode[] ANIMATION_STYLE_VALUES = new SpritePlayer.Mode[] {
-            SpritePlayer.Mode.SWIRL,
-            SpritePlayer.Mode.BLINK,
-            SpritePlayer.Mode.SINGLE,
-            SpritePlayer.Mode.TSP
-    };
-
-    // ANIMATION_STYLE_NAMES indexed
-    public static final int[] ANIMATION_STYLE_TITLES = new int[] {
-            R.string.settings_animation_style_swirl_title,
-            R.string.settings_animation_style_blink_title,
-            R.string.settings_animation_style_single_title,
-            R.string.settings_animation_style_tsp_title
-    };
-
-    // ANIMATION_STYLE_NAMES indexed
-    public static final int[] ANIMATION_STYLE_DESCRIPTIONS = new int[] {
-            R.string.settings_animation_style_swirl_description,
-            R.string.settings_animation_style_blink_description,
-            R.string.settings_animation_style_single_description,
-            R.string.settings_animation_style_tsp_description
     };
 
     public static final String ANIMATION_STYLE_FMT = "animation_%s";
@@ -332,12 +353,21 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
-    public String isEnabledWhileKey(int mode) {
+    public String getEnabledWhileKey(int mode) {
         return String.format(Locale.ENGLISH, ENABLED_WHILE_FMT, SCREEN_AND_POWER_STATE[mode]);
     }
 
+    public void setEnabledWhile(int mode, boolean enabled) {
+        edit();
+        try {
+            editor.putBoolean(getEnabledWhileKey(mode), enabled);
+        } finally {
+            save(true);
+        }
+    }
+
     public boolean isEnabledWhile(int mode) {
-        return isEnabled() && prefs.getBoolean(isEnabledWhileKey(mode), ENABLED_WHILE_DEFAULTS[mode]);
+        return isEnabled() && prefs.getBoolean(getEnabledWhileKey(mode), ENABLED_WHILE_DEFAULTS[mode]);
     }
 
     public boolean isEnabledWhileScreenOn() {
@@ -418,25 +448,20 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public SpritePlayer.Mode getAnimationMode(int mode) {
         String key = String.format(Locale.ENGLISH, ANIMATION_STYLE_FMT, SCREEN_AND_POWER_STATE[mode]);
-        String value = prefs.getString(key, ANIMATION_STYLE_DEFAULTS[mode]);
-        for (int i = 0; i < ANIMATION_STYLE_NAMES.length; i++) {
-            if (ANIMATION_STYLE_NAMES[i].equals(value)) {
-                return ANIMATION_STYLE_VALUES[i];
-            }
-        }
+        AnimationStyle as = getAnimationStyle(prefs.getString(key, ANIMATION_STYLE_DEFAULTS[mode]));
+        if (as != null) return as.mode;
         return null;
     }
 
     public void setAnimationMode(int mode, SpritePlayer.Mode animationMode) {
         String key = String.format(Locale.ENGLISH, ANIMATION_STYLE_FMT, SCREEN_AND_POWER_STATE[mode]);
-        for (int i = 0; i < ANIMATION_STYLE_VALUES.length; i++) {
-            if (ANIMATION_STYLE_VALUES[i] == animationMode) {
-                edit();
-                try {
-                    editor.putString(key, ANIMATION_STYLE_NAMES[i]);
-                } finally {
-                    save(true);
-                }
+        AnimationStyle as = getAnimationStyle(animationMode);
+        if (as != null) {
+            edit();
+            try {
+                editor.putString(key, as.name);
+            } finally {
+                save(true);
             }
         }
     }

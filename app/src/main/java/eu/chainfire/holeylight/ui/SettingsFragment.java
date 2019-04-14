@@ -26,6 +26,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 
+import java.util.Locale;
+
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
@@ -45,10 +47,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefScreenOffCharging = null;
     private CheckBoxPreference prefScreenOnBattery = null;
     private CheckBoxPreference prefScreenOffBattery = null;
-    private Preference prefAnimationScreenOnCharging = null;
-    private Preference prefAnimationScreenOnBattery = null;
-    private Preference prefAnimationScreenOffCharging = null;
-    private Preference prefAnimationScreenOffBattery = null;
     private CheckBoxPreference prefLockscreenOn = null;
     private CheckBoxPreference prefSeenPickupScreenOnCharging = null;
     private CheckBoxPreference prefSeenPickupScreenOffCharging = null;
@@ -114,6 +112,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         return retval;
     }
 
+    private int getModeFromPreference(Preference preference) {
+        if (preference == prefScreenOnCharging) return Settings.SCREEN_ON_CHARGING;
+        else if (preference == prefScreenOffCharging) return Settings.SCREEN_OFF_CHARGING;
+        else if (preference == prefScreenOnBattery) return Settings.SCREEN_ON_BATTERY;
+        else if (preference == prefScreenOffBattery) return Settings.SCREEN_OFF_BATTERY;
+        return -1;
+    }
+
     @SuppressWarnings({"ConstantConditions", "deprecation"})
     private PreferenceScreen createPreferenceHierarchy() {
         PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
@@ -153,11 +159,59 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         });
         root.addPreference(basicHelp);
 
-        PreferenceCategory catOperation = category(root, R.string.settings_category_operation_title, 0);
-        prefScreenOnCharging = check(catOperation, R.string.settings_screen_on_charging_title, R.string.settings_screen_on_charging_description, settings.isEnabledWhileKey(Settings.SCREEN_ON_CHARGING), settings.isEnabledWhile(Settings.SCREEN_ON_CHARGING), true);
-        prefScreenOffCharging = check(catOperation, R.string.settings_screen_off_charging_title, R.string.settings_screen_off_charging_description, settings.isEnabledWhileKey(Settings.SCREEN_OFF_CHARGING), settings.isEnabledWhile(Settings.SCREEN_OFF_CHARGING), true);
-        prefScreenOnBattery = check(catOperation, R.string.settings_screen_on_battery_title, R.string.settings_screen_on_battery_description, settings.isEnabledWhileKey(Settings.SCREEN_ON_BATTERY), settings.isEnabledWhile(Settings.SCREEN_ON_BATTERY), true);
-        prefScreenOffBattery = check(catOperation, R.string.settings_screen_off_battery_title, R.string.settings_screen_off_battery_description, settings.isEnabledWhileKey(Settings.SCREEN_OFF_BATTERY), settings.isEnabledWhile(Settings.SCREEN_OFF_BATTERY), false);
+        PreferenceCategory catOperation = category(root, R.string.settings_category_operation_title_v2, 0);
+
+        Preference.OnPreferenceClickListener operationClickListener = preference -> {
+            final int mode = getModeFromPreference(preference);
+            if (mode < 0) return false;
+
+            boolean charging = (mode == Settings.SCREEN_ON_CHARGING) || (mode == Settings.SCREEN_OFF_CHARGING);
+            boolean screenOff = (mode == Settings.SCREEN_OFF_CHARGING) || (mode == Settings.SCREEN_OFF_BATTERY);
+
+            CharSequence[] options = new CharSequence[screenOff ? 5 : 4];
+            options[0] = Html.fromHtml(String.format(Locale.ENGLISH, Settings.AnimationStyle.HTML_FORMAT, getString(R.string.operation_mode_disabled_title), getString(R.string.operation_mode_disabled_description)));
+            options[1] = settings.getAnimationStyle(SpritePlayer.Mode.SWIRL).getHtmlDisplay(getContext(), charging);
+            options[2] = settings.getAnimationStyle(SpritePlayer.Mode.BLINK).getHtmlDisplay(getContext(), charging);
+            options[3] = settings.getAnimationStyle(SpritePlayer.Mode.SINGLE).getHtmlDisplay(getContext(), charging);
+            if (screenOff) {
+                options[4] = settings.getAnimationStyle(SpritePlayer.Mode.TSP).getHtmlDisplay(getContext(), charging);
+            }
+
+            if (mode >= 0) {
+                (new AlertDialog.Builder(getContext()))
+                        .setTitle(preference.getTitle())
+                        .setItems(options, (dialog, which) -> {
+                            settings.setEnabledWhile(mode, which > 0);
+                            switch (which) {
+                                case 1:
+                                    settings.setAnimationMode(mode, SpritePlayer.Mode.SWIRL);
+                                    break;
+                                case 2:
+                                    settings.setAnimationMode(mode, SpritePlayer.Mode.BLINK);
+                                    break;
+                                case 3:
+                                    settings.setAnimationMode(mode, SpritePlayer.Mode.SINGLE);
+                                    break;
+                                case 4:
+                                    settings.setAnimationMode(mode, SpritePlayer.Mode.TSP);
+                                    break;
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show();
+            }
+            return false;
+        };
+
+        prefScreenOnCharging = check(catOperation, R.string.settings_screen_on_charging_title, R.string.settings_screen_on_charging_description, settings.getEnabledWhileKey(Settings.SCREEN_ON_CHARGING), settings.isEnabledWhile(Settings.SCREEN_ON_CHARGING), true);
+        prefScreenOffCharging = check(catOperation, R.string.settings_screen_off_charging_title, R.string.settings_screen_off_charging_description, settings.getEnabledWhileKey(Settings.SCREEN_OFF_CHARGING), settings.isEnabledWhile(Settings.SCREEN_OFF_CHARGING), true);
+        prefScreenOnBattery = check(catOperation, R.string.settings_screen_on_battery_title, R.string.settings_screen_on_battery_description, settings.getEnabledWhileKey(Settings.SCREEN_ON_BATTERY), settings.isEnabledWhile(Settings.SCREEN_ON_BATTERY), true);
+        prefScreenOffBattery = check(catOperation, R.string.settings_screen_off_battery_title, R.string.settings_screen_off_battery_description, settings.getEnabledWhileKey(Settings.SCREEN_OFF_BATTERY), settings.isEnabledWhile(Settings.SCREEN_OFF_BATTERY), false);
+        for (CheckBoxPreference pref : new CheckBoxPreference[] { prefScreenOnCharging, prefScreenOffCharging, prefScreenOnBattery, prefScreenOffBattery }) {
+            pref.setOnPreferenceChangeListener((preference, newValue) -> false);
+            pref.setOnPreferenceClickListener(operationClickListener);
+        }
+
         prefLockscreenOn = check(catOperation, R.string.settings_lockscreen_on_title, R.string.settings_lockscreen_on_description, Settings.ENABLED_LOCKSCREEN, settings.isEnabledOnLockscreen(), true);
         check(catOperation, R.string.temp_settings_hide_aod_title, R.string.temp_settings_hide_aod_description, Settings.HIDE_AOD, settings.isHideAOD(), true);
 
@@ -170,38 +224,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             startActivity(new Intent(getActivity(), ColorActivity.class));
             return false;
         });
-
-        Preference.OnPreferenceClickListener animationClickListener = preference -> {
-            final int mode;
-            if (preference == prefAnimationScreenOnCharging) mode = Settings.SCREEN_ON_CHARGING;
-            else if (preference == prefAnimationScreenOffCharging) mode = Settings.SCREEN_OFF_CHARGING;
-            else if (preference == prefAnimationScreenOnBattery) mode = Settings.SCREEN_ON_BATTERY;
-            else if (preference == prefAnimationScreenOffBattery) mode = Settings.SCREEN_OFF_BATTERY;
-            else return false;
-
-            boolean screenOff = (mode == Settings.SCREEN_OFF_CHARGING) || (mode == Settings.SCREEN_OFF_BATTERY);
-
-            CharSequence[] options = new CharSequence[screenOff ? 4 : 3];
-            options[0] = Html.fromHtml(getString(Settings.ANIMATION_STYLE_TITLES[0]) + "<br><small>" + getString(Settings.ANIMATION_STYLE_DESCRIPTIONS[0]) + "</small>");
-            options[1] = Html.fromHtml(getString(Settings.ANIMATION_STYLE_TITLES[1]) + "<br><small>" + getString(Settings.ANIMATION_STYLE_DESCRIPTIONS[1]) + "</small>");
-            options[2] = Html.fromHtml(getString(Settings.ANIMATION_STYLE_TITLES[2]) + "<br><small>" + getString(Settings.ANIMATION_STYLE_DESCRIPTIONS[2]) + "</small>");
-            if (screenOff) {
-                options[3] = Html.fromHtml(getString(Settings.ANIMATION_STYLE_TITLES[3]) + "<br><small>" + getString(Settings.ANIMATION_STYLE_DESCRIPTIONS[3]) + "</small>");
-            }
-
-            if (mode >= 0) {
-                (new AlertDialog.Builder(getContext()))
-                        .setTitle(R.string.settings_animation_style_dialog_title)
-                        .setItems(options, (dialog, which) -> settings.setAnimationMode(mode, Settings.ANIMATION_STYLE_VALUES[which]))
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .show();
-            }
-            return false;
-        };
-        prefAnimationScreenOnCharging = pref(catAnimation, R.string.settings_animation_screen_on_charging_title, 0, null, true, animationClickListener);
-        prefAnimationScreenOffCharging = pref(catAnimation, R.string.settings_animation_screen_off_charging_title, 0, null, true, animationClickListener);
-        prefAnimationScreenOnBattery = pref(catAnimation, R.string.settings_animation_screen_on_battery_title, 0, null, true, animationClickListener);
-        prefAnimationScreenOffBattery = pref(catAnimation, R.string.settings_animation_screen_off_battery_title, 0, null, true, animationClickListener);
 
         PreferenceCategory catMarkAsSeen;
 
@@ -257,23 +279,30 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         }
     }
 
-    private String getAnimationStyleTitle(int mode) {
+    private String getAnimationStyleSuffix(int mode) {
         SpritePlayer.Mode animationMode = settings.getAnimationMode(mode);
-        for (int i = 0; i < Settings.ANIMATION_STYLE_VALUES.length; i++) {
-            if (Settings.ANIMATION_STYLE_VALUES[i] == animationMode) {
-                return getString(Settings.ANIMATION_STYLE_TITLES[i]);
-            }
+        Settings.AnimationStyle as = settings.getAnimationStyle(animationMode);
+        if (as != null) {
+            return "\n[ " + getString(as.title) + " ]";
         }
-        return "?";
+        return "\n[ ? ]";
     }
 
     @SuppressWarnings({ "unused", "ConstantConditions" })
     private void updatePrefs(String key) {
         if (prefScreenOnCharging != null) {
-            prefScreenOnCharging.setEnabled(settings.isEnabled());
-            prefScreenOffCharging.setEnabled(settings.isEnabled());
-            prefScreenOnBattery.setEnabled(settings.isEnabled());
-            prefScreenOffBattery.setEnabled(settings.isEnabled());
+            for (CheckBoxPreference pref : new CheckBoxPreference[] { prefScreenOnCharging, prefScreenOffCharging, prefScreenOnBattery, prefScreenOffBattery }) {
+                int mode = getModeFromPreference(pref);
+                pref.setEnabled(settings.isEnabled());
+                pref.setChecked(settings.isEnabledWhile(mode));
+                String summary = pref.getSummary().toString();
+                int index = summary.indexOf("\n[");
+                if (index > -1) summary = summary.substring(0, index);
+                if (settings.isEnabledWhile(mode)) {
+                    summary += getAnimationStyleSuffix(mode);
+                }
+                pref.setSummary(summary);
+            }
             prefLockscreenOn.setEnabled(settings.isEnabledWhileScreenOn());
             prefSeenPickupScreenOnCharging.setEnabled(settings.isEnabledWhile(Settings.SCREEN_ON_CHARGING));
             prefSeenPickupScreenOffCharging.setEnabled(settings.isEnabledWhile(Settings.SCREEN_OFF_CHARGING));
@@ -281,15 +310,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             prefSeenPickupScreenOffBattery.setEnabled(settings.isEnabledWhile(Settings.SCREEN_OFF_BATTERY));
             prefSeenOnLockscreen.setEnabled(settings.isEnabledWhileScreenOff());
             prefSeenOnUserPresent.setEnabled(settings.isEnabledWhileScreenOff());
-
-            prefAnimationScreenOnCharging.setEnabled(settings.isEnabledWhile(Settings.SCREEN_ON_CHARGING));
-            prefAnimationScreenOnCharging.setSummary(getString(R.string.settings_animation_screen_on_charging_description, getAnimationStyleTitle(Settings.SCREEN_ON_CHARGING)));
-            prefAnimationScreenOffCharging.setEnabled(settings.isEnabledWhile(Settings.SCREEN_OFF_CHARGING));
-            prefAnimationScreenOffCharging.setSummary(getString(R.string.settings_animation_screen_off_charging_description, getAnimationStyleTitle(Settings.SCREEN_OFF_CHARGING)));
-            prefAnimationScreenOnBattery.setEnabled(settings.isEnabledWhile(Settings.SCREEN_ON_BATTERY));
-            prefAnimationScreenOnBattery.setSummary(getString(R.string.settings_animation_screen_on_battery_description, getAnimationStyleTitle(Settings.SCREEN_ON_BATTERY)));
-            prefAnimationScreenOffBattery.setEnabled(settings.isEnabledWhile(Settings.SCREEN_OFF_BATTERY));
-            prefAnimationScreenOffBattery.setSummary(getString(R.string.settings_animation_screen_off_battery_description, getAnimationStyleTitle(Settings.SCREEN_OFF_BATTERY)));
         }
     }
 }
