@@ -25,7 +25,11 @@ import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.TypedValue;
+import android.view.ViewGroup;
+import android.widget.ListView;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 import androidx.preference.CheckBoxPreference;
@@ -48,10 +52,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefScreenOnBattery = null;
     private CheckBoxPreference prefScreenOffBattery = null;
     private CheckBoxPreference prefLockscreenOn = null;
-    private CheckBoxPreference prefSeenPickupScreenOnCharging = null;
-    private CheckBoxPreference prefSeenPickupScreenOffCharging = null;
-    private CheckBoxPreference prefSeenPickupScreenOnBattery = null;
-    private CheckBoxPreference prefSeenPickupScreenOffBattery = null;
+    private Preference prefSeenPickup = null;
     private CheckBoxPreference prefSeenOnLockscreen = null;
     private CheckBoxPreference prefSeenOnUserPresent = null;
 
@@ -227,13 +228,52 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         PreferenceCategory catMarkAsSeen;
 
-        catMarkAsSeen = category(root, R.string.settings_category_seen_pickup_title, R.string.settings_category_seen_pickup_description);
-        prefSeenPickupScreenOnCharging = check(catMarkAsSeen, R.string.settings_seen_pickup_screen_on_charging_title, R.string.settings_seen_pickup_screen_on_charging_description, Settings.SEEN_PICKUP_SCREEN_ON_CHARGING, settings.isSeenPickupScreenOnCharging(false), true);
-        prefSeenPickupScreenOffCharging = check(catMarkAsSeen, R.string.settings_seen_pickup_screen_off_charging_title, R.string.settings_seen_pickup_screen_off_charging_description, Settings.SEEN_PICKUP_SCREEN_OFF_CHARGING, settings.isSeenPickupScreenOffCharging(false), true);
-        prefSeenPickupScreenOnBattery = check(catMarkAsSeen, R.string.settings_seen_pickup_screen_on_battery_title, R.string.settings_seen_pickup_screen_on_battery_description, Settings.SEEN_PICKUP_SCREEN_ON_BATTERY, settings.isSeenPickupScreenOnBattery(false), true);
-        prefSeenPickupScreenOffBattery = check(catMarkAsSeen, R.string.settings_seen_pickup_screen_off_battery_title, R.string.settings_seen_pickup_screen_off_battery_description, Settings.SEEN_PICKUP_SCREEN_OFF_BATTERY, settings.isSeenPickupScreenOffBattery(false), true);
+        catMarkAsSeen = category(root, R.string.settings_category_seen_title, R.string.settings_category_seen_description);
+        prefSeenPickup = pref(catMarkAsSeen, R.string.settings_seen_pickup_title, R.string.settings_seen_pickup_description, null, true, preference -> {
+            String FORMAT = "%s<br><small>%s</small>";
+            AlertDialog alertDialog = (new AlertDialog.Builder(getContext()))
+                    .setTitle(preference.getTitle())
+                    .setMultiChoiceItems(new CharSequence[] {
+                            Html.fromHtml(String.format(Locale.ENGLISH, FORMAT, getString(R.string.charging_screen_on), getString(R.string.settings_seen_pickup_screen_on_charging_description))),
+                            Html.fromHtml(String.format(Locale.ENGLISH, FORMAT, getString(R.string.charging_screen_off), getString(R.string.settings_seen_pickup_screen_off_charging_description))),
+                            Html.fromHtml(String.format(Locale.ENGLISH, FORMAT, getString(R.string.battery_screen_on), getString(R.string.settings_seen_pickup_screen_on_battery_description))),
+                            Html.fromHtml(String.format(Locale.ENGLISH, FORMAT, getString(R.string.battery_screen_off), getString(R.string.settings_seen_pickup_screen_off_battery_description)))
+                    }, new boolean[] {
+                            settings.isSeenPickupWhile(Settings.SCREEN_ON_CHARGING, false),
+                            settings.isSeenPickupWhile(Settings.SCREEN_OFF_CHARGING, false),
+                            settings.isSeenPickupWhile(Settings.SCREEN_ON_BATTERY, false),
+                            settings.isSeenPickupWhile(Settings.SCREEN_OFF_BATTERY, false),
+                    }, (dialog, which, isChecked) -> {
+                        switch (which) {
+                            case 0:
+                                settings.setSeenPickupWhile(Settings.SCREEN_ON_CHARGING, isChecked);
+                                break;
+                            case 1:
+                                settings.setSeenPickupWhile(Settings.SCREEN_OFF_CHARGING, isChecked);
+                                break;
+                            case 2:
+                                settings.setSeenPickupWhile(Settings.SCREEN_ON_BATTERY, isChecked);
+                                break;
+                            case 3:
+                                settings.setSeenPickupWhile(Settings.SCREEN_OFF_BATTERY, isChecked);
+                                break;
+                        }
+                    })
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+            
+            ListView listView = alertDialog.getListView();
+            listView.setDividerHeight((int)(16 * TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getContext().getResources().getDisplayMetrics())));
 
-        catMarkAsSeen = category(root, R.string.settings_category_seen_lockscreen_title, 0);
+            // Bloody Android and its AlertDialog auto-sizing
+            ViewGroup.LayoutParams params = listView.getLayoutParams();
+            params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            params.height = (int)(getActivity().getWindow().getDecorView().getHeight() * 0.75f);
+            listView.setLayoutParams(params);
+
+            return false;
+        });
+
         prefSeenOnLockscreen = check(catMarkAsSeen, R.string.settings_seen_on_lockscreen_title, R.string.settings_seen_on_lockscreen_description, Settings.SEEN_ON_LOCKSCREEN, settings.isSeenOnLockscreen(false), true);
         prefSeenOnUserPresent = check(catMarkAsSeen, R.string.settings_seen_on_user_present_title, R.string.settings_seen_on_user_present_description, Settings.SEEN_ON_USER_PRESENT, settings.isSeenOnUserPresent(false), true);
 
@@ -304,10 +344,16 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 pref.setSummary(summary);
             }
             prefLockscreenOn.setEnabled(settings.isEnabledWhileScreenOn());
-            prefSeenPickupScreenOnCharging.setEnabled(settings.isEnabledWhile(Settings.SCREEN_ON_CHARGING));
-            prefSeenPickupScreenOffCharging.setEnabled(settings.isEnabledWhile(Settings.SCREEN_OFF_CHARGING));
-            prefSeenPickupScreenOnBattery.setEnabled(settings.isEnabledWhile(Settings.SCREEN_ON_BATTERY));
-            prefSeenPickupScreenOffBattery.setEnabled(settings.isEnabledWhile(Settings.SCREEN_OFF_BATTERY));
+
+            ArrayList<String> seenPickup = new ArrayList<>();
+            for (int i = 0; i < Settings.SCREEN_AND_POWER_STATE_DESCRIPTIONS.length; i++) {
+                if (settings.isSeenPickupWhile(i, false)) {
+                    seenPickup.add(getString(Settings.SCREEN_AND_POWER_STATE_DESCRIPTIONS[i]));
+                }
+            }
+            prefSeenPickup.setEnabled(settings.isEnabled());
+            prefSeenPickup.setSummary(getString(R.string.settings_seen_pickup_description) + "\n[ " + (seenPickup.size() > 0 ? String.join(", ", seenPickup) : getString(R.string.never)) + " ]");
+
             prefSeenOnLockscreen.setEnabled(settings.isEnabledWhileScreenOff());
             prefSeenOnUserPresent.setEnabled(settings.isEnabledWhileScreenOff());
         }

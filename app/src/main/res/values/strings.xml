@@ -45,7 +45,7 @@
     <string name="battery_screen_on">Battery: Screen on</string>
     <string name="battery_screen_off">Battery: Screen off</string>
 
-<!-- obsolete --><string name="settings_category_operation_title">Operation</string>
+<!-- obsolete --><string translatable="false" name="settings_category_operation_title">Operation</string>
 <!-- obsolete --><string translatable="false" name="settings_screen_on_title">Screen on</string>
 <!-- obsolete --><string translatable="false" name="settings_screen_on_description">Show notification light while the phone is in normal use</string>
     <string translatable="false" name="settings_screen_off_charging_title">@string/charging_screen_off</string>
@@ -55,7 +55,7 @@
     <string name="settings_lockscreen_on_title">Lockscreen</string>
     <string name="settings_lockscreen_on_description">Show notification light on lockscreen; this may look strange if face unlock is enabled</string>
 
-    <string name="settings_category_seen_pickup_title">Mark as seen: Pickup</string>
+<!-- obsolete --><string translatable="false" name="settings_category_seen_pickup_title">Mark as seen: Pickup</string>
     <string name="settings_category_seen_pickup_description">Stationary for &gt;10s before moving</string>
     <string translatable="false" name="settings_seen_pickup_screen_on_charging_title">@string/charging_screen_on</string>
     <string name="settings_seen_pickup_screen_on_charging_description">Makes sense when you usually charge your phone where you can see it</string>
@@ -66,7 +66,7 @@
     <string translatable="false" name="settings_seen_pickup_screen_off_battery_title">@string/battery_screen_off</string>
     <string name="settings_seen_pickup_screen_off_battery_description">Consumes significant additional power</string>
 
-    <string name="settings_category_seen_lockscreen_title">Mark as seen: Lockscreen</string>
+<!-- obsolete --><string translatable="false" name="settings_category_seen_lockscreen_title">Mark as seen: Lockscreen</string>
     <string name="settings_seen_on_lockscreen_title">On lockscreen</string>
     <string name="settings_seen_on_lockscreen_description">Each time the lockscreen is shown</string>
     <string name="settings_seen_on_user_present_title">After unlock</string>
@@ -118,9 +118,11 @@
     <!-- Your name (or xda/twitter/reddit/github/etc username) here -->
     <string name="translation_by"></string>
 
+    <string name="never">Never</string>
+
     <string name="colors_header_active">Currently active</string>
     <string name="colors_header_inactive">Not currently active</string>
-    <string name="colors_help"><![CDATA[<i>Applications</i> can have multiple <i>channels</i>. Each <i>channel</i> is listed individually here. Entries are added only once a new notification is <i>seen</i>. You <b>cannot</b> add entries manually, because <i>channel</i> names can\'t be known beforehand. Set an entry completely <b>black</b> to disable that notification.]]></string>
+    <string name="colors_help"><![CDATA[<i>Applications</i> can have multiple <i>channels</i>. Each <i>channel</i> is isEnabledWhile(Settings.SCREEN_OFF_BATTERY)ed individually here. Entries are added only once a new notification is <i>seen</i>. You <b>cannot</b> add entries manually, because <i>channel</i> names can\'t be known beforehand. Set an entry completely <b>black</b> to disable that notification.]]></string>
     <string name="settings_animation_colors_description_v3">Adjust notification color per package and channel</string>
 
     <string name="permission_accessibility_v2"><![CDATA[In the next screen, please go to <b>Installed services</b>, and enable <b>Holey Light</b>. This is required to be able to show notifications, and be able to tap into AOD. If this doesn\'t work right, try rebooting.]]></string>
@@ -142,4 +144,9 @@
     <string name="animation_style_location_screen_center">Screen center</string>
     <string name="animation_style_percentage_up_to">Up to %.1f%% battery/hour</string>
     <string name="animation_style_percentage_below">Below %.0f%% battery/hour</string>
+
+    <string name="settings_category_seen_title">Mark as seen</string>
+    <string name="settings_category_seen_description">Treat notifications as dismissed</string>
+    <string name="settings_seen_pickup_title">When picked up</string>
+    <string translatable="false" name="settings_seen_pickup_description">@string/settings_category_seen_pickup_description</string>
 </resources>

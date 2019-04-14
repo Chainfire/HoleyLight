@@ -58,6 +58,14 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     };
 
     // SCREEN_AND_POWER_STATE indexed
+    public static final int[] SCREEN_AND_POWER_STATE_DESCRIPTIONS = new int[] {
+            R.string.charging_screen_on,
+            R.string.charging_screen_off,
+            R.string.battery_screen_on,
+            R.string.battery_screen_off
+    };
+
+    // SCREEN_AND_POWER_STATE indexed
     public static final boolean[] ENABLED_WHILE_DEFAULTS = new boolean[] {
             true,
             true,
@@ -132,19 +140,10 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
             "tsp"
     };
 
-    public static final String ANIMATION_STYLE_FMT = "animation_%s";
+    private static final String ANIMATION_STYLE_FMT = "animation_%s";
 
-    public static final String SEEN_PICKUP_SCREEN_ON_CHARGING = "seen_pickup_" + SCREEN_AND_POWER_STATE[SCREEN_ON_CHARGING];
-    private static final boolean SEEN_PICKUP_SCREEN_ON_CHARGING_DEFAULT = false;
-
-    public static final String SEEN_PICKUP_SCREEN_OFF_CHARGING = "seen_pickup_" + SCREEN_AND_POWER_STATE[SCREEN_OFF_CHARGING];
-    private static final boolean SEEN_PICKUP_SCREEN_OFF_CHARGING_DEFAULT = false;
-
-    public static final String SEEN_PICKUP_SCREEN_ON_BATTERY = "seen_pickup_" + SCREEN_AND_POWER_STATE[SCREEN_ON_BATTERY];
-    private static final boolean SEEN_PICKUP_SCREEN_ON_BATTERY_DEFAULT = false;
-
-    public static final String SEEN_PICKUP_SCREEN_OFF_BATTERY = "seen_pickup_" + SCREEN_AND_POWER_STATE[SCREEN_OFF_BATTERY];
-    private static final boolean SEEN_PICKUP_SCREEN_OFF_BATTERY_DEFAULT = false;
+    public static final boolean SEEN_PICKUP_DEFAULT = false;
+    private static final String SEEN_PICKUP_WHILE_FMT = "seen_pickup_%s";
 
     public static final String SEEN_ON_LOCKSCREEN = "seen_on_lockscreen";
     private static final boolean SEEN_ON_LOCKSCREEN_DEFAULT = false;
@@ -421,21 +420,22 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         }
         return ret;
     }
-
-    public boolean isSeenPickupScreenOnCharging(boolean effective) {
-        return (!effective || isEnabled()) && prefs.getBoolean(SEEN_PICKUP_SCREEN_ON_CHARGING, SEEN_PICKUP_SCREEN_ON_CHARGING_DEFAULT);
+    
+    public String getSeenPickupWhileKey(int mode) {
+        return String.format(Locale.ENGLISH, SEEN_PICKUP_WHILE_FMT, SCREEN_AND_POWER_STATE[mode]);
+    }
+    
+    public void setSeenPickupWhile(int mode, boolean seenPickup) {
+        edit();
+        try {
+            editor.putBoolean(getSeenPickupWhileKey(mode), seenPickup);
+        } finally {
+            save(true);
+        }
     }
 
-    public boolean isSeenPickupScreenOffCharging(boolean effective) {
-        return (!effective || isEnabledWhile(Settings.SCREEN_OFF_CHARGING)) && prefs.getBoolean(SEEN_PICKUP_SCREEN_OFF_CHARGING, SEEN_PICKUP_SCREEN_OFF_CHARGING_DEFAULT);
-    }
-
-    public boolean isSeenPickupScreenOnBattery(boolean effective) {
-        return (!effective || isEnabled()) && prefs.getBoolean(SEEN_PICKUP_SCREEN_ON_BATTERY, SEEN_PICKUP_SCREEN_ON_BATTERY_DEFAULT);
-    }
-
-    public boolean isSeenPickupScreenOffBattery(boolean effective) {
-        return (!effective || isEnabledWhile(Settings.SCREEN_OFF_BATTERY)) && prefs.getBoolean(SEEN_PICKUP_SCREEN_OFF_BATTERY, SEEN_PICKUP_SCREEN_OFF_BATTERY_DEFAULT);
+    public boolean isSeenPickupWhile(int mode, boolean effective) {
+        return (!effective || isEnabledWhile(mode)) && prefs.getBoolean(getSeenPickupWhileKey(mode), SEEN_PICKUP_DEFAULT);
     }
 
     public boolean isSeenOnLockscreen(boolean effective) {
@@ -446,20 +446,22 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         return (!effective || isEnabledWhileScreenOff()) && prefs.getBoolean(SEEN_ON_USER_PRESENT, SEEN_ON_USER_PRESENT_DEFAULT);
     }
 
+    private String getAnimationModeKey(int mode) {
+        return String.format(Locale.ENGLISH, ANIMATION_STYLE_FMT, SCREEN_AND_POWER_STATE[mode]);
+    }
+
     public SpritePlayer.Mode getAnimationMode(int mode) {
-        String key = String.format(Locale.ENGLISH, ANIMATION_STYLE_FMT, SCREEN_AND_POWER_STATE[mode]);
-        AnimationStyle as = getAnimationStyle(prefs.getString(key, ANIMATION_STYLE_DEFAULTS[mode]));
+        AnimationStyle as = getAnimationStyle(prefs.getString(getAnimationModeKey(mode), ANIMATION_STYLE_DEFAULTS[mode]));
         if (as != null) return as.mode;
         return null;
     }
 
     public void setAnimationMode(int mode, SpritePlayer.Mode animationMode) {
-        String key = String.format(Locale.ENGLISH, ANIMATION_STYLE_FMT, SCREEN_AND_POWER_STATE[mode]);
         AnimationStyle as = getAnimationStyle(animationMode);
         if (as != null) {
             edit();
             try {
-                editor.putString(key, as.name);
+                editor.putString(getAnimationModeKey(mode), as.name);
             } finally {
                 save(true);
             }

@@ -373,15 +373,7 @@ public class NotificationListenerService extends android.service.notification.No
     }
 
     private boolean canMarkAsReadFromPickup() {
-        boolean charging = Battery.isCharging(this);
-        return
-            ((isUserPresent) && (
-                    (charging && settings.isSeenPickupScreenOnCharging(true)) ||
-                    (!charging && settings.isSeenPickupScreenOnBattery(true))
-            )) || ((!isUserPresent) && (
-                    (charging && settings.isSeenPickupScreenOffCharging(true)) ||
-                    (!charging && settings.isSeenPickupScreenOffBattery(true))
-            ));
+        return settings.isSeenPickupWhile(settings.getMode(Battery.isCharging(this), isUserPresent), true);
     }
 
     private MotionSensor.OnMotionStateListener onMotionStateListener = (motionState, for_millis) -> {
