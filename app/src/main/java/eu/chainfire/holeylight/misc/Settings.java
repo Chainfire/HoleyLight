@@ -366,7 +366,11 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public boolean isEnabledWhile(int mode) {
-        return isEnabled() && prefs.getBoolean(getEnabledWhileKey(mode), ENABLED_WHILE_DEFAULTS[mode]);
+        return isEnabledWhile(mode, true);
+    }
+
+    public boolean isEnabledWhile(int mode, boolean effective) {
+        return (!effective || isEnabled()) && prefs.getBoolean(getEnabledWhileKey(mode), ENABLED_WHILE_DEFAULTS[mode]);
     }
 
     public boolean isEnabledWhileScreenOn() {

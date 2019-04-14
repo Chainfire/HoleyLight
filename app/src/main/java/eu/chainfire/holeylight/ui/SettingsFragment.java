@@ -334,11 +334,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             for (CheckBoxPreference pref : new CheckBoxPreference[] { prefScreenOnCharging, prefScreenOffCharging, prefScreenOnBattery, prefScreenOffBattery }) {
                 int mode = getModeFromPreference(pref);
                 pref.setEnabled(settings.isEnabled());
-                pref.setChecked(settings.isEnabledWhile(mode));
+                pref.setChecked(settings.isEnabledWhile(mode, false));
                 String summary = pref.getSummary().toString();
                 int index = summary.indexOf("\n[");
                 if (index > -1) summary = summary.substring(0, index);
-                if (settings.isEnabledWhile(mode)) {
+                if (settings.isEnabledWhile(mode, false)) {
                     summary += getAnimationStyleSuffix(mode);
                 }
                 pref.setSummary(summary);
