@@ -31,6 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
+            android:textStyle="bold"
             android:textAppearance="?attr/textAppearanceListItem"
             android:ellipsize="end"
             android:clickable="false" />
@@ -39,7 +40,7 @@
             android:id="@+id/channel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxLines="2"
+            android:maxLines="3"
             android:textAppearance="?attr/textAppearanceListItemSmall"
             android:ellipsize="end"
             android:clickable="false" />

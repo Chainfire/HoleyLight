@@ -55,10 +55,12 @@ public class NotificationListenerService extends android.service.notification.No
     public static class ActiveNotification {
         private final String packageName;
         private final String channelName;
+        private final CharSequence tickerText;
 
-        public ActiveNotification(String packageName, String channelName) {
+        public ActiveNotification(String packageName, String channelName, CharSequence tickerText) {
             this.packageName = packageName;
             this.channelName = channelName;
+            this.tickerText = tickerText;
         }
 
         public String getPackageName() {
@@ -67,6 +69,10 @@ public class NotificationListenerService extends android.service.notification.No
 
         public String getChannelName() {
             return channelName;
+        }
+
+        public CharSequence getTickerText() {
+            return tickerText;
         }
     }
 
@@ -293,7 +299,7 @@ public class NotificationListenerService extends android.service.notification.No
                     }
                 }
 
-                activeNotifications.add(new ActiveNotification(sbn.getPackageName(), channelName));
+                activeNotifications.add(new ActiveNotification(sbn.getPackageName(), channelName, not.tickerText));
 
                 // Save to prefs, or get overriden value from prefs
                 c = settings.getColorForPackageAndChannel(sbn.getPackageName(), channelName, c);

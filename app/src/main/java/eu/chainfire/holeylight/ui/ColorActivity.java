@@ -138,6 +138,7 @@ public class ColorActivity extends AppCompatActivity {
             return null;
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
             holder.appItem = items.get(position);
@@ -148,7 +149,11 @@ public class ColorActivity extends AppCompatActivity {
             } else if (holder.appItem.viewType == VIEW_TYPE_ITEM) {
                 holder.ivIcon.setImageDrawable(holder.appItem.icon);
                 holder.tvTitleOrPackage.setText(holder.appItem.title != null ? holder.appItem.title : holder.appItem.packageName);
-                holder.tvChannel.setText(holder.appItem.channelName);
+                if (holder.appItem.tickerText != null) {
+                    holder.tvChannel.setText(Html.fromHtml("<small>" + holder.appItem.channelName + "<br>" + holder.appItem.tickerText.toString() + "</small>"));
+                } else {
+                    holder.tvChannel.setText(Html.fromHtml("<small>" + holder.appItem.channelName + "</small>"));
+                }
                 holder.ivColor.setBackgroundColor(holder.appItem.color);
                 holder.view.setOnClickListener(v -> {
                     final AppItem item = holder.appItem;
@@ -267,6 +272,7 @@ public class ColorActivity extends AppCompatActivity {
                                 getLabel(pm, info),
                                 pkg,
                                 chan,
+                                found != null ? found.getTickerText() : null,
                                 getIcon(pm, info),
                                 packagesChannelsAndColors.get(pkgChan),
                                 VIEW_TYPE_ITEM
@@ -297,10 +303,10 @@ public class ColorActivity extends AppCompatActivity {
             Collections.sort(inactiveItems, sorter);
 
             items.clear();
-            items.add(new AppItem("", null, null, null, 0, VIEW_TYPE_HELP));
-            items.add(new AppItem(getString(R.string.colors_header_active), null, null, null, 0, VIEW_TYPE_HEADER));
+            items.add(new AppItem("", null, null, null, null, 0, VIEW_TYPE_HELP));
+            items.add(new AppItem(getString(R.string.colors_header_active), null, null, null, null, 0, VIEW_TYPE_HEADER));
             items.addAll(activeItems);
-            items.add(new AppItem(getString(R.string.colors_header_inactive), null, null, null, 0, VIEW_TYPE_HEADER));
+            items.add(new AppItem(getString(R.string.colors_header_inactive), null, null, null, null, 0, VIEW_TYPE_HEADER));
             items.addAll(inactiveItems);
             notifyDataSetChanged();
         }
@@ -309,17 +315,19 @@ public class ColorActivity extends AppCompatActivity {
             public final String title;
             public final String packageName;
             public final String channelName;
+            public final CharSequence tickerText;
             public final Drawable icon;
             public int color;
             public final int viewType;
 
-            public AppItem(String title, String packageName, String channelName, Drawable icon, int color, int viewType) {
+            public AppItem(String title, String packageName, String channelName, CharSequence tickerText, Drawable icon, int color, int viewType) {
                 if ((title != null) && title.equals(packageName)) {
                     title = null;
                 }
                 this.title = title;
                 this.packageName = packageName;
                 this.channelName = channelName;
+                this.tickerText = tickerText;
                 this.icon = icon;
                 this.color = color;
                 this.viewType = viewType;
