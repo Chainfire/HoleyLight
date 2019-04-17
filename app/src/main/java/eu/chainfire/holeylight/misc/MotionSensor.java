@@ -28,6 +28,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 
 import java.util.ArrayList;
@@ -74,7 +75,7 @@ public class MotionSensor {
     private List<OnMotionStateListener> listeners = new ArrayList<>();
 
     private MotionSensor(Context context) {
-        handler = new Handler();
+        handler = new Handler(Looper.getMainLooper());
         sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
         accelSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         measurementInProgress = false;

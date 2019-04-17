@@ -25,23 +25,34 @@ import static android.content.Context.DISPLAY_SERVICE;
 
 @SuppressWarnings("WeakerAccess")
 public class Display {
+    public enum State { ON, OFF, DOZE, OTHER }
+
     private static android.view.Display display = null;
 
-    public static boolean is(Context context, boolean ifOn, boolean ifOff, boolean ifDoze, boolean ifOther) {
+    public static State get(Context context) {
         if (display == null) {
             display = ((DisplayManager)context.getSystemService(DISPLAY_SERVICE)).getDisplay(0);
         }
         switch (display.getState()) {
-            case android.view.Display.STATE_ON: return ifOn;
-            case android.view.Display.STATE_OFF: return ifOff;
+            case android.view.Display.STATE_ON: return State.ON;
+            case android.view.Display.STATE_OFF: return State.OFF;
 
             case android.view.Display.STATE_DOZE:
             case android.view.Display.STATE_DOZE_SUSPEND:
-            case android.view.Display.STATE_ON_SUSPEND: return ifDoze; // technically, no
+            case android.view.Display.STATE_ON_SUSPEND: return State.DOZE; // technically, no
 
-            case android.view.Display.STATE_VR: return ifOther;
-            case android.view.Display.STATE_UNKNOWN: return ifOther;
+            case android.view.Display.STATE_VR: return State.OTHER;
+            case android.view.Display.STATE_UNKNOWN: return State.OTHER;
 
+            default: return State.OTHER;
+        }
+    }
+
+    public static boolean is(Context context, boolean ifOn, boolean ifOff, boolean ifDoze, boolean ifOther) {
+        switch (get(context)) {
+            case ON: return ifOn;
+            case OFF: return ifOff;
+            case DOZE: return ifDoze;
             default: return ifOther;
         }
     }

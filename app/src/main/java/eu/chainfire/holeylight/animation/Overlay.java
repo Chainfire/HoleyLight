@@ -35,11 +35,14 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.WindowManager;
+
+import java.util.Locale;
 
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.misc.AODControl;
@@ -75,6 +78,8 @@ public class Overlay {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() == null) return;
+
+            log("Intent: %s", intent.getAction());
 
             switch (intent.getAction()) {
                 case Intent.ACTION_CONFIGURATION_CHANGED:
@@ -159,10 +164,15 @@ public class Overlay {
         keyguardManager = (KeyguardManager)context.getSystemService(KEYGUARD_SERVICE);
         cpuWakeLock = ((PowerManager)context.getSystemService(POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, BuildConfig.APPLICATION_ID + ":cpu");
         drawWakeLock = ((PowerManager)context.getSystemService(POWER_SERVICE)).newWakeLock(0x00000080 | 0x40000000, BuildConfig.APPLICATION_ID + ":draw"); /* DRAW_WAKE_LOCK | UNIMPORTANT_FOR_LOGGING */
-        handler = new Handler();
+        handler = new Handler(Looper.getMainLooper());
         settings = Settings.getInstance(context);
         resolution = getResolution();
         resolver = context.getContentResolver();
+    }
+
+    @SuppressWarnings("all")
+    private void log(String fmt, Object... args) {
+        Slog.d("Overlay", String.format(Locale.ENGLISH, fmt, args));
     }
 
     private void pokeWakeLocks(int timeout_ms) {
@@ -258,6 +268,7 @@ public class Overlay {
             intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
             intentFilter.addAction(Intent.ACTION_POWER_CONNECTED);
             intentFilter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+            intentFilter.setPriority(999);
 
             spritePlayer.getContext().getApplicationContext().registerReceiver(broadcastReceiver, intentFilter);
         }
@@ -347,7 +358,7 @@ public class Overlay {
 
     private Runnable evaluateLoop = this::evaluate;
 
-    private void evaluate() {
+    public void evaluate() {
         if (spritePlayer == null) {
             if (wanted) handler.postDelayed(evaluateLoop, 500);
             return;

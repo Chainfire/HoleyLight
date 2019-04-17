@@ -31,6 +31,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.util.TypedValue;
 import android.view.Choreographer;
@@ -104,7 +105,7 @@ public class SpritePlayer extends RelativeLayout {
         handlerThreadLoader = new HandlerThread("SpritePlayer#Loader");
         handlerThreadLoader.start();
         handlerLoader = new Handler(handlerThreadLoader.getLooper());
-        handlerMain = new Handler();
+        handlerMain = new Handler(Looper.getMainLooper());
 
         paint.setAntiAlias(false);
         paint.setDither(false);

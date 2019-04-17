@@ -28,10 +28,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Process;
 import android.os.UserHandle;
 import android.service.notification.StatusBarNotification;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +44,7 @@ import eu.chainfire.holeylight.misc.Battery;
 import eu.chainfire.holeylight.misc.Display;
 import eu.chainfire.holeylight.misc.MotionSensor;
 import eu.chainfire.holeylight.misc.Settings;
+import eu.chainfire.holeylight.misc.Slog;
 
 @SuppressWarnings("WeakerAccess")
 public class NotificationListenerService extends android.service.notification.NotificationListenerService implements Settings.OnSettingsChangedListener {
@@ -121,7 +122,7 @@ public class NotificationListenerService extends android.service.notification.No
     private IntentFilter intentFilter = null;
 
     private void log(String fmt, Object... args) {
-        Log.d("HoleyLight/Listener", String.format(Locale.ENGLISH, fmt, args));
+        Slog.d("Listener", String.format(Locale.ENGLISH, fmt, args));
     }
 
     @Override
@@ -133,7 +134,7 @@ public class NotificationListenerService extends android.service.notification.No
         motionSensor = MotionSensor.getInstance(this);
         keyguardManager = (KeyguardManager)getSystemService(KEYGUARD_SERVICE);
 
-        handler = new Handler();
+        handler = new Handler(Looper.getMainLooper());
 
         tracker = new NotificationTracker();
 
@@ -350,7 +351,7 @@ public class NotificationListenerService extends android.service.notification.No
         if (enabled) {
             overlay.show(currentColors);
         } else {
-            overlay.hide(!enabled);
+            overlay.hide(true);
         }
         startMotionSensor();
     }
