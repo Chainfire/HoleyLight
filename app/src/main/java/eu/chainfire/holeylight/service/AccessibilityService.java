@@ -52,12 +52,21 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         //
         // Of course it is possible we're getting the wrong views inside some random Android
         // activity, so we make sure elsewhere the system is actually in doze mode before using it.
+        //
+        // The refresh calls are quite costly, abandon processing as soon as possible if no match.
+        //
+        // We also track screen state here, we regularly get that information here before we
+        // receive SCREEN_ON/OFF events.
 
         Display.State state = Display.get(this);
         if (state != lastState) {
             Slog.d("Access", String.format(Locale.ENGLISH, "display %s --> %s [%d/%s]", lastState != null ? lastState.toString() : "null", state.toString(), event.getEventType(), event.getPackageName() != null ? event.getPackageName() : "null"));
             lastState = state;
             Overlay.getInstance(this).evaluate();
+        }
+
+        if ((lastState == Display.State.ON) || (lastState == Display.State.OTHER)) {
+            return;
         }
 
         if (event.getPackageName() == null) return;
