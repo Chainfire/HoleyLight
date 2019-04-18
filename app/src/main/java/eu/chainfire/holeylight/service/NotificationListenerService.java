@@ -36,7 +36,6 @@ import android.service.notification.StatusBarNotification;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.animation.Overlay;
@@ -122,7 +121,7 @@ public class NotificationListenerService extends android.service.notification.No
     private IntentFilter intentFilter = null;
 
     private void log(String fmt, Object... args) {
-        Slog.d("Listener", String.format(Locale.ENGLISH, fmt, args));
+        Slog.d("Listener", fmt, args);
     }
 
     @Override

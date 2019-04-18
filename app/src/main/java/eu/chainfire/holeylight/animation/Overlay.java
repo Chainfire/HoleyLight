@@ -42,8 +42,6 @@ import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.WindowManager;
 
-import java.util.Locale;
-
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.misc.AODControl;
 import eu.chainfire.holeylight.misc.Battery;
@@ -172,7 +170,7 @@ public class Overlay {
 
     @SuppressWarnings("all")
     private void log(String fmt, Object... args) {
-        Slog.d("Overlay", String.format(Locale.ENGLISH, fmt, args));
+        Slog.d("Overlay", fmt, args);
     }
 
     private void pokeWakeLocks(int timeout_ms) {
