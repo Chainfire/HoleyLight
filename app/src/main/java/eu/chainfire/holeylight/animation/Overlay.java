@@ -290,7 +290,6 @@ public class Overlay {
                 0,
                 WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
                       WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                    | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
                     | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                     | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
                     | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
