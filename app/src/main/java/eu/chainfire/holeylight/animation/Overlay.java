@@ -174,6 +174,8 @@ public class Overlay {
     }
 
     private void pokeWakeLocks(int timeout_ms) {
+        Slog.d("WakeLock", "%d", timeout_ms);
+
         cpuWakeLock.acquire(timeout_ms);
 
         // This allows us to update the screen while in doze mode. Both
@@ -204,6 +206,8 @@ public class Overlay {
                 public void onDimensionsApplied(SpritePlayer view) {
                     if (added) {
                         try {
+                            //TODO remove/add adjusts view layout better more consistently, but flickers?
+                            //TODO maybe loop this to fix Unholey Light location sometimes not updating?
                             windowManager.updateViewLayout(view, view.getLayoutParams());
                         } catch (IllegalArgumentException e) {
                             //TODO figure out why this happens
