@@ -275,8 +275,14 @@ public class NotificationListenerService extends android.service.notification.No
         List<Integer> colors = new ArrayList<>();
         activeNotifications.clear();
 
+        int timeout = settings.getSeenTimeout(settings.getMode(Battery.isCharging(this), !Display.isDoze(this)));
+
         try {
-            StatusBarNotification[] sbns = tracker.prune(getActiveNotifications(), !Display.isOn(this, false) || !settings.isSeenIfScreenOn(true));
+            StatusBarNotification[] sbns = tracker.prune(
+                    getActiveNotifications(),
+                    !Display.isOn(this, false) || !settings.isSeenIfScreenOn(true),
+                    timeout
+            );
             for (StatusBarNotification sbn : sbns) {
                 Notification not = sbn.getNotification();
 
@@ -369,6 +375,9 @@ public class NotificationListenerService extends android.service.notification.No
             currentColors = sorted;
             motionSensor.resetDuration();
             apply();
+        }
+        if ((currentColors.length > 0) && (timeout > 0)) {
+            handler.postDelayed(this::handleLEDNotifications, timeout);
         }
     }
 

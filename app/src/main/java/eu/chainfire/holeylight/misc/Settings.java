@@ -142,8 +142,8 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     private static final String ANIMATION_STYLE_FMT = "animation_%s";
 
-    public static final boolean SEEN_PICKUP_DEFAULT = false;
     private static final String SEEN_PICKUP_WHILE_FMT = "seen_pickup_%s";
+    public static final boolean SEEN_PICKUP_DEFAULT = false;
 
     public static final String SEEN_IF_SCREEN_ON = "seen_if_screen_on";
     private static final boolean SEEN_IF_SCREEN_ON_DEFAULT = false;
@@ -178,6 +178,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public static final String RESPECT_DND = "respect_dnd";
     private static final boolean RESPECT_DND_DEFAULT = true;
+
+    private static final String SEEN_TIMEOUT_FMT = "seen_timeout_%s";
+    public static final int SEEN_TIMEOUT_DEFAULT = 0;
 
     private static final String SETUP_WIZARD_COMPLETE = "setup_wizard_complete";
 
@@ -584,5 +587,30 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public boolean isRespectDoNotDisturb() {
         return prefs.getBoolean(RESPECT_DND, RESPECT_DND_DEFAULT);
+    }
+
+    public boolean haveSeenTimeoutAny() {
+        return
+                (getSeenTimeout(SCREEN_ON_CHARGING) > 0) ||
+                (getSeenTimeout(SCREEN_OFF_CHARGING) > 0) ||
+                (getSeenTimeout(SCREEN_ON_BATTERY) > 0) ||
+                (getSeenTimeout(SCREEN_OFF_BATTERY) > 0);
+    }
+
+    public String getSeenTimeoutKey(int mode) {
+        return String.format(Locale.ENGLISH, SEEN_TIMEOUT_FMT, SCREEN_AND_POWER_STATE[mode]);
+    }
+
+    public int getSeenTimeout(int mode) {
+        return prefs.getInt(getSeenTimeoutKey(mode), SEEN_TIMEOUT_DEFAULT);
+    }
+
+    public void setSeenTimeout(int mode, int value) {
+        edit();
+        try {
+            editor.putInt(getSeenTimeoutKey(mode), value);
+        } finally {
+            save(true);
+        }
     }
 }

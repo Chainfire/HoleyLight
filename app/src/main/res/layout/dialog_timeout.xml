@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- section -->
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="@string/charging_screen_on"
+        android:gravity="left"
+        android:textStyle="bold" />
+
+    <SeekBar
+        android:id="@+id/timeout_charging_screen_on_seek"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_marginBottom="4dp"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:progressTint="#00000000" />
+
+    <TextView
+        android:id="@+id/timeout_charging_screen_on_value"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text=""
+        android:gravity="center_horizontal" />
+
+    <!-- section -->
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="@string/charging_screen_off"
+        android:gravity="left"
+        android:textStyle="bold" />
+
+    <SeekBar
+        android:id="@+id/timeout_charging_screen_off_seek"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_marginBottom="4dp"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:progressTint="#00000000" />
+
+    <TextView
+        android:id="@+id/timeout_charging_screen_off_value"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text=""
+        android:gravity="center_horizontal" />
+
+    <!-- section -->
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="@string/battery_screen_on"
+        android:gravity="left"
+        android:textStyle="bold" />
+
+    <SeekBar
+        android:id="@+id/timeout_battery_screen_on_seek"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_marginBottom="4dp"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:progressTint="#00000000" />
+
+    <TextView
+        android:id="@+id/timeout_battery_screen_on_value"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text=""
+        android:gravity="center_horizontal" />
+
+    <!-- section -->
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="@string/battery_screen_off"
+        android:gravity="left"
+        android:textStyle="bold" />
+
+    <SeekBar
+        android:id="@+id/timeout_battery_screen_off_seek"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_marginBottom="4dp"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:progressTint="#00000000" />
+
+    <TextView
+        android:id="@+id/timeout_battery_screen_off_value"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text=""
+        android:gravity="center_horizontal" />
+</LinearLayout>

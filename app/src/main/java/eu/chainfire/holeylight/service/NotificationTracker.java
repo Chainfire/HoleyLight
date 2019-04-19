@@ -18,6 +18,7 @@
 
 package eu.chainfire.holeylight.service;
 
+import android.os.SystemClock;
 import android.service.notification.StatusBarNotification;
 
 import java.util.ArrayList;
@@ -31,12 +32,15 @@ public class NotificationTracker {
         private String key;
         private long posted;
         private long when;
+        private long firstSeen;
         private boolean seen = false;
+        private int shown = 0;
 
         public Item(StatusBarNotification sbn) {
             key = sbn.getKey();
             posted = sbn.getPostTime();
             when = sbn.getNotification().when;
+            firstSeen = SystemClock.elapsedRealtime();
         }
 
         public boolean match(StatusBarNotification sbn) {
@@ -46,7 +50,9 @@ public class NotificationTracker {
 
     private List<Item> items = new ArrayList<>();
 
-    public StatusBarNotification[] prune(StatusBarNotification[] active, boolean addNewNotifications) {
+    public StatusBarNotification[] prune(StatusBarNotification[] active, boolean addNewNotifications, int timeout) {
+        long now = SystemClock.elapsedRealtime();
+
         // remove notifications from our own list that are no longer active
         for (int i = items.size() - 1; i >= 0; i--) {
             Item item = items.get(i);
@@ -71,7 +77,12 @@ public class NotificationTracker {
             for (Item item : items) {
                 if (item.match(sbn)) {
                     if (!item.seen || sbn.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
-                        sbns.add(sbn);
+                        if ((timeout > 0) && (now - item.firstSeen > timeout) && (item.shown > 0) && !sbn.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
+                            item.seen = true;
+                        } else {
+                            item.shown++;
+                            sbns.add(sbn);
+                        }
                     }
                     found = true;
                     break;

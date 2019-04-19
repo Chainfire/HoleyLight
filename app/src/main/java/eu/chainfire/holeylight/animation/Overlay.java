@@ -449,6 +449,7 @@ public class Overlay {
         handler.removeCallbacks(evaluateLoop);
         this.colors = colors;
         wanted = true;
+        kill = false;
         evaluate(true);
     }
 

@@ -30,6 +30,8 @@ import android.text.format.DateFormat;
 import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -58,9 +60,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private Preference prefAODSchedule = null;
     private CheckBoxPreference prefRespectDND = null;
     private Preference prefSeenPickup = null;
-    private CheckBoxPreference prefSeenIfScreenOn = null;
     private CheckBoxPreference prefSeenOnLockscreen = null;
     private CheckBoxPreference prefSeenOnUserPresent = null;
+    private CheckBoxPreference prefSeenIfScreenOn = null;
+    private CheckBoxPreference prefSeenOnTimeout = null;
     private CheckBoxPreference prefHideAOD = null;
 
     @Override
@@ -126,6 +129,71 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         else if (preference == prefScreenOnBattery) return Settings.SCREEN_ON_BATTERY;
         else if (preference == prefScreenOffBattery) return Settings.SCREEN_OFF_BATTERY;
         return -1;
+    }
+
+    private class TimeoutHelper {
+        private final int[] VALUES = new int[] {
+            0,
+            5 * 1000,
+            10 * 1000,
+            30 * 1000,
+            60 * 1000,
+            2 * 60 * 1000,
+            5 * 60 * 1000,
+            10 * 60 * 1000,
+            30 * 60 * 1000,
+            60 * 60 * 1000,
+            2 * 60 * 60 * 1000
+        };
+
+        private final SeekBar seekBar;
+        private final TextView textValue;
+        private final int mode;
+
+        public TimeoutHelper(AlertDialog base, int seekBarId, int textValueId, int mode) {
+            seekBar = base.findViewById(seekBarId);
+            textValue = base.findViewById(textValueId);
+            this.mode = mode;
+
+            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    textValue.setText(getDescriptionFromIndex(progress));
+                }
+                @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+                @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+            });
+            seekBar.setMax(VALUES.length - 1);
+            seekBar.setProgress(getIndexFromValue(settings.getSeenTimeout(mode)), false);
+            textValue.setText(getDescriptionFromIndex(seekBar.getProgress()));
+        }
+
+        public int getIndexFromValue(int value) {
+            for (int i = 0; i < VALUES.length; i++) {
+                if (value <= VALUES[i]) return i;
+            }
+            return 0;
+        }
+
+        public int getValueFromIndex(int index) {
+            return VALUES[index];
+        }
+
+        public int getValue() {
+            return getValueFromIndex(seekBar.getProgress());
+        }
+
+        public String getDescriptionFromIndex(int index) {
+            int ms = getValueFromIndex(index);
+            if (ms == 0) return getString(R.string.settings_seen_on_timeout_none);
+            if (ms < 2 * 60 * 1000) return getString(R.string.x_seconds, ms / 1000);
+            if (ms < 2 * 60 * 60 * 1000) return getString(R.string.x_minutes, ms / (60 * 1000));
+            return getString(R.string.x_hours, ms / (60 * 60 * 1000));
+        }
+
+        public void save() {
+            settings.setSeenTimeout(mode, getValue());
+        }
     }
 
     @SuppressWarnings({"ConstantConditions", "deprecation"})
@@ -315,7 +383,35 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         prefSeenOnLockscreen = check(catMarkAsSeen, R.string.settings_seen_on_lockscreen_title, R.string.settings_seen_on_lockscreen_description, Settings.SEEN_ON_LOCKSCREEN, settings.isSeenOnLockscreen(false), true);
         prefSeenOnUserPresent = check(catMarkAsSeen, R.string.settings_seen_on_user_present_title, R.string.settings_seen_on_user_present_description, Settings.SEEN_ON_USER_PRESENT, settings.isSeenOnUserPresent(false), true);
-        prefSeenIfScreenOn = check(catMarkAsSeen, R.string.seen_if_screen_on_title, R.string.seen_if_screen_on_description, Settings.SEEN_IF_SCREEN_ON, settings.isSeenIfScreenOn(false), true);
+        prefSeenIfScreenOn = check(catMarkAsSeen, R.string.settings_seen_if_screen_on_title, R.string.settings_seen_if_screen_on_description, Settings.SEEN_IF_SCREEN_ON, settings.isSeenIfScreenOn(false), true);
+
+        prefSeenOnTimeout = check(catMarkAsSeen, R.string.settings_seen_on_timeout_title, R.string.settings_seen_on_timeout_description, null, false, true);
+        prefSeenOnTimeout.setOnPreferenceChangeListener((preference, newValue) -> false);
+        prefSeenOnTimeout.setOnPreferenceClickListener(preference -> {
+            ArrayList<TimeoutHelper> helpers = new ArrayList<>();
+
+            AlertDialog dialog = (new AlertDialog.Builder(getContext()))
+                    .setTitle(preference.getTitle())
+                    .setView(R.layout.dialog_timeout)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(android.R.string.ok, (dialog1, which) -> {
+                        settings.edit();
+                        try {
+                            for (TimeoutHelper helper : helpers) {
+                                helper.save();
+                            }
+                        } finally {
+                            settings.save(true);
+                        }
+                    })
+                    .show();
+
+            helpers.add(new TimeoutHelper(dialog, R.id.timeout_charging_screen_on_seek, R.id.timeout_charging_screen_on_value, Settings.SCREEN_ON_CHARGING));
+            helpers.add(new TimeoutHelper(dialog, R.id.timeout_charging_screen_off_seek, R.id.timeout_charging_screen_off_value, Settings.SCREEN_OFF_CHARGING));
+            helpers.add(new TimeoutHelper(dialog, R.id.timeout_battery_screen_on_seek, R.id.timeout_battery_screen_on_value, Settings.SCREEN_ON_BATTERY));
+            helpers.add(new TimeoutHelper(dialog, R.id.timeout_battery_screen_off_seek, R.id.timeout_battery_screen_off_value, Settings.SCREEN_OFF_BATTERY));
+            return false;
+        });
 
         PreferenceCategory catChainfire = category(root, R.string.settings_category_chainfire_title, 0);
         pref(catChainfire, R.string.settings_playstore_title, R.string.settings_playstore_description, null, true, preference -> {
@@ -416,9 +512,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             prefSeenPickup.setEnabled(settings.isEnabled());
             prefSeenPickup.setSummary(getString(R.string.settings_seen_pickup_description) + "\n[ " + (seenPickup.size() > 0 ? String.join(", ", seenPickup) : getString(R.string.never)) + " ]");
 
-            prefSeenIfScreenOn.setEnabled(settings.isEnabled());
             prefSeenOnLockscreen.setEnabled(settings.isEnabledWhileScreenOff());
             prefSeenOnUserPresent.setEnabled(settings.isEnabledWhileScreenOff());
+            prefSeenIfScreenOn.setEnabled(settings.isEnabled());
+            prefSeenOnTimeout.setChecked(settings.haveSeenTimeoutAny());
+            prefSeenOnTimeout.setEnabled(settings.isEnabled());
 
             prefHideAOD.setEnabled(settings.isEnabledWhileScreenOff());
             prefHideAOD.setChecked(settings.isHideAOD());

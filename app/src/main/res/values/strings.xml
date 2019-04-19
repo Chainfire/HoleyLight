@@ -188,8 +188,8 @@
     <string name="hide_aod_partial_title">Partial</string>
     <string name="hide_aod_partial_description">Keep charging information and fingerprint visible</string>
 
-    <string name="seen_if_screen_on_title">If screen on</string>
-    <string name="seen_if_screen_on_description">If the screen is on when a new notification arrives, mark it as seen</string>
+    <string name="settings_seen_if_screen_on_title">If screen on</string>
+    <string name="settings_seen_if_screen_on_description">Ignore notifications arriving while the screen is on</string>
 
     <string name="settings_category_schedule">Schedule</string>
     <string name="settings_schedule_aod_title">Always On Display</string>
@@ -197,4 +197,12 @@
     <string name="settings_schedule_aod_none">No schedule set</string>
     <string name="settings_schedule_dnd_title">Respect Do Not Disturb mode</string>
     <string name="settings_schedule_dnd_description"><![CDATA[Do not show notifications while <i>Do Not Disturb</i> mode is enabled]]></string>
+
+    <string name="settings_seen_on_timeout_title">On timeout</string>
+    <string name="settings_seen_on_timeout_description">Show notifications only for a set period</string>
+    <string name="settings_seen_on_timeout_none">No timeout</string>
+
+    <string name="x_seconds">%d seconds</string>
+    <string name="x_minutes">%d minutes</string>
+    <string name="x_hours">%d hours</string>
 </resources>
