@@ -195,4 +195,6 @@
     <string name="settings_schedule_aod_title">Always On Display</string>
     <string name="settings_schedule_aod_description"><![CDATA[The display schedule (for when the screen is off) is controlled by AOD, <b>Settings -> Lock screen -> Always On Display -> Display mode</b>.]]></string>
     <string name="settings_schedule_aod_none">No schedule set</string>
+    <string name="settings_schedule_dnd_title">Respect Do Not Disturb mode</string>
+    <string name="settings_schedule_dnd_description"><![CDATA[Do not show notifications while <i>Do Not Disturb</i> mode is enabled]]></string>
 </resources>

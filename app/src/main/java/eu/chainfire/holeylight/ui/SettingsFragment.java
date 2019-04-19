@@ -56,6 +56,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefScreenOffBattery = null;
     private CheckBoxPreference prefLockscreenOn = null;
     private Preference prefAODSchedule = null;
+    private CheckBoxPreference prefRespectDND = null;
     private Preference prefSeenPickup = null;
     private CheckBoxPreference prefSeenIfScreenOn = null;
     private CheckBoxPreference prefSeenOnLockscreen = null;
@@ -251,6 +252,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         PreferenceCategory catSchedule = category(root, R.string.settings_category_schedule, 0);
         prefAODSchedule = pref(catSchedule, R.string.settings_schedule_aod_title, 0, null, true, null);
+        prefRespectDND = check(catSchedule, R.string.settings_schedule_dnd_title, 0, Settings.RESPECT_DND, settings.isRespectDoNotDisturb(), true);
+        prefRespectDND.setSummary(Html.fromHtml(getString(R.string.settings_schedule_dnd_description)));
 
         PreferenceCategory catAnimation = category(root, R.string.settings_category_animation_title, 0);
         pref(catAnimation, R.string.settings_animation_tune_title, R.string.settings_animation_tune_description, null, true, preference -> {
@@ -401,6 +404,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 }
                 prefAODSchedule.setSummary(Html.fromHtml(getString(R.string.settings_schedule_aod_description) + "<br>[ " + start + " - " + end + " ]"));
             }
+
+            prefRespectDND.setEnabled(settings.isEnabled());
 
             ArrayList<String> seenPickup = new ArrayList<>();
             for (int i = 0; i < Settings.SCREEN_AND_POWER_STATE_DESCRIPTIONS.length; i++) {

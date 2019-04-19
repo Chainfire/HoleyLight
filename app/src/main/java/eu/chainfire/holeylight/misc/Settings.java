@@ -176,6 +176,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final String HIDE_AOD_FULLY = "hide_aod_fully";
     private static final boolean HIDE_AOD_FULLY_DEFAULT = false;
 
+    public static final String RESPECT_DND = "respect_dnd";
+    private static final boolean RESPECT_DND_DEFAULT = true;
+
     private static final String SETUP_WIZARD_COMPLETE = "setup_wizard_complete";
 
     private static Settings instance;
@@ -577,5 +580,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         } finally {
             save(true);
         }
+    }
+
+    public boolean isRespectDoNotDisturb() {
+        return prefs.getBoolean(RESPECT_DND, RESPECT_DND_DEFAULT);
     }
 }

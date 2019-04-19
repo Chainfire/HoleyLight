@@ -26,7 +26,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.ContentObserver;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Process;
@@ -51,6 +53,7 @@ public class NotificationListenerService extends android.service.notification.No
     public static NotificationListenerService getInstance() {
         return instance;
     }
+    private ContentObserver doNotDisturbObserver = null;
 
     public static class ActiveNotification {
         private final String packageName;
@@ -144,6 +147,23 @@ public class NotificationListenerService extends android.service.notification.No
         intentFilter.setPriority(998);
 
         settings.registerOnSettingsChangedListener(this);
+
+        doNotDisturbObserver = new ContentObserver(handler) {
+           @Override
+           public boolean deliverSelfNotifications() {
+               return true;
+           }
+
+           @Override
+           public void onChange(boolean selfChange) {
+               handleLEDNotifications();
+           }
+
+           @Override
+           public void onChange(boolean selfChange, Uri uri) {
+               onChange(selfChange);
+           }
+       };
     }
 
     @Override
@@ -174,6 +194,7 @@ public class NotificationListenerService extends android.service.notification.No
         registerReceiver(broadcastReceiver, intentFilter);
         handleLEDNotifications();
         startMotionSensor();
+        getContentResolver().registerContentObserver(android.provider.Settings.Global.getUriFor("zen_mode"), false, doNotDisturbObserver);
     }
 
     @Override
@@ -181,6 +202,7 @@ public class NotificationListenerService extends android.service.notification.No
         log("onListenerDisconnected");
         instance = null;
         connected = false;
+        getContentResolver().unregisterContentObserver(doNotDisturbObserver);
         stopMotionSensor();
         unregisterReceiver(broadcastReceiver);
         overlay.hide(true);
@@ -247,6 +269,8 @@ public class NotificationListenerService extends android.service.notification.No
         if (!connected) return;
 
         log("handleLEDNotifications");
+
+        boolean dnd = settings.isRespectDoNotDisturb() && (android.provider.Settings.Global.getInt(getContentResolver(), "zen_mode", 0) > 0);
 
         List<Integer> colors = new ArrayList<>();
         activeNotifications.clear();
@@ -317,7 +341,9 @@ public class NotificationListenerService extends android.service.notification.No
                 Integer color = c;
                 log("%s [%s] (%s) --> #%08X / #%08X --> #%08X", sbn.getKey(), sbn.getPackageName(), channelName, cChan, not.color, c);
                 if (!colors.contains(color)) {
-                    colors.add(color);
+                    if (!dnd) {
+                        colors.add(color);
+                    }
                 }
             }
         } catch (SecurityException e) {
