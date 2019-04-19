@@ -25,7 +25,6 @@ import android.app.KeyguardManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -155,7 +154,7 @@ public class Overlay {
     private boolean added = false;
     private Point resolution;
     private IBinder windowToken;
-    private ContentResolver resolver;
+    private long lastVisibleTime;
 
     private Overlay(Context context) {
         windowManager = (WindowManager)context.getSystemService(Activity.WINDOW_SERVICE);
@@ -165,7 +164,6 @@ public class Overlay {
         handler = new Handler(Looper.getMainLooper());
         settings = Settings.getInstance(context);
         resolution = getResolution();
-        resolver = context.getContentResolver();
     }
 
     @SuppressWarnings("all")
@@ -374,11 +372,19 @@ public class Overlay {
         boolean on = Display.isOn(context, false);
         boolean doze = Display.isDoze(context);
         boolean visible = on || doze;
+        if (visible) {
+            lastVisibleTime = SystemClock.elapsedRealtime();
+        }
         boolean allowHideAOD = settings.isEnabledWhileScreenOff();
+        boolean screenTimeOut = false;
         if (!visible && settings.isHideAOD() && allowHideAOD) {
-            // we will be visible soon
-            visible = true;
-            doze = true;
+            // we will be visible soon, but if it doesn't happen within 10 seconds, give up
+            if (SystemClock.elapsedRealtime() - lastVisibleTime < 10000) {
+                visible = true;
+                doze = true;
+            } else {
+                screenTimeOut = true;
+            }
         }
         boolean lockscreen = on && keyguardManager.isKeyguardLocked();
         boolean charging = Battery.isCharging(context);
@@ -432,7 +438,7 @@ public class Overlay {
             }
         }
 
-        if (wantedEffective) handler.postDelayed(evaluateLoop, 500);
+        if (wantedEffective) handler.postDelayed(evaluateLoop, screenTimeOut ? 60000 : 500);
     }
 
     public void show(int[] colors) {
