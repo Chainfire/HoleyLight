@@ -301,8 +301,8 @@ public class NotificationListenerService extends android.service.notification.No
 
                 activeNotifications.add(new ActiveNotification(sbn.getPackageName(), channelName, not.tickerText));
 
-                // Save to prefs, or get overriden value from prefs
-                c = settings.getColorForPackageAndChannel(sbn.getPackageName(), channelName, c);
+                // Save to prefs, or get overridden value from prefs
+                c = settings.getColorForPackageAndChannel(sbn.getPackageName(), channelName, c, (cChan & 0x00FFFFFF) != 0x000000);
                 settings.setColorForPackageAndChannel(sbn.getPackageName(), channelName, c, true);
 
                 // Make sure we have alpha (again)

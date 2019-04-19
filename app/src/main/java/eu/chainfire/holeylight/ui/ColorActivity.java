@@ -28,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -50,6 +52,7 @@ import top.defaults.colorpicker.ColorPickerPopup;
 public class ColorActivity extends AppCompatActivity {
     private Settings settings = null;
     private AppAdapter apps = null;
+    private Integer colorCopy = null;
 
     @SuppressWarnings("ConstantConditions")
     @Override
@@ -68,8 +71,7 @@ public class ColorActivity extends AppCompatActivity {
         apps = new AppAdapter();
         list.setAdapter(apps);
 
-        //TODO Async this, slow with many items
-        apps.loadAppItems(settings.getPackagesChannelsAndColors());
+        refresh();
     }
 
     @Override
@@ -103,6 +105,32 @@ public class ColorActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void refresh() {
+        //TODO Async this, slow with many items
+        apps.loadAppItems(settings.getPackagesChannelsAndColors());
+    }
+
+    private void forceOverlayReload() {
+        boolean startEnabled = settings.isEnabled();
+        settings.setEnabled(!startEnabled);
+        settings.setEnabled(startEnabled);
+    }
+
+    private void setColorForPackage(String packageName, int color, boolean includeDisabled) {
+        for (AppAdapter.AppItem item : apps.items) {
+            if (item.packageName != null) {
+                if (item.packageName.equals(packageName)) {
+                    if (((item.color & 0x00FFFFFF) != 0x00000000) || includeDisabled) {
+                        settings.setColorForPackageAndChannel(packageName, item.channelName, color, false);
+                        item.color = color;
+                    }
+                }
+            }
+        }
+        forceOverlayReload();
+        apps.notifyDataSetChanged();
+    }
+
     @SuppressWarnings({"WeakerAccess"})
     private class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
         //TODO Refactor help/header/item into different ViewHolder classes, etc
@@ -117,6 +145,7 @@ public class ColorActivity extends AppCompatActivity {
             this.items = new ArrayList<>();
         }
 
+        @SuppressWarnings("ConstantConditions")
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -142,8 +171,10 @@ public class ColorActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
             holder.appItem = items.get(position);
+            holder.view.setOnClickListener(null);
+            holder.view.setOnLongClickListener(null);
             if (holder.appItem.viewType == VIEW_TYPE_HELP) {
-                holder.tvTitleOrPackage.setText(Html.fromHtml(getString(R.string.colors_help)));
+                holder.tvTitleOrPackage.setText(Html.fromHtml(getString(R.string.colors_help) + getString(R.string.colors_longpress)));
             } else if (holder.appItem.viewType == VIEW_TYPE_HEADER) {
                 holder.tvTitleOrPackage.setText(holder.appItem.title);
             } else if (holder.appItem.viewType == VIEW_TYPE_ITEM) {
@@ -155,31 +186,97 @@ public class ColorActivity extends AppCompatActivity {
                     holder.tvChannel.setText(Html.fromHtml("<small>" + holder.appItem.channelName + "</small>"));
                 }
                 holder.ivColor.setBackgroundColor(holder.appItem.color);
-                holder.view.setOnClickListener(v -> {
-                    final AppItem item = holder.appItem;
-                    (new ColorPickerPopup.Builder(ColorActivity.this))
-                            .initialColor(holder.appItem.color)
-                            .enableAlpha(false)
-                            .enableBrightness(true)
-                            .okTitle(getString(android.R.string.ok))
-                            .cancelTitle(getString(android.R.string.cancel))
-                            .showIndicator(true)
-                            .showValue(false)
-                            .build()
-                            .show(new ColorPickerPopup.ColorPickerObserver() {
-                                @Override
-                                public void onColorPicked(int color) {
-                                    settings.setColorForPackageAndChannel(item.packageName, item.channelName, color, false);
-                                    item.color = color;
+                final AppItem item = holder.appItem;
+                holder.view.setOnClickListener(v -> (new ColorPickerPopup.Builder(ColorActivity.this))
+                        .initialColor(holder.appItem.color)
+                        .enableAlpha(false)
+                        .enableBrightness(true)
+                        .okTitle(getString(android.R.string.ok))
+                        .cancelTitle(getString(android.R.string.cancel))
+                        .showIndicator(true)
+                        .showValue(false)
+                        .build()
+                        .show(new ColorPickerPopup.ColorPickerObserver() {
+                            @Override
+                            public void onColorPicked(int color) {
+                                settings.setColorForPackageAndChannel(item.packageName, item.channelName, color | 0xFF000000, false);
+                                item.color = color;
+                                forceOverlayReload();
+                                notifyDataSetChanged();
+                            }
+                        }));
+                holder.view.setOnLongClickListener(v -> {
+                    CharSequence[] entries = new CharSequence[colorCopy == null ? 5 : 6];
+                    entries[0] = getString(R.string.colors_disable);
+                    entries[1] = getString(R.string.colors_hex);
+                    entries[2] = Html.fromHtml(getString(R.string.colors_set_default, holder.appItem.title));
+                    entries[3] = Html.fromHtml(getString(R.string.colors_apply, holder.appItem.title));
+                    entries[4] = getString(R.string.colors_copy);
+                    if (colorCopy != null) {
+                        entries[5] = getString(R.string.colors_paste);
+                    }
 
-                                    // force overlay reload
-                                    boolean startEnabled = settings.isEnabled();
-                                    settings.setEnabled(!startEnabled);
-                                    settings.setEnabled(startEnabled);
-
-                                    notifyDataSetChanged();
+                    (new AlertDialog.Builder(v.getContext()))
+                            .setItems(entries, (dialog, which) -> {
+                                switch (which) {
+                                    case 0: // disable
+                                        settings.setColorForPackageAndChannel(item.packageName, item.channelName, 0xFF000000, false);
+                                        item.color = 0xFF000000;
+                                        forceOverlayReload();
+                                        notifyDataSetChanged();
+                                        break;
+                                    case 1: // hex
+                                        AlertDialog hexDialog = (new AlertDialog.Builder(v.getContext()))
+                                                .setTitle(R.string.colors_hex)
+                                                .setView(R.layout.item_color_hex)
+                                                .setPositiveButton(android.R.string.ok, (dialog1, which1) -> {
+                                                    EditText hexEdit = ((AlertDialog)dialog1).findViewById(R.id.hex);
+                                                    if (hexEdit != null) {
+                                                        try {
+                                                            int color = Integer.parseInt(hexEdit.getText().toString(), 16) | 0xFF000000;
+                                                            settings.setColorForPackageAndChannel(item.packageName, item.channelName, color, false);
+                                                            item.color = color;
+                                                            forceOverlayReload();
+                                                            notifyDataSetChanged();
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                    }
+                                                })
+                                                .setNegativeButton(android.R.string.cancel, null)
+                                                .show();
+                                        EditText hexEdit = hexDialog.findViewById(R.id.hex);
+                                        if (hexEdit != null) {
+                                            hexEdit.setText(String.format("%06X", item.color & 0x00FFFFFF));
+                                            hexEdit.requestFocus();
+                                        }
+                                        break;
+                                    case 2: // default
+                                        settings.setColorForPackageAndChannel(item.packageName, null, item.color, false);
+                                        refresh();
+                                        break;
+                                    case 3: // apply
+                                        (new AlertDialog.Builder(v.getContext()))
+                                                .setTitle(R.string.colors_apply_short)
+                                                .setMessage(Html.fromHtml(getString(R.string.colors_apply_include_black)))
+                                                .setPositiveButton(R.string.yes, (dialog1, which1) -> setColorForPackage(item.packageName, item.color, true))
+                                                .setNegativeButton(R.string.no, (dialog1, which1) -> setColorForPackage(item.packageName, item.color, false))
+                                                .show();
+                                        break;
+                                    case 4: // copy
+                                        colorCopy = item.color;
+                                        break;
+                                    case 5: // paste
+                                        settings.setColorForPackageAndChannel(item.packageName, item.channelName, colorCopy, false);
+                                        item.color = colorCopy;
+                                        forceOverlayReload();
+                                        notifyDataSetChanged();
+                                        break;
                                 }
-                            });
+                            })
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .show();
+                    return true;
                 });
             }
         }
@@ -294,7 +391,11 @@ public class ColorActivity extends AppCompatActivity {
                     sort = a.title.compareToIgnoreCase(b.title);
                 }
                 if (sort == 0) {
-                    sort = a.channelName.compareToIgnoreCase(b.channelName);
+                    if (a.channelName.equals(Settings.CHANNEL_NAME_DEFAULT)) {
+                        sort = -1;
+                    } else {
+                        sort = a.channelName.compareToIgnoreCase(b.channelName);
+                    }
                 }
                 return sort;
             };
@@ -340,8 +441,7 @@ public class ColorActivity extends AppCompatActivity {
         MenuItem menuItem = menu.add(R.string.refresh);
         menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         menuItem.setOnMenuItemClickListener(item -> {
-            //TODO Async this, slow with many items
-            apps.loadAppItems(settings.getPackagesChannelsAndColors());
+            refresh();
             return true;
         });
         return super.onCreateOptionsMenu(menu);

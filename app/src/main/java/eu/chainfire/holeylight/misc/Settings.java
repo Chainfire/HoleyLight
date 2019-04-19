@@ -165,6 +165,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     private static final String CHANNEL_COLOR = "CHANNEL_COLOR:";
     private static final String CHANNEL_COLOR_FMT = CHANNEL_COLOR + "%s:%s";
+    public static final String CHANNEL_NAME_DEFAULT = "default";
 
     public static final String HIDE_AOD = "hide_aod";
     private static final boolean HIDE_AOD_DEFAULT = false;
@@ -398,11 +399,20 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         return ret;
     }
 
-    public int getColorForPackageAndChannel(String packageName, String channelName, int defaultValue) {
-        return prefs.getInt(String.format(Locale.ENGLISH, CHANNEL_COLOR_FMT, packageName, channelName), defaultValue);
+    public int getColorForPackageAndChannel(String packageName, String channelName, int defaultValue, boolean returnAppDefault) {
+        if (channelName == null) channelName = CHANNEL_NAME_DEFAULT;
+        String keyChannel = String.format(Locale.ENGLISH, CHANNEL_COLOR_FMT, packageName, channelName);
+        String keyDefault = String.format(Locale.ENGLISH, CHANNEL_COLOR_FMT, packageName, CHANNEL_NAME_DEFAULT);
+        if (prefs.contains(keyChannel)) {
+            return prefs.getInt(keyChannel, defaultValue);
+        } else if (prefs.contains(keyDefault) && returnAppDefault) {
+            return prefs.getInt(keyDefault, defaultValue);
+        }
+        return defaultValue;
     }
 
     public void setColorForPackageAndChannel(String packageName, String channelName, int color, boolean fromListener) {
+        if (channelName == null) channelName = CHANNEL_NAME_DEFAULT;
         String key = String.format(Locale.ENGLISH, CHANNEL_COLOR_FMT, packageName, channelName);
         if (!prefs.contains(key) || (prefs.getInt(key, -1) != color)) {
             edit();
@@ -410,6 +420,19 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
                 editor.putInt(key, color);
             } finally {
                 save(!fromListener);
+            }
+        }
+    }
+
+    public void deleteColorForPackageAndChannel(String packageName, String channelName) {
+        if (channelName == null) channelName = CHANNEL_NAME_DEFAULT;
+        String key = String.format(Locale.ENGLISH, CHANNEL_COLOR_FMT, packageName, channelName);
+        if (prefs.contains(key)) {
+            edit();
+            try {
+                editor.remove(key);
+            } finally {
+                save(true);
             }
         }
     }

@@ -169,4 +169,16 @@
     <string name="setup_wizard_option_show_aod">Show AOD</string>
     <string name="setup_wizard_option_hide_aod">Hide AOD</string>
     <string name="setup_wizard_complete"><![CDATA[We\'re done with initial setup. More popup dialogs will follow to help you setup permissions and other Android settings to allow this app to function.<br><br>Afterwards, there are more settings for you to explore on your own!]]></string>
+
+    <!-- v0.65 -->
+
+    <string name="colors_longpress"><![CDATA[<br><br>Tap to change color, long-press for additional options.]]></string>
+    <string name="colors_copy">Copy color</string>
+    <string name="colors_paste">Paste color</string>
+    <string name="colors_hex">Edit hex value</string>
+    <string name="colors_set_default"><![CDATA[Set as default for <b>%s</b> for <b>new</b> entries]]></string>
+    <string name="colors_apply"><![CDATA[Apply to all <b>%s</b> entries]]></string>
+    <string name="colors_apply_short">Apply to all</string>
+    <string name="colors_apply_include_black"><![CDATA[Include currently <b>black</b> (disabled) entries?]]></string>
+    <string name="colors_disable">Disable</string>
 </resources>
