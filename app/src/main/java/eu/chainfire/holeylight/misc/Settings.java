@@ -170,6 +170,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final String HIDE_AOD = "hide_aod";
     private static final boolean HIDE_AOD_DEFAULT = false;
 
+    public static final String HIDE_AOD_FULLY = "hide_aod_fully";
+    private static final boolean HIDE_AOD_FULLY_DEFAULT = false;
+
     private static final String SETUP_WIZARD_COMPLETE = "setup_wizard_complete";
 
     private static Settings instance;
@@ -528,6 +531,29 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         edit();
         try {
             editor.putBoolean(HIDE_AOD, hide);
+        } finally {
+            save(true);
+        }
+    }
+    
+    public void setHideAOD(boolean hide, boolean fully) {
+        edit();
+        try {
+            setHideAOD(hide);
+            setHideAODFully(fully);
+        } finally {
+            save(true);
+        }
+    }
+
+    public boolean isHideAODFully() {
+        return prefs.getBoolean(HIDE_AOD_FULLY, HIDE_AOD_FULLY_DEFAULT);
+    }
+
+    public void setHideAODFully(boolean fully) {
+        edit();
+        try {
+            editor.putBoolean(HIDE_AOD_FULLY, fully);
         } finally {
             save(true);
         }

@@ -402,10 +402,10 @@ public class Overlay {
                 animation.setMode(renderMode);
                 createOverlay();
                 if (settings.isHideAOD() && doze && allowHideAOD) {
-                    animation.setHideAOD(true);
+                    animation.setHideAOD(true, settings.isHideAODFully());
                     AODControl.setAOD(spritePlayer.getContext(), true);
                 } else {
-                    animation.setHideAOD(spritePlayer.isTSPMode(renderMode));
+                    animation.setHideAOD(spritePlayer.isTSPMode(renderMode), settings.isHideAODFully());
                 }
                 animation.setDpAdd(dpAdd);
                 animation.play(activeHide ? new int[] { Color.BLACK } : colors, false, (renderMode != lastMode));

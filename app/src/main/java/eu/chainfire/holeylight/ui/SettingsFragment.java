@@ -218,6 +218,32 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         prefLockscreenOn = check(catOperation, R.string.settings_lockscreen_on_title, R.string.settings_lockscreen_on_description, Settings.ENABLED_LOCKSCREEN, settings.isEnabledOnLockscreen(), true);
 
         prefHideAOD = check(catOperation, R.string.settings_hide_aod_title, R.string.settings_hide_aod_description, Settings.HIDE_AOD, settings.isHideAOD(), true);
+        prefHideAOD.setOnPreferenceChangeListener((preference, newValue) -> false);
+        prefHideAOD.setOnPreferenceClickListener(preference -> {
+            String FORMAT = "%s<br><small>%s</small>";
+            (new AlertDialog.Builder(getContext()))
+                    .setTitle(preference.getTitle())
+                    .setItems(new CharSequence[] {
+                            getString(R.string.disabled),
+                            Html.fromHtml(String.format(Locale.ENGLISH, FORMAT, getString(R.string.hide_aod_full_title), getString(R.string.hide_aod_full_description))),
+                            Html.fromHtml(String.format(Locale.ENGLISH, FORMAT, getString(R.string.hide_aod_partial_title), getString(R.string.hide_aod_partial_description))),
+                    }, (dialog, which) -> {
+                        switch (which) {
+                            case 0:
+                                settings.setHideAOD(false);
+                                break;
+                            case 1:
+                                settings.setHideAOD(true, true);
+                                break;
+                            case 2:
+                                settings.setHideAOD(true, false);
+                                break;
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+            return false;
+        });
 
         PreferenceCategory catAnimation = category(root, R.string.settings_category_animation_title, 0);
         pref(catAnimation, R.string.settings_animation_tune_title, R.string.settings_animation_tune_description, null, true, preference -> {
@@ -362,6 +388,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
             prefHideAOD.setEnabled(settings.isEnabledWhileScreenOff());
             prefHideAOD.setChecked(settings.isHideAOD());
+            prefHideAOD.setSummary(getString(R.string.settings_hide_aod_description) + (settings.isHideAOD() ? "\n[ " + getString(settings.isHideAODFully() ? R.string.hide_aod_full_title : R.string.hide_aod_partial_title) + " ]" : ""));
 
             if (key != null) {
                 Activity activity = getActivity();

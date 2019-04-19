@@ -74,6 +74,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private volatile boolean playNext = false;
 
     private volatile boolean hideAOD = false;
+    private volatile boolean hideAODFully = false;
     private volatile SpritePlayer.Mode mode = SpritePlayer.Mode.SWIRL;
     private volatile Rect tspRect = new Rect(0, 0, 0, 0);
 
@@ -311,8 +312,8 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                 // Update parent view
                 WindowManager.LayoutParams params = (WindowManager.LayoutParams)spritePlayer.getLayoutParams();
                 if (hideAOD) {
-                    // Not 100% height, to leave room for the fully charged notification and the fingerprint animation
-                    update.set(0, 0, resolution.x, (int)(resolution.y * 0.77f));
+                    // If not hideAODFully, less than 100% height, to leave room for the fully charged notification and the fingerprint animation
+                    update.set(0, 0, resolution.x, hideAODFully ? resolution.y : (int)(resolution.y * 0.77f));
                     spritePlayer.setBackgroundColor(Color.BLACK);
                 } else {
                     update.set((int)left, (int)top, (int)(left + width), (int)(top + height));
@@ -423,10 +424,15 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         return hideAOD;
     }
 
-    public void setHideAOD(boolean hideAOD) {
+    public void setHideAOD(boolean hide) {
+        setHideAOD(hide, false);
+    }
+
+    public void setHideAOD(boolean hide, boolean fully) {
         synchronized (getSynchronizer()) {
-            if (this.hideAOD != hideAOD) {
-                this.hideAOD = hideAOD;
+            if ((this.hideAOD != hide) || (this.hideAODFully != fully)) {
+                this.hideAOD = hide;
+                this.hideAODFully = fully;
                 applyDimensions();
             }
         }
