@@ -22,7 +22,6 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.companion.AssociationRequest;
 import android.companion.CompanionDeviceManager;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.net.Uri;
@@ -198,11 +197,10 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
                 (settings.getAnimationMode(Settings.SCREEN_OFF_CHARGING) == SpritePlayer.Mode.TSP) ||
                 (settings.getAnimationMode(Settings.SCREEN_OFF_BATTERY) == SpritePlayer.Mode.TSP)
         );
-        if (aodRequired || aodWithImageRequired) {
-            ContentResolver resolver = getContentResolver();
-            aodRequired = (android.provider.Settings.System.getInt(resolver, "aod_mode", 0) == 0) && !AODControl.haveHelperPackage(this, true);
+        if (aodRequired) {
+            aodRequired = !AODControl.isAODEnabled(this) && !AODControl.haveHelperPackage(this, true);
             if (aodWithImageRequired) {
-                aodWithImageRequired = (android.provider.Settings.System.getString(resolver, "current_sec_aod_theme_package") == null);
+                aodWithImageRequired = (AODControl.getAODThemePackage(this) == null);
             }
             if (aodRequired) {
                 (currentDialog = newAlert(false)
