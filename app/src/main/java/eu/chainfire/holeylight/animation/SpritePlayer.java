@@ -47,6 +47,9 @@ import androidx.annotation.NonNull;
 public class SpritePlayer extends RelativeLayout {
     public enum Mode { SWIRL, BLINK, SINGLE, TSP, TSP_HIDE }
 
+    private final int TSP_FAST_DRAW_TIME = 10000;
+    private final int TSP_FIRST_DRAW_DELAY = 2000;
+
     public interface OnSpriteSheetNeededListener {
         SpriteSheet onSpriteSheetNeeded(int width, int height, Mode mode);
     }
@@ -198,8 +201,10 @@ public class SpritePlayer extends RelativeLayout {
         if (isTSPMode()) {
             // TSP_HIDE is a no_op, background drawn already, we only handle it at all because
             // rendering here causes the rest of the screen to be updated as well
-
-            if (drawMode == Mode.TSP) {
+            //
+            // We delay a short time to prevent the circle jumping around on first show, due to
+            // AOD start TSP rect updates
+            if ((drawMode == Mode.TSP) && (SystemClock.elapsedRealtime() - modeStart > TSP_FIRST_DRAW_DELAY)) {
                 paint.setColorFilter(null);
                 paint.setXfermode(null);
 
@@ -277,7 +282,7 @@ public class SpritePlayer extends RelativeLayout {
 
                     if (isTSPMode()) {
                         boolean draw;
-                        if (startTimeNanos == 0) {
+                        if ((startTimeNanos == 0) || (diff <= TSP_FAST_DRAW_TIME)) {
                             draw = true;
                         } else {
                             draw = (frameTimeNanos - startTimeNanos >= 8000000000L);
@@ -385,7 +390,7 @@ public class SpritePlayer extends RelativeLayout {
     private void callNextFrame(boolean immediately) {
         cancelNextFrame();
         if (immediately) surfaceInvalidated = true;
-        if (isTSPMode()) {
+        if (isTSPMode() && (Math.abs(SystemClock.elapsedRealtime() - modeStart) > TSP_FAST_DRAW_TIME) || immediately) {
             handlerRender.postDelayed(tspFrame, immediately ? 0 : 250);
         } else {
             choreographer.postFrameCallback(frameCallback);
