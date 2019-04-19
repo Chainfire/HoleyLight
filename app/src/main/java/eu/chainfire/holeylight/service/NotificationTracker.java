@@ -46,7 +46,7 @@ public class NotificationTracker {
 
     private List<Item> items = new ArrayList<>();
 
-    public StatusBarNotification[] prune(StatusBarNotification[] active) {
+    public StatusBarNotification[] prune(StatusBarNotification[] active, boolean addNewNotifications) {
         // remove notifications from our own list that are no longer active
         for (int i = items.size() - 1; i >= 0; i--) {
             Item item = items.get(i);
@@ -78,8 +78,13 @@ public class NotificationTracker {
                 }
             }
             if (!found) {
-                items.add(new Item(sbn));
-                sbns.add(sbn);
+                Item item = new Item(sbn);
+                if (addNewNotifications || BuildConfig.APPLICATION_ID.equals(sbn.getPackageName())) {
+                    sbns.add(sbn);
+                } else {
+                    item.seen = true;
+                }
+                items.add(item);
             }
         }
         return sbns.toArray(new StatusBarNotification[0]);

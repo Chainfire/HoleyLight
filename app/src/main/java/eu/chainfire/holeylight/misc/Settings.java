@@ -145,6 +145,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final boolean SEEN_PICKUP_DEFAULT = false;
     private static final String SEEN_PICKUP_WHILE_FMT = "seen_pickup_%s";
 
+    public static final String SEEN_IF_SCREEN_ON = "seen_if_screen_on";
+    private static final boolean SEEN_IF_SCREEN_ON_DEFAULT = false;
+
     public static final String SEEN_ON_LOCKSCREEN = "seen_on_lockscreen";
     private static final boolean SEEN_ON_LOCKSCREEN_DEFAULT = false;
 
@@ -468,6 +471,10 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public boolean isSeenPickupWhile(int mode, boolean effective) {
         return (!effective || isEnabledWhile(mode)) && prefs.getBoolean(getSeenPickupWhileKey(mode), SEEN_PICKUP_DEFAULT);
+    }
+    
+    public boolean isSeenIfScreenOn(boolean effective) {
+        return (!effective || isEnabled()) && prefs.getBoolean(SEEN_IF_SCREEN_ON, SEEN_IF_SCREEN_ON_DEFAULT);
     }
 
     public boolean isSeenOnLockscreen(boolean effective) {

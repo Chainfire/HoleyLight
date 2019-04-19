@@ -252,7 +252,7 @@ public class NotificationListenerService extends android.service.notification.No
         activeNotifications.clear();
 
         try {
-            StatusBarNotification[] sbns = tracker.prune(getActiveNotifications());
+            StatusBarNotification[] sbns = tracker.prune(getActiveNotifications(), !Display.isOn(this, false) || !settings.isSeenIfScreenOn(true));
             for (StatusBarNotification sbn : sbns) {
                 Notification not = sbn.getNotification();
 

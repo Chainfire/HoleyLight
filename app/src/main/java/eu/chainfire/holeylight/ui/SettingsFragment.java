@@ -54,6 +54,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefScreenOffBattery = null;
     private CheckBoxPreference prefLockscreenOn = null;
     private Preference prefSeenPickup = null;
+    private CheckBoxPreference prefSeenIfScreenOn = null;
     private CheckBoxPreference prefSeenOnLockscreen = null;
     private CheckBoxPreference prefSeenOnUserPresent = null;
     private CheckBoxPreference prefHideAOD = null;
@@ -305,6 +306,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         prefSeenOnLockscreen = check(catMarkAsSeen, R.string.settings_seen_on_lockscreen_title, R.string.settings_seen_on_lockscreen_description, Settings.SEEN_ON_LOCKSCREEN, settings.isSeenOnLockscreen(false), true);
         prefSeenOnUserPresent = check(catMarkAsSeen, R.string.settings_seen_on_user_present_title, R.string.settings_seen_on_user_present_description, Settings.SEEN_ON_USER_PRESENT, settings.isSeenOnUserPresent(false), true);
+        prefSeenIfScreenOn = check(catMarkAsSeen, R.string.seen_if_screen_on_title, R.string.seen_if_screen_on_description, Settings.SEEN_IF_SCREEN_ON, settings.isSeenIfScreenOn(false), true);
 
         PreferenceCategory catChainfire = category(root, R.string.settings_category_chainfire_title, 0);
         pref(catChainfire, R.string.settings_playstore_title, R.string.settings_playstore_description, null, true, preference -> {
@@ -383,6 +385,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             prefSeenPickup.setEnabled(settings.isEnabled());
             prefSeenPickup.setSummary(getString(R.string.settings_seen_pickup_description) + "\n[ " + (seenPickup.size() > 0 ? String.join(", ", seenPickup) : getString(R.string.never)) + " ]");
 
+            prefSeenIfScreenOn.setEnabled(settings.isEnabled());
             prefSeenOnLockscreen.setEnabled(settings.isEnabledWhileScreenOff());
             prefSeenOnUserPresent.setEnabled(settings.isEnabledWhileScreenOff());
 

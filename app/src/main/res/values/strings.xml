@@ -181,4 +181,13 @@
     <string name="colors_apply_short">Apply to all</string>
     <string name="colors_apply_include_black"><![CDATA[Include currently <b>black</b> (disabled) entries?]]></string>
     <string name="colors_disable">Disable</string>
+
+    <string name="hide_aod_full_title">Full</string>
+    <string name="hide_aod_full_description">Hide AOD fully</string>
+
+    <string name="hide_aod_partial_title">Partial</string>
+    <string name="hide_aod_partial_description">Keep charging information and fingerprint visible</string>
+
+    <string name="seen_if_screen_on_title">If screen on</string>
+    <string name="seen_if_screen_on_description">If the screen is on when a new notification arrives, mark it as seen</string>
 </resources>
