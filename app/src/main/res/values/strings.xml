@@ -190,4 +190,9 @@
 
     <string name="seen_if_screen_on_title">If screen on</string>
     <string name="seen_if_screen_on_description">If the screen is on when a new notification arrives, mark it as seen</string>
+
+    <string name="settings_category_schedule">Schedule</string>
+    <string name="settings_schedule_aod_title">Always On Display</string>
+    <string name="settings_schedule_aod_description"><![CDATA[The display schedule (for when the screen is off) is controlled by AOD, <b>Settings -> Lock screen -> Always On Display -> Display mode</b>.]]></string>
+    <string name="settings_schedule_aod_none">No schedule set</string>
 </resources>

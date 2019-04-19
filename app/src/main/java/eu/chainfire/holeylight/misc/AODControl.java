@@ -18,16 +18,24 @@
 
 package eu.chainfire.holeylight.misc;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
+import android.os.SystemClock;
 
+import java.util.Date;
 import java.util.List;
+
+import eu.chainfire.holeylight.receiver.AlarmReceiver;
 
 public class AODControl {
     private static Boolean helperPackageFound = null;
+    private static long lastInScheduleCheck = 0L;
+    private static boolean lastInSchedule = true;
 
     private static Intent getIntent(boolean enabled) {
         Intent intent = new Intent("eu.chainfire.holeylight.aodhelper.SET_AOD");
@@ -54,6 +62,7 @@ public class AODControl {
         return false;
     }
 
+    @SuppressWarnings("deprecation")
     public static void setAOD(Context context, boolean enabled) {
         // We can't en/disable AOD directly because we cannot write the required settings from
         // this app. You need targetApi <= 22 for that. But if we set that, we lose the
@@ -69,6 +78,29 @@ public class AODControl {
                 }
             }
         }, null, 0, null, null);
+
+        if (!enabled) {
+            // Schedule an alarm to wake up according to AOD schedule, if we're using the helper
+            // (otherwise we're hidden instead of really off)
+            int[] schedule = getAODSchedule(context);
+            if ((schedule != null) && (haveHelperPackage(context, false))) {
+                AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+
+                Date now = new Date(System.currentTimeMillis());
+                int nowInt = (now.getHours() * 60) + now.getMinutes();
+                if (nowInt >= schedule[0]) {
+                    now = new Date(now.getTime() + (24 * 60 * 60 * 1000));
+                }
+                Date when = new Date(now.getYear(), now.getMonth(), now.getDate(), schedule[0] / 60, schedule[0] % 60, 0);
+
+                Intent intent = new Intent(AlarmReceiver.ACTION);
+                intent.setClass(context, AlarmReceiver.class);
+
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+                alarmManager.cancel(pendingIntent);
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, when.getTime(), pendingIntent);
+            }
+        }
     }
 
     public static boolean isAODEnabled(Context context) {
@@ -79,5 +111,39 @@ public class AODControl {
     public static String getAODThemePackage(Context context) {
         ContentResolver resolver = context.getContentResolver();
         return android.provider.Settings.System.getString(resolver, "current_sec_aod_theme_package");
+    }
+
+    public static int[] getAODSchedule(Context context) {
+        ContentResolver resolver = context.getContentResolver();
+        int start = android.provider.Settings.System.getInt(resolver, "aod_mode_start_time", 0);
+        int end = android.provider.Settings.System.getInt(resolver, "aod_mode_end_time", 0);
+        if (start != end) return new int[] { start, end };
+        return null;
+    }
+
+    @SuppressWarnings("deprecation")
+    public static boolean inAODSchedule(Context context, boolean refresh) {
+        long now = SystemClock.elapsedRealtime();
+        if ((lastInScheduleCheck != 0) && (Math.abs(now - lastInScheduleCheck) < 60000) && !refresh) {
+            return lastInSchedule;
+        }
+
+        lastInScheduleCheck = now;
+        int[] schedule = getAODSchedule(context);
+
+        if (schedule == null) {
+            lastInSchedule = true;
+            return true;
+        }
+
+        // Deprecated in favor of Calendar, which is... meh
+        Date date = new Date(System.currentTimeMillis());
+        int cmp = (date.getHours() * 60) + date.getMinutes();
+        if (schedule[0] < schedule[1]) {
+            lastInSchedule = (cmp >= schedule[0]) && (cmp <= schedule[1]);
+        } else {
+            lastInSchedule = (cmp >= schedule[0]) || (cmp <= schedule[1]);
+        }
+        return lastInSchedule;
     }
 }

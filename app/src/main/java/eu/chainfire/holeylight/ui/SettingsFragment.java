@@ -26,6 +26,7 @@ import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.format.DateFormat;
 import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -41,6 +42,7 @@ import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.SpritePlayer;
+import eu.chainfire.holeylight.misc.AODControl;
 import eu.chainfire.holeylight.misc.Settings;
 
 @SuppressWarnings({"WeakerAccess"})
@@ -53,6 +55,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefScreenOnBattery = null;
     private CheckBoxPreference prefScreenOffBattery = null;
     private CheckBoxPreference prefLockscreenOn = null;
+    private Preference prefAODSchedule = null;
     private Preference prefSeenPickup = null;
     private CheckBoxPreference prefSeenIfScreenOn = null;
     private CheckBoxPreference prefSeenOnLockscreen = null;
@@ -246,6 +249,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return false;
         });
 
+        PreferenceCategory catSchedule = category(root, R.string.settings_category_schedule, 0);
+        prefAODSchedule = pref(catSchedule, R.string.settings_schedule_aod_title, 0, null, true, null);
+
         PreferenceCategory catAnimation = category(root, R.string.settings_category_animation_title, 0);
         pref(catAnimation, R.string.settings_animation_tune_title, R.string.settings_animation_tune_description, null, true, preference -> {
             startActivity(new Intent(getActivity(), TuneActivity.class));
@@ -359,7 +365,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         return "\n[ ? ]";
     }
 
-    @SuppressWarnings({ "unused", "ConstantConditions" })
+    @SuppressWarnings({ "unused", "ConstantConditions", "deprecation" })
     private void updatePrefs(String key) {
         if (prefScreenOnCharging != null) {
             for (CheckBoxPreference pref : new CheckBoxPreference[] { prefScreenOnCharging, prefScreenOffCharging, prefScreenOnBattery, prefScreenOffBattery }) {
@@ -375,6 +381,26 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 pref.setSummary(summary);
             }
             prefLockscreenOn.setEnabled(settings.isEnabledWhileScreenOn());
+
+            int[] aodSchedule = AODControl.getAODSchedule(getContext());
+            if (aodSchedule == null) {
+                prefAODSchedule.setSummary(Html.fromHtml(getString(R.string.settings_schedule_aod_description) + "<br>[ " + getString(R.string.settings_schedule_aod_none) + " ]"));
+            } else {
+                String start;
+                String end;
+                if (DateFormat.is24HourFormat(getContext())) {
+                    start = String.format(Locale.ENGLISH, "%d:%02d", aodSchedule[0] / 60, aodSchedule[0] % 60);
+                    end = String.format(Locale.ENGLISH, "%d:%02d", aodSchedule[1] / 60, aodSchedule[1] % 60);
+                } else {
+                    int startHour = (aodSchedule[0] % (12 * 60)) / 60;
+                    if (startHour == 0) startHour = 12;
+                    int endHour = (aodSchedule[1] % (12 * 60)) / 60;
+                    if (endHour == 0) endHour = 12;
+                    start = String.format(Locale.ENGLISH, "%d:%02d %s", startHour, aodSchedule[0] % 60, aodSchedule[0] < 12 * 60 ? "AM" : "PM");
+                    end = String.format(Locale.ENGLISH, "%d:%02d %s", endHour, aodSchedule[1] % 60, aodSchedule[1] < 12 * 60 ? "AM" : "PM");
+                }
+                prefAODSchedule.setSummary(Html.fromHtml(getString(R.string.settings_schedule_aod_description) + "<br>[ " + start + " - " + end + " ]"));
+            }
 
             ArrayList<String> seenPickup = new ArrayList<>();
             for (int i = 0; i < Settings.SCREEN_AND_POWER_STATE_DESCRIPTIONS.length; i++) {

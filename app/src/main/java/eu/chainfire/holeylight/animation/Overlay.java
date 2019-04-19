@@ -115,19 +115,19 @@ public class Overlay {
                     break;
                 case Intent.ACTION_SCREEN_ON:
                     animation.updateTSPRect(new Rect(0, 0, 0, 0));
-                    evaluate();
+                    evaluate(true);
                     break;
                 case Intent.ACTION_USER_PRESENT:
                 case Intent.ACTION_POWER_CONNECTED:
                 case Intent.ACTION_POWER_DISCONNECTED:
-                    evaluate();
+                    evaluate(true);
                     break;
                 case Intent.ACTION_SCREEN_OFF:
                     if (settings.isHideAOD()) {
                         // without AOD we might immediately go to sleep, give us some time to setup
                         pokeWakeLocks(10000);
                     }
-                    evaluate();
+                    evaluate(true);
                     break;
             }
         }
@@ -149,6 +149,7 @@ public class Overlay {
     private boolean kill = false;
     private boolean lastState = false;
     private int[] lastColors = new int[0];
+    private boolean lastInAODSchedule = false;
     private SpritePlayer.Mode lastMode = SpritePlayer.Mode.SWIRL;
     private int lastDpAdd = 0;
     private boolean added = false;
@@ -272,7 +273,7 @@ public class Overlay {
 
             spritePlayer.getContext().getApplicationContext().registerReceiver(broadcastReceiver, intentFilter);
         }
-        evaluate();
+        evaluate(true);
     }
 
     @Override
@@ -355,9 +356,9 @@ public class Overlay {
         return false;
     }
 
-    private Runnable evaluateLoop = this::evaluate;
+    private Runnable evaluateLoop = () -> evaluate(false);
 
-    public void evaluate() {
+    public void evaluate(boolean refreshAll) {
         if (spritePlayer == null) {
             if (wanted) handler.postDelayed(evaluateLoop, 500);
             return;
@@ -377,9 +378,10 @@ public class Overlay {
         }
         boolean allowHideAOD = settings.isEnabledWhileScreenOff();
         boolean screenTimeOut = false;
+        boolean inAODSchedule = AODControl.inAODSchedule(context, refreshAll);
         if (!visible && settings.isHideAOD() && allowHideAOD) {
             // we will be visible soon, but if it doesn't happen within 10 seconds, give up
-            if (SystemClock.elapsedRealtime() - lastVisibleTime < 10000) {
+            if ((SystemClock.elapsedRealtime() - lastVisibleTime < 10000) || (inAODSchedule != lastInAODSchedule)) {
                 visible = true;
                 doze = true;
             } else {
@@ -394,17 +396,17 @@ public class Overlay {
 
         // We don't have the helper package that properly turns off AOD (passive hide) when we want
         // to hide it, but we still want AOD to be invisible: active hide
-        boolean activeHide = (colors.length == 0) && doze && allowHideAOD && (settings.isHideAOD() || spritePlayer.isTSPMode(renderMode)) && !AODControl.haveHelperPackage(context, false);
+        boolean activeHide = (colors.length == 0) && doze && allowHideAOD && (settings.isHideAOD() || spritePlayer.isTSPMode(renderMode)) && !AODControl.haveHelperPackage(context, refreshAll);
         if (activeHide) {
             renderMode = SpritePlayer.Mode.TSP_HIDE;
         }
 
         boolean lockscreenOk = !on || !lockscreen || settings.isEnabledOnLockscreen();
-        boolean wantedEffective = (wanted || activeHide) && settings.isEnabledWhile(mode) && lockscreenOk;
+        boolean wantedEffective = (wanted || activeHide) && settings.isEnabledWhile(mode) && lockscreenOk && (on || inAODSchedule || activeHide);
 
         if (visible && wantedEffective && ((colors.length > 0) || activeHide)) {
             int dpAdd = (doze ? 1 : 0);
-            if (!lastState || colorsChanged() || renderMode != lastMode || (dpAdd != lastDpAdd)) {
+            if (!lastState || colorsChanged() || renderMode != lastMode || (dpAdd != lastDpAdd) || (inAODSchedule != lastInAODSchedule)) {
                 animation.setMode(renderMode);
                 createOverlay();
                 if (settings.isHideAOD() && doze && allowHideAOD) {
@@ -419,6 +421,7 @@ public class Overlay {
                 lastState = true;
                 lastMode = renderMode;
                 lastDpAdd = dpAdd;
+                lastInAODSchedule = inAODSchedule;
             }
         } else {
             if (lastState) {
@@ -435,6 +438,7 @@ public class Overlay {
                     if (immediately) removeOverlay();
                 }
                 lastState = false;
+                lastInAODSchedule = inAODSchedule;
             }
         }
 
@@ -445,14 +449,14 @@ public class Overlay {
         handler.removeCallbacks(evaluateLoop);
         this.colors = colors;
         wanted = true;
-        evaluate();
+        evaluate(true);
     }
 
     public void hide(boolean immediately) {
         handler.removeCallbacks(evaluateLoop);
         wanted = false;
         kill = immediately;
-        evaluate();
+        evaluate(true);
     }
 
     public void updateTSPRect(Rect rect) {
