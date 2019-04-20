@@ -390,7 +390,7 @@ public class SpritePlayer extends RelativeLayout {
     private void callNextFrame(boolean immediately) {
         cancelNextFrame();
         if (immediately) surfaceInvalidated = true;
-        if (isTSPMode() && (Math.abs(SystemClock.elapsedRealtime() - modeStart) > TSP_FAST_DRAW_TIME) || immediately) {
+        if (isTSPMode() && ((Math.abs(SystemClock.elapsedRealtime() - modeStart) > TSP_FAST_DRAW_TIME) || immediately)) {
             handlerRender.postDelayed(tspFrame, immediately ? 0 : 250);
         } else {
             choreographer.postFrameCallback(frameCallback);
