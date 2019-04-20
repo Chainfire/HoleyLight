@@ -20,6 +20,8 @@ package eu.chainfire.holeylight.ui;
 
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Html;
@@ -30,8 +32,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -48,6 +52,8 @@ import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.service.NotificationListenerService;
 import top.defaults.colorpicker.ColorPickerPopup;
+
+import static android.content.res.Configuration.UI_MODE_NIGHT_YES;
 
 public class ColorActivity extends AppCompatActivity {
     private Settings settings = null;
@@ -187,24 +193,43 @@ public class ColorActivity extends AppCompatActivity {
                 }
                 holder.ivColor.setBackgroundColor(holder.appItem.color);
                 final AppItem item = holder.appItem;
-                holder.view.setOnClickListener(v -> (new ColorPickerPopup.Builder(ColorActivity.this))
-                        .initialColor(holder.appItem.color)
-                        .enableAlpha(false)
-                        .enableBrightness(true)
-                        .okTitle(getString(android.R.string.ok))
-                        .cancelTitle(getString(android.R.string.cancel))
-                        .showIndicator(true)
-                        .showValue(false)
-                        .build()
-                        .show(new ColorPickerPopup.ColorPickerObserver() {
-                            @Override
-                            public void onColorPicked(int color) {
-                                settings.setColorForPackageAndChannel(item.packageName, item.channelName, color | 0xFF000000, false);
-                                item.color = color;
-                                forceOverlayReload();
-                                notifyDataSetChanged();
-                            }
-                        }));
+                holder.view.setOnClickListener(v -> {
+                    ColorPickerPopup popup = (new ColorPickerPopup.Builder(ColorActivity.this))
+                            .initialColor(holder.appItem.color)
+                            .enableAlpha(false)
+                            .enableBrightness(true)
+                            .okTitle(getString(android.R.string.ok))
+                            .cancelTitle(getString(android.R.string.cancel))
+                            .showIndicator(true)
+                            .showValue(false)
+                            .build();
+
+                    popup.show(new ColorPickerPopup.ColorPickerObserver() {
+                        @Override
+                        public void onColorPicked(int color) {
+                            settings.setColorForPackageAndChannel(item.packageName, item.channelName, color | 0xFF000000, false);
+                            item.color = color;
+                            forceOverlayReload();
+                            notifyDataSetChanged();
+                        }
+                    });
+
+                    boolean nightMode = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == UI_MODE_NIGHT_YES;
+                    if (nightMode) {
+                        try {
+                            // Doesn't seem to be a way to do this normally with the current version of ColorPicker
+                            // It forces the background white, but in the night theme the text is also white
+                            // Changing background color didn't seem to work, so we change the text color
+                            Field f = popup.getClass().getDeclaredField("popupWindow");
+                            f.setAccessible(true);
+                            PopupWindow popupWindow = (PopupWindow)f.get(popup);
+                            ((TextView)popupWindow.getContentView().findViewById(R.id.ok)).setTextColor(Color.BLACK);
+                            ((TextView)popupWindow.getContentView().findViewById(R.id.cancel)).setTextColor(Color.BLACK);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
                 holder.view.setOnLongClickListener(v -> {
                     CharSequence[] entries = new CharSequence[colorCopy == null ? 5 : 6];
                     entries[0] = getString(R.string.colors_disable);
