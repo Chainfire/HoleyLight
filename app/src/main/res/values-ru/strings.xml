@@ -8,17 +8,23 @@
     <string name="animation_style_single_title">Постоянно</string>
     <string name="animation_style_swirl_title">Змейка</string>
     <string name="animation_style_tsp_title">Кольцо</string>
-    <string name="app_details">"Авторское право © 2019 – Chainfire
-Twitter: @ChainfireXDA
-Источник: github.com/Chainfire/HoleyLight
-Нажмите, для посещения темы на XDA"</string>
+    <string name="app_details">Авторское право © 2019 – Chainfire\nTwitter: @ChainfireXDA\nИсточник: github.com/Chainfire/HoleyLight\nНажмите, для посещения темы на XDA</string>
     <string name="battery_screen_off">От батареи: экран выключен</string>
     <string name="battery_screen_on">От батареи: экран включен</string>
     <string name="charging_screen_off">От зарядки: экран выключен</string>
     <string name="charging_screen_on">От зарядки: экран включен</string>
+    <string name="colors_apply">Применить ко всем &lt;b>%s&lt;/b> записям</string>
+    <string name="colors_apply_include_black">Включить в настоящее время &lt;b>черные&lt;/b> (отключенные) записи?</string>
+    <string name="colors_apply_short">Применить ко всем</string>
+    <string name="colors_copy">Скопировать цвет</string>
+    <string name="colors_disable">Отключить</string>
     <string name="colors_header_active">В настоящее время активен</string>
     <string name="colors_header_inactive">В данный момент не активен</string>
-    <string name="colors_help">"&lt;i>Приложения&lt;/i> могут иметь несколько &lt;i>каналов&lt;/i>. указанных отдельно здесь. Пункты добавляются только после того, как новое уведомление &lt;i>поступит&lt;/i>. Вы &lt;b>не можете&lt;/b> добавить пункт вручную, поскольку имена &lt;i>каналов&lt;/i> не могут быть известны заранее. Установите цвет полностью &lt;b>черным&lt;/b> чтобы отключить это уведомление."</string>
+    <string name="colors_help">&lt;i>Приложения&lt;/i> могут иметь несколько &lt;i>каналов&lt;/i>. указанных отдельно здесь. Пункты добавляются только после того, как новое уведомление &lt;i>поступит&lt;/i>. Вы &lt;b>не можете&lt;/b> добавить пункт вручную, поскольку имена &lt;i>каналов&lt;/i> не могут быть известны заранее. Установите цвет полностью &lt;b>черным&lt;/b> чтобы отключить это уведомление.</string>
+    <string name="colors_hex">Изменить шестнадцатеричное значение</string>
+    <string name="colors_longpress">&lt;br>&lt;br>Нажмите, чтобы изменить цвет, нажмите и удерживайте, чтобы получить дополнительные параметры.</string>
+    <string name="colors_paste">Вставить цвет</string>
+    <string name="colors_set_default">Установить по умолчанию для &lt;b>%s&lt;/b> для &lt;b>новых&lt;/b> записей</string>
     <string name="disabled">Отключить</string>
     <string name="enabled">Включить</string>
     <string name="error">Ошибка</string>
@@ -35,9 +41,13 @@ Twitter: @ChainfireXDA
         Несмотря на то, что было приложено много усилий для максимального сокращения использования батареи,, &lt;b>Holey Light&lt;/b> &lt;i>does&lt;/i> использует дополнительный заряд
         по сравнению с использованием только &lt;b>AOD&lt;/b>."</string>
     <string name="help_basic_title">Помощь</string>
+    <string name="hide_aod_full_description">Полностью скрыть AOD</string>
+    <string name="hide_aod_full_title">Полный</string>
+    <string name="hide_aod_partial_description">Удерживать информацию о зарядке и отпечатке пальцев, видимымой</string>
+    <string name="hide_aod_partial_title">Частичный</string>
     <string name="never">Никогда</string>
     <string name="no">Нет</string>
-    <string name="notice_aod_required_message">"Текущая конфигурация требует, чтобы &lt;b>Always On Display&lt;/b> был включен.&lt;br>&lt;br>Перейдите на страницу &lt;b>Настройки -> Экрана блокировки -> Always On Display&lt;/b> установите &lt;b>Показывать всегда&lt;/b> (or &lt;b>Нажмите для показа&lt;/b> if на Ваше усмотрение).&lt;br>&lt;br>Пожалуйста, также убедитесь, что &lt;b>для ориентации экрана&lt;/b> вкл режим &lt;b>Портретный&lt;/b>.&lt;br>&lt;br>Вы также можете настроить расписание и яркость AOD."</string>
+    <string name="notice_aod_required_message">Текущая конфигурация требует, чтобы &lt;b>Always On Display&lt;/b> был включен.&lt;br>&lt;br>Перейдите на страницу &lt;b>Настройки -> Экрана блокировки -> Always On Display&lt;/b> установите &lt;b>Показывать всегда&lt;/b> (or &lt;b>Нажмите для показа&lt;/b> if на Ваше усмотрение).&lt;br>&lt;br>Пожалуйста, также убедитесь, что &lt;b>для ориентации экрана&lt;/b> вкл режим &lt;b>Портретный&lt;/b>.&lt;br>&lt;br>Вы также можете настроить расписание и яркость AOD.</string>
     <string name="notice_aod_with_image_required_message">Текущая конфигурация требует, чтобы изображение было применено в &lt;b>Always On Display&lt;/b>.&lt;br>&lt;br>Перейдите &lt;b>Темы (AOD)&lt;/b>, &lt;b>загрузите&lt;/b> любую бесплатную тему и &lt;b>Apply&lt;/b> примените как &lt;b>Только изображение&lt;/b>.&lt;br>&lt;br> Если вы примените его как &lt;b>Часы и картинка&lt;/b>, часы со временем станут видимыми.</string>
     <string name="notice_dialog_title">Примечание</string>
     <string name="notification_permissions_description">Некоторые разрешения необходимо обновить. Нажмите, чтобы начать.</string>
@@ -45,8 +55,8 @@ Twitter: @ChainfireXDA
     <string name="notification_test_title">Holey Light: Тест</string>
     <string name="open_android_settings">Открыть настройки</string>
     <string name="open_theme_store">Открыть Темы</string>
-    <string name="operation_mode_disabled_description">Не показывать уведомления </string>
-    <string name="operation_mode_disabled_title">Отключено </string>
+    <string name="operation_mode_disabled_description">Не показывать уведомления</string>
+    <string name="operation_mode_disabled_title">Отключено</string>
     <string name="permission_accessibility">На следующем экране перейдите к &lt;b>Установленным службам&lt;/b>, и включите &lt;b>Holey Light&lt;/b>. Это необходимо для отображения анимации уведомления. Если это не сработает, попробуйте перезагрузить устройство.</string>
     <string name="permission_accessibility_v2">" На следующем экране перейдите на страницу &lt;b>Установленные службы&lt;/b>, включите &lt;b>Holey Light&lt;/b>. Это необходимо для возможности отображения уведомлений и сможете подключиться к AOD. Если это не сработает, попробуйте перезагрузить телефон."</string>
     <string name="permission_associate">В следующем диалоговом окне, пожалуйста, свяжитесь &lt;b>Holey Light&lt;/b> with &lt;b>any&lt;/b> с устройством. Это необходимо для доступа к цветам уведомлений. Не имеет значения, какое устройство вы выберете.&lt;br>&lt;br>Пожалуйста &lt;b>включите Wi-Fi и Bluetooth&lt;/b> прежде чем продолжить; затем вы можете снова отключить их.&lt;br>&lt;br>Если всплывающее окно не появляется, попробуйте убедиться, что &lt;b>сканирование ближайшего устройства&lt;/b> включено, и выполнить сопряжение с устройством Bluetooth.</string>
@@ -66,6 +76,7 @@ Twitter: @ChainfireXDA
     <string name="settings_category_animation_title">Анимация</string>
     <string name="settings_category_operation_title">Опции</string>
     <string name="settings_category_operation_title_v2">Когда и как отображать</string>
+    <string name="settings_category_schedule">Расписание</string>
     <string name="settings_category_seen_description">Рассматривать уведомления, как отклоненные</string>
     <string name="settings_category_seen_lockscreen_title">Пометить нужное: экран блокировки</string>
     <string name="settings_category_seen_pickup_description">Видимая в течение >10сек перед удалением</string>
@@ -79,6 +90,13 @@ Twitter: @ChainfireXDA
     <string name="settings_lockscreen_on_title">Экран блокировки</string>
     <string name="settings_playstore_description">Просмотреть все мои приложения, доступные в Google Play</string>
     <string name="settings_playstore_title">Все мои приложения</string>
+    <string name="settings_schedule_aod_description">Расписание отображения (для случая, когда экран выключен) контролируется AOD, &lt;b>Настройки -> Экран блокировки -> Always On Display -> Режим отображения&lt;/b>.</string>
+    <string name="settings_schedule_aod_none">Расписание не установлено</string>
+    <string name="settings_schedule_aod_title">Always On Display</string>
+    <string name="settings_schedule_dnd_description">Не показывать уведомления, когда режим &lt;i>Не беспокоить&lt;/i> включен</string>
+    <string name="settings_schedule_dnd_title">Режим не беспокоить</string>
+    <string name="settings_seen_if_screen_on_description">Игнорировать уведомления, поступающие при включенном экране</string>
+    <string name="settings_seen_if_screen_on_title">Если экран включен</string>
     <string name="settings_screen_off_battery_description">Показывать индикатор уведомлений, когда экран выключен и работает от батареи, потребляет дополнительную мощность</string>
     <string name="settings_screen_off_charging_description">Показывать индикатор уведомлений, когда экран выключен и заряжается</string>
     <string name="settings_screen_on_battery_description">Показывать индикатор уведомлений, когда экран включен и работает от батареи</string>
@@ -87,6 +105,9 @@ Twitter: @ChainfireXDA
     <string name="settings_screen_on_title">Экран вкл</string>
     <string name="settings_seen_on_lockscreen_description">Каждый раз, когда отображается экран блокировки</string>
     <string name="settings_seen_on_lockscreen_title">На экране блокировки</string>
+    <string name="settings_seen_on_timeout_description">Показывать уведомления только в течение установленного периода </string>
+    <string name="settings_seen_on_timeout_none">Нет тайм-аут</string>
+    <string name="settings_seen_on_timeout_title">С тайм-аут</string>
     <string name="settings_seen_on_user_present_description">Каждый раз, когда разблокируется телефон</string>
     <string name="settings_seen_on_user_present_title">После разблокировки</string>
     <string name="settings_seen_pickup_screen_off_battery_description">потребляет больше энергии</string>
@@ -94,15 +115,15 @@ Twitter: @ChainfireXDA
     <string name="settings_seen_pickup_screen_on_battery_description">потребляет немного дополнительной энергии</string>
     <string name="settings_seen_pickup_screen_on_charging_description">Имеет смысл, когда вы обычно заряжаете свой телефон там, и его видно</string>
     <string name="settings_seen_pickup_title">При получении</string>
-    <string name="setup_wizard_choose_notification_style" formatted="false">"Пожалуйста, выберите стиль анимации, когда экран выключен.&lt;br>&lt;br>&lt;b>Змейка&lt;/b> это источник света, который вращается вокруг отверстие камеры и использует до &lt;b>5.5%&lt;/b> батареи в час (наихудший случай).&lt;br>&lt;br>&lt;b>Мигание&lt;/b> мигающий круг вокруг камеры и использует до &lt;b>3.5%&lt;/b> батареи в час.&lt;br>&lt;br>&lt;b>Кольцо&lt;/b> большой круг в середине вашего экрана. Он не анимирован, но использует меньше, чем &lt;b>1%&lt;/b> батареи в час. Этот параметр. &lt;i>всегда&lt;/i> &lt;b>скрывает AOD&lt;/b>, что является &lt;i>не обязательным&lt;/i> для остальных двух."</string>
-    <string name="setup_wizard_complete">"Мы закончили с первоначальной настройкой. Далее появятся дополнительные всплывающие диалоговые окна, которые помогут вам настроить разрешения и другие настройки Android, чтобы позволить этому приложению функционировать.&lt;br>&lt;br>После этого больше настроек для самостоятельного изучения!"</string>
+    <string name="setup_wizard_choose_notification_style" formatted="false">Пожалуйста, выберите стиль анимации, когда экран выключен.&lt;br>&lt;br>&lt;b>Змейка&lt;/b> это источник света, который вращается вокруг отверстие камеры и использует до &lt;b>5.5%&lt;/b> батареи в час (наихудший случай).&lt;br>&lt;br>&lt;b>Мигание&lt;/b> мигающий круг вокруг камеры и использует до &lt;b>3.5%&lt;/b> батареи в час.&lt;br>&lt;br>&lt;b>Кольцо&lt;/b> большой круг в середине вашего экрана. Он не анимирован, но использует меньше, чем &lt;b>1%&lt;/b> батареи в час. Этот параметр. &lt;i>всегда&lt;/i> &lt;b>скрывает AOD&lt;/b>, что является &lt;i>не обязательным&lt;/i> для остальных двух.</string>
+    <string name="setup_wizard_complete">Мы закончили с первоначальной настройкой. Далее появятся дополнительные всплывающие диалоговые окна, которые помогут вам настроить разрешения и другие настройки Android, чтобы позволить этому приложению функционировать.&lt;br>&lt;br>После этого больше настроек для самостоятельного изучения!</string>
     <string name="setup_wizard_description">Помогает вам настроить Holey Light</string>
     <string name="setup_wizard_hide_aod">&lt;b>Always On Display&lt;/b> это функция Samsung, которая может отображать различную информацию на экране, когда он выключен, используя менее 1% заряда батареи в час. Некоторые считают это полезным, другие находят, что это отвлекает. &lt;br>&lt;br>Мы можем &lt;b>показать AOD&lt;/b> вместе с нашим индикатором уведомлений, или мы можем &lt;b>скрыть AOD&lt;/b> и отобразить только нашие уведомление с черным экраном.</string>
     <string name="setup_wizard_option_hide_aod">Скрыть AOD</string>
     <string name="setup_wizard_option_show_aod">Показывать AOD</string>
-    <string name="setup_wizard_run_while_screen_off" formatted="false">"Мы можем отображать уведомления, когда экран выключен, но при этом используются значения между &lt;b>1%&lt;/b> и &lt;b>5.5%&lt;/b> в &lt;b>час&lt;/b>, в зависимости от настроек.&lt;br>&lt;br>Это также требует&lt;b>Always On Display&lt;/b> ,функция должна быть включена. Если тебе не нравится &lt;b>AOD&lt;/b>,можно скрыть это позже!&lt;br>&lt;br>Хотите показывать уведомления, когда экран выключен?"</string>
+    <string name="setup_wizard_run_while_screen_off" formatted="false">Мы можем отображать уведомления, когда экран выключен, но при этом используются значения между &lt;b>1%&lt;/b> и &lt;b>5.5%&lt;/b> в &lt;b>час&lt;/b>, в зависимости от настроек.&lt;br>&lt;br>Это также требует&lt;b>Always On Display&lt;/b> ,функция должна быть включена. Если тебе не нравится &lt;b>AOD&lt;/b>,можно скрыть это позже!&lt;br>&lt;br>Хотите показывать уведомления, когда экран выключен?</string>
     <string name="setup_wizard_title">Мастер настроек</string>
-    <string name="setup_wizard_welcome">"Добро пожаловать в &lt;b>Holey Light&lt;/b>! Давайте проведем настройку.&lt;br>&lt;br>Предупреждаем, это приложение требует некоторых довольно экстремальных разрешений, для работы. Если вас это не устраивает, вам не следует продолжать.&lt;br>&lt;br>Обратите внимание, что исходный код этого приложения в свободном доступе для всех желающих.&lt;br>&lt;br>Появятся несколько всплывающих окнон для настройки, это займет несколько минут!"</string>
+    <string name="setup_wizard_welcome">Добро пожаловать в &lt;b>Holey Light&lt;/b>! Давайте проведем настройку.&lt;br>&lt;br>Предупреждаем, это приложение требует некоторых довольно экстремальных разрешений, для работы. Если вас это не устраивает, вам не следует продолжать.&lt;br>&lt;br>Обратите внимание, что исходный код этого приложения в свободном доступе для всех желающих.&lt;br>&lt;br>Появятся несколько всплывающих окнон для настройки, это займет несколько минут!</string>
     <string name="temp_settings_hide_aod_description">Требуется AOD Helper. Вам нужно сначала настроить изображение без часов на AOD.</string>
     <string name="temp_settings_hide_aod_title">Автоматический показ AOD - РАБОТА ВЕДЕТСЯ</string>
     <string name="translation">Перевод от:</string>
@@ -113,5 +134,8 @@ Twitter: @ChainfireXDA
     <string name="tune_shift_horizontal">Сдвиг по горизонтали: %.2fdp</string>
     <string name="tune_shift_vertical">Сдвиг по вертикали: %.2fdp</string>
     <string name="tune_speed">Скорость: %.1fx</string>
+    <string name="x_hours">%d час.</string>
+    <string name="x_minutes">%d мин.</string>
+    <string name="x_seconds">%d сек.</string>
     <string name="yes">Да</string>
 </resources>
