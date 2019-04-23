@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string translatable="false" name="app_name">Holey Light</string>
+    <string translatable="false" name="app_details">Copyright © 2019 – Chainfire\nTwitter: @ChainfireXDA\nSources: github.com/Chainfire/HoleyLight\nTap to visit XDA thread</string>
+    <string translatable="false" name="app_website_url">https://forum.xda-developers.com/galaxy-s10/themes/app-holey-light-t3917675</string>
+
+    <string name="permission_required">Permisos necesarios</string>
+    <string name="permission_battery"><![CDATA[En el siguiente diálogo, por favor detenga la optimización del uso de batería para <b>Holey Light</b>. Esto es necesario para mantener la animación de notificación en ejecución.]]></string>
+    <string name="permission_associate"><![CDATA[En el siguiente diálogo, por favor vincule <b>Holey Light</b> con <b>algún</b> dispositivo. Esto es necesario para poder acceder a los colores de las notificaciones. No importa el dispositivo que seleccione.<br><br>Por favor, <b>active el Wi-Fi y el Bluetooth</b> antes de continuar; puede desactivarlo más tarde.<br><br>Si no aparece ninguna ventana emergente, asegúrese que la opción <b>Escaneando dispositivos cercanos</b> está activa, y emparejado con algún dispositivo Bluetooth.]]></string>
+    <string name="permission_notifications"><![CDATA[En la siguiente pantalla, por favor permita a <b>Holey Light</b> el acceso a las notificaciones. Esto es necesario para poder detectar las notificaciones.]]></string>
+
+    <string name="notification_test_title">Holey Light: Prueba</string>
+    <string name="notification_test_description">Notificación de prueba, LED blanco</string>
+
+    <string translatable="false" name="notification_permissions_title">@string/app_name</string>
+    <string name="notification_permissions_description">Algunos permisos necesitan ser actualizados. Pulse para comenzar.</string>
+
+    <string name="error">Error</string>
+    <string name="error_hide_notch"><![CDATA[<b>Holey Light</b> no puede funcionar cuando la muesca de la cámara está oculta. Desactive la opción <b>Ajustes</b> - <b>Pantalla</b> - <b>Apps a pantalla completa</b> - <b>Ocultar cámara frontal</b>.]]></string>
+    <string name="error_unsupported_device"><![CDATA[<b>Holey Light</b> parece que no es compatible con su dispositivo. Si está usando una variante del <b>S10</b> por favor, reporta este código en el hilo en XDA:<br><br>[ <b>%s</b> ]]]></string>
+
+    <string name="enabled">Activado</string>
+    <string name="disabled">Desactivado</string>
+
+    <string name="charging_screen_on">Cargando: Pantalla encendida</string>
+    <string name="charging_screen_off">Cargando: Pantalla apagada</string>
+    <string name="battery_screen_on">Batería: Pantalla encendida</string>
+    <string name="battery_screen_off">Batería: Pantalla apagada</string>
+
+    <string translatable="false" name="settings_screen_off_charging_title">@string/charging_screen_off</string>
+    <string name="settings_screen_off_charging_description">Mostrar luz de notificación cuando la pantalla está apagada y cargando</string>
+    <string translatable="false" name="settings_screen_off_battery_title">@string/battery_screen_off</string>
+    <string name="settings_screen_off_battery_description">Mostrar luz de notificación cuando la pantalla está apagada y usando batería, consume energía extra</string>
+    <string name="settings_lockscreen_on_title">Pantalla de bloqueo</string>
+    <string name="settings_lockscreen_on_description">Mostrar luz de notificación en pantalla de bloqueo; esto puede parecer extraño si el desbloqueo facial está activado.</string>
+
+    <string name="settings_category_seen_pickup_description">Permanecer durante &gt;10s antes de moverse</string>
+    <string translatable="false" name="settings_seen_pickup_screen_on_charging_title">@string/charging_screen_on</string>
+    <string name="settings_seen_pickup_screen_on_charging_description">Tiene sentido cuando carga normalmente su teléfono donde puede verlo</string>
+    <string translatable="false" name="settings_seen_pickup_screen_off_charging_title">@string/charging_screen_off</string>
+    <string name="settings_seen_pickup_screen_off_charging_description">Tiene sentido cuando carga normalmente su teléfono donde puede verlo</string>
+    <string translatable="false" name="settings_seen_pickup_screen_on_battery_title">@string/battery_screen_on</string>
+    <string name="settings_seen_pickup_screen_on_battery_description">Produce un consumo de batería extra pequeño</string>
+    <string translatable="false" name="settings_seen_pickup_screen_off_battery_title">@string/battery_screen_off</string>
+    <string name="settings_seen_pickup_screen_off_battery_description">Produce un consumo de batería extra significativo</string>
+
+    <string name="settings_seen_on_lockscreen_title">En Pantalla de bloqueo</string>
+    <string name="settings_seen_on_lockscreen_description">Cada vez que se muestra la pantalla de bloqueo</string>
+    <string name="settings_seen_on_user_present_title">Despues de desbloquear</string>
+    <string name="settings_seen_on_user_present_description">Cada vez que se desbloquea la pantalla</string>
+
+    <string name="settings_category_animation_title">Animación</string>
+    <string name="settings_animation_tune_title">Personalizar</string>
+    <string name="settings_animation_tune_description">Ajustar tamaño, posición y velocidad</string>
+    <string name="settings_animation_colors_title">Colores</string>
+
+    <string name="settings_category_chainfire_title">Chainfire</string>
+    <string name="settings_playstore_title">Todas mis aplicaciones</string>
+    <string name="settings_playstore_description">Ver todas mis aplicaciones disponibles en Google Play</string>
+    <string name="settings_follow_twitter_title">Sígame en Twitter</string>
+    <string name="settings_follow_twitter_description">Manténgase al día de mis proyectos</string>
+
+    <string name="tune_notice">Los cambios tardan un ciclo de animación completo en actualizarse!</string>
+    <string name="tune_scale_base">Escala base: %.2fdp</string>
+    <string name="tune_scale_horizontal">Escala horizontal: %.2fdp</string>
+    <string name="tune_shift_vertical">Desplazamiento vertical: %.2fdp</string>
+    <string name="tune_shift_horizontal">Desplazamiento horizontal: %.2fdp</string>
+    <string name="tune_speed">Velocidad: %.1fx</string>
+
+    <!-- v0.50 -->
+
+    <string name="reset">Resetear</string>
+    <string name="refresh">Actualizar</string>
+
+    <!-- v0.55 -->
+
+    <string name="translation">Traducido por:</string>
+
+    <string name="translation_by">@zEio</string>
+
+    <string name="never">Nunca</string>
+
+    <string name="colors_header_active">Actualmente activo</string>
+    <string name="colors_header_inactive">Actualmente inactivo</string>
+    <string name="colors_help"><![CDATA[<i>Las aplicaciones</i> pueden tener múltiples <i>canales</i>. Cada <i>canal</i> se muestra aquí listado individualmente. Las entradas se añaden solas cuando se recibe una nueva notificación y es <i>visualizada</i>. No <b>se puede</b> añadir entradas manualmente, porque el nombre de cada <i>canal</i> no se puede conocer de antemano. Establezca una entrada de color <b>negro</b> para desactivar esa notificación.]]></string>
+    <string name="settings_animation_colors_description_v3">Ajustar el color de notificación por paquete y canal</string>
+
+    <string name="permission_accessibility_v2"><![CDATA[En la siguiente pantalla, vaya a <b>Servicios instalados</b>, y active <b>Holey Light</b>. Esto es necesario para poder mostrar notificaciones y poder acceder a AOD. Si esto no funciona bien, intente reiniciar.]]></string>
+
+    <string translatable="false" name="settings_screen_on_charging_title">@string/charging_screen_on</string>
+    <string name="settings_screen_on_charging_description">Mostrar luz de notificación cuando la pantalla está encendida y cargando</string>
+    <string translatable="false" name="settings_screen_on_battery_title">@string/battery_screen_on</string>
+    <string name="settings_screen_on_battery_description">Mostrar luz de notificación cuando la pantalla está encendida y usando batería</string>
+
+    <string name="settings_category_operation_title_v2">Cuándo y cómo mostrar</string>
+    <string name="operation_mode_disabled_title">Desactivado</string>
+    <string name="operation_mode_disabled_description">No mostrar notificaciones</string>
+
+    <string name="animation_style_swirl_title">Remolino</string>
+    <string name="animation_style_blink_title">Parpadeo</string>
+    <string name="animation_style_single_title">Pie</string>
+    <string name="animation_style_tsp_title">Unholey Light</string>
+    <string name="animation_style_location_camera">Cámara</string>
+    <string name="animation_style_location_screen_center">Centro de pantalla</string>
+    <string name="animation_style_percentage_up_to">Hasta %.1f%% batería/hora</string>
+    <string name="animation_style_percentage_below">Inferior a %.0f%% batería/hora</string>
+
+    <string name="settings_category_seen_title">Marcar como leído</string>
+    <string name="settings_category_seen_description">Marcar las notificaciones como descartadas</string>
+    <string name="settings_seen_pickup_title">Cuando seleccionar</string>
+    <string translatable="false" name="settings_seen_pickup_description">@string/settings_category_seen_pickup_description</string>
+
+    <string name="settings_hide_aod_title">Ocultar AOD</string>
+    <string name="settings_hide_aod_description">Cuando la pantalla está apagada, ocultar Always On Display y mostrar solo nuestra animación</string>
+
+    <string name="notice_dialog_title">Aviso</string>
+    <string name="notice_aod_required_message"><![CDATA[La configuración actual requiere que <b>Always On Display</b> esté activado.<br><br>Por favor, vaya a <b>Ajustes -> Pantalla de bloqueo -> Always On Display</b> y active <b>Mostrar siempre</b> (o <b>Pulsar para mostrar</b> si así lo desea).<br><br>Además, asegúrese que la opción <b>Orientación de pantalla</b> está en modo <b>Vertical</b>.<br><br>También puede configurar la planificación y el brillo de AOD.]]></string>
+    <string name="notice_aod_with_image_required_message"><![CDATA[La configuración actual requiere que se aplique una imagen a <b>Always On Display</b>.<br><br>Por favor, vaya a <b>Temas (Sección AOD)</b>, <b>Descargue</b> algún tema (gratuito), y pulse <b>Aplicar</b> como <b>Imagen solo</b>.<br><br>Si lo aplica como <b>Reloj e imagen</b>, puede que el reloj se muestre ocasionalmente.]]></string>
+    <string name="open_android_settings">Abrir Ajustes de Android</string>
+    <string name="open_theme_store">Abrir Galaxy Themes</string>
+
+    <string name="yes">Sí</string>
+    <string name="no">No</string>
+
+    <string name="setup_wizard_title">Asistente de configuración</string>
+    <string name="setup_wizard_description">Le ayudará a configurar Holey Light</string>
+    <string name="setup_wizard_welcome"><![CDATA[Bienvenido a <b>Holey Light</b>! Vamos a iniciar la configuración.<br><br>Aviso, esta aplicación requiere algunos permisos "extremos" para poder funcionar correctamente. Si no se siente cómodo con eso, no debe continuar.<br><br>Tenga en cuenta que el código fuente de esta aplicación está disponible de forma gratuita para que cualquiera pueda verlo.<br><br>A continuación se mostrarán varias ventanas emergentes, esto le tomará unos minutos!]]></string>
+    <string name="setup_wizard_run_while_screen_off"><![CDATA[Podemos mostrar notificaciones cuando la pantalla está apagada, pero esto usa entre un <b>1%</b> y un <b>5.5%</b> de batería por <b>hora</b>, dependiendo de su configuración.<br><br>Esto también requiere que la opción <b>Always On Display</b> esté activada. Si no le gusta <b>AOD</b>, puede ocultarlo luego más tarde!<br><br>Desea que se le muestren notificaciones cuando la pantalla está apagada?]]></string>
+    <string name="setup_wizard_choose_notification_style"><![CDATA[Por favor, seleccione el efecto de animación para cuando la pantalla está apagada.<br><br><b>Remolino</b> muestra una luz que circula alrededor de la muesca de la cámara y usa hasta un <b>5.5%</b> de batería por hora (peor de los casos).<br><br><b>Parpadeo</b> muestra un círculo parpadeante alrededor de la muesca de la cámara, y usa hasta un <b>3.5%</b> de batería por hora (peor de los casos).<br><br><b>Unholy Light</b> muestra un círculo grande en el centro de la pantalla. No es un efecto animado, pero usa menos de un <b>1%</b> de batería por hora. Esta opción <i>siempre</i> <b>oculta AOD</b>, que es <i>opcional</i> para los otros dos efectos.]]></string>
+    <string name="setup_wizard_hide_aod"><![CDATA[<b>Always On Display</b> es una función de Samsung que puede mostrar información diversa en su pantalla cuando está apagada, usando menos de 1% de batería por hora. Algunos lo encuentran útil, a otros lo distraen<br><br>Se puede <b>mostrar AOD</b> junto con nuestra luz de notificación, o podemos <b>ocultar AOD</b> y mostrarle solo nuestra luz de notificación y por otro lado una pantalla negra.]]></string>
+    <string name="setup_wizard_option_show_aod">Mostrar AOD</string>
+    <string name="setup_wizard_option_hide_aod">Ocultar AOD</string>
+    <string name="setup_wizard_complete"><![CDATA[Hemos terminado con la configuración inicial. Se seguirán mostrando más diálogos emergentes para ayudarle a configurar los permisos necesarios y otras opciones de Android para permitir que la aplicación funcione correctamente.<br><br>Luego, hay más opciones para que explore por su cuenta!]]></string>
+
+    <!-- v0.65 -->
+
+    <string name="colors_longpress"><![CDATA[<br><br>Pulse para cambiar el color, mantenga pulsado para ver opciones adicionales.]]></string>
+    <string name="colors_copy">Copiar color</string>
+    <string name="colors_paste">Pegar color</string>
+    <string name="colors_hex">Editar valor hex</string>
+    <string name="colors_set_default"><![CDATA[Establecer como predeterminado para <b>%s</b> para <b>nuevas</b> entradas]]></string>
+    <string name="colors_apply"><![CDATA[Aplicar a todas las <b>%s</b> entradas]]></string>
+    <string name="colors_apply_short">Aplicar a todo</string>
+    <string name="colors_apply_include_black"><![CDATA[Incluir entradas actualmente en <b>negro</b> (desactivadas)?]]></string>
+    <string name="colors_disable">Desactivar</string>
+
+    <string name="hide_aod_full_title">Completo</string>
+    <string name="hide_aod_full_description">Ocultar AOD completamente</string>
+
+    <string name="hide_aod_partial_title">Parcial</string>
+    <string name="hide_aod_partial_description">Mantener la información de carga y la huella digital visible</string>
+
+    <string name="settings_seen_if_screen_on_title">Con pantalla encendida</string>
+    <string name="settings_seen_if_screen_on_description">Ignorar las notificaciones que llegan cuando la pantalla está encendida</string>
+
+    <string name="settings_category_schedule">Programar</string>
+    <string name="settings_schedule_aod_title">Always On Display</string>
+    <string name="settings_schedule_aod_description"><![CDATA[La pantalla de planificación (con pantalla apagada) es controlado por AOD, <b>Ajustes -> Pantalla de bloqueo -> Always On Display -> Modo de pantalla</b>.]]></string>
+    <string name="settings_schedule_aod_none">No hay ninguna planificación establecida</string>
+    <string name="settings_schedule_dnd_title">Respetar modo No molestar</string>
+    <string name="settings_schedule_dnd_description"><![CDATA[No mostrar notificaciones cuando el modo <i>No molestar</i> está activado]]></string>
+
+    <string name="settings_seen_on_timeout_title">Tiempo de espera</string>
+    <string name="settings_seen_on_timeout_description">Mostrar notificaciones solo por un periodo determinado</string>
+    <string name="settings_seen_on_timeout_none">Sin tiempo de espera</string>
+
+    <string name="x_seconds">%d segundos</string>
+    <string name="x_minutes">%d minutos</string>
+    <string name="x_hours">%d horas</string>
+</resources>
