@@ -9,7 +9,7 @@
 
     <string name="permission_required">Permissões necessárias</string>
     <string name="permission_battery"><![CDATA[Na próxima caixa de diálogo, por favor permita o <b>Holey Light</b> parar de otimizar o uso da bateria. Isso é necessário para manter a animação de notificação em execução.]]></string>
-    <string name="permission_associate"><![CDATA[Na próxima caixa de diálogo, por favor linque o <b>Holey Light</b> a <b>qualquer</b> dispositivo. Isso é necessário para acessar as cores das notificações. Não importa qual dispositivo você vai escolher.<br><br>Por favor, <b>ligue o Wi-Fi e o Bluetooth</b> antes de continuar; você pode desligá-los depois.<br><br>Se não aparecer nenhum pop-up, certifique-se que o <b>Escaneamento de dispositivos próximos</b> está habilitado, e emparelhe com um dispositivo Bluetooth.]]></string>
+    <string name="permission_associate"><![CDATA[Na próxima caixa de diálogo, por favor link o <b>Holey Light</b> a <b>qualquer</b> dispositivo. Isso é necessário para acessar as cores das notificações. Não importa qual dispositivo você vai escolher.<br><br>Por favor, <b>ligue o Wi-Fi e o Bluetooth</b> antes de continuar; você pode desligá-los depois.<br><br>Se não aparecer nenhum pop-up, certifique-se que o <b>Escaneamento de dispositivos próximos</b> está habilitado, e emparelhe com um dispositivo Bluetooth.]]></string>
     <string name="permission_notifications"><![CDATA[Na próxima tela, por favor permita o <b>Holey Light</b> acessar as notificações. Isso é necessário para detectarmos as notificações.]]></string>
 <!-- obsolete --><string translatable="false" name="permission_accessibility"><![CDATA[Na próxima tela, por favor, vá para <b>Serviços instalados</b>, e habilite o <b>Holey Light</b>. Isso é necessário para mostrar a animação da notificação. Se isso não funcionar, tente reiniciar.]]></string>
 
@@ -45,13 +45,13 @@
 
 <!-- obsolete --><string translatable="false" name="settings_category_operation_title">Operação</string>
 <!-- obsolete --><string translatable="false" name="settings_screen_on_title">Tela ligada</string>
-<!-- obsolete --><string translatable="false" name="settings_screen_on_description">Mostrar luz de notificação enquanto o telefone está em uso normal</string>
+<!-- obsolete --><string translatable="false" name="settings_screen_on_description">Mostra a luz de notificação enquanto o telefone está em uso normal</string>
     <string translatable="false" name="settings_screen_off_charging_title">@string/charging_screen_off</string>
-    <string name="settings_screen_off_charging_description">Mostrar luz de notificação enquanto a tela está desligada e carregando</string>
+    <string name="settings_screen_off_charging_description">Mostra a luz de notificação enquanto a tela está desligada e carregando</string>
     <string translatable="false" name="settings_screen_off_battery_title">@string/battery_screen_off</string>
-    <string name="settings_screen_off_battery_description">Mostrar luz de notificação enquanto a tela estiver desligada e com a energia da bateria, consumindo energia adicional</string>
+    <string name="settings_screen_off_battery_description">Mostra a luz de notificação enquanto a tela estiver desligada e com a energia da bateria, consumindo energia adicional</string>
     <string name="settings_lockscreen_on_title">Tela de bloqueio</string>
-    <string name="settings_lockscreen_on_description">Mostrar luz de notificação na tela de bloqueio; isso pode parecer estranho se o desbloqueio facial estiver ativado</string>
+    <string name="settings_lockscreen_on_description">Mostra a luz de notificação na tela de bloqueio; isso pode parecer estranho se o desbloqueio facial estiver ativado</string>
 
 <!-- obsolete --><string translatable="false" name="settings_category_seen_pickup_title">Marcar como visto: Selecionar</string>
     <string name="settings_category_seen_pickup_description">Estacionado por &gt;10s antes de se mover</string>
@@ -72,9 +72,9 @@
 
     <string name="settings_category_animation_title">Animação</string>
     <string name="settings_animation_tune_title">Ajuste</string>
-    <string name="settings_animation_tune_description">Ajuste fino de tamanho, posição e velocidade</string>
+    <string name="settings_animation_tune_description">Ajuste fino do tamanho, posição e velocidade</string>
     <string name="settings_animation_colors_title">Cores</string>
-<!-- obsolete --><string translatable="false" name="settings_animation_colors_description">Ajustar as cores de notificação por pacote (use preto para ocultar)</string>
+<!-- obsolete --><string translatable="false" name="settings_animation_colors_description">Ajuste as cores de notificação por pacote (use preto para ocultar)</string>
 
 <!-- obsolete --><string translatable="false" name="settings_animation_powersave_title">Animação de economia de energia</string>
 <!-- obsolete --><string translatable="false" name="settings_animation_powersave_description">Use a animação de economia de energia em vez de redemoinho, isso reduz significativamente o uso da bateria</string>
@@ -124,9 +124,9 @@
     <string name="permission_accessibility_v2"><![CDATA[Na próxima tela, por favor, vá para <b>Serviços instalados</b>, e habilite o <b>Holey Light</b>. Isso é necessário para mostrar as notificações e acessar o AOD. Se isso não funcionar, tente reiniciar.]]></string>
 
     <string translatable="false" name="settings_screen_on_charging_title">@string/charging_screen_on</string>
-    <string name="settings_screen_on_charging_description">Mostrar luz de notificação enquanto a tela estiver ligada e carregando</string>
+    <string name="settings_screen_on_charging_description">Mostra a luz de notificação enquanto a tela estiver ligada e carregando</string>
     <string translatable="false" name="settings_screen_on_battery_title">@string/battery_screen_on</string>
-    <string name="settings_screen_on_battery_description">Mostrar luz de notificação enquanto a tela estiver ligada e funcionando na energia da bateria</string>
+    <string name="settings_screen_on_battery_description">Mostra a luz de notificação enquanto a tela estiver ligada e funcionando na energia da bateria</string>
 
     <string name="settings_category_operation_title_v2">Quando e como exibir</string>
     <string name="operation_mode_disabled_title">Desabilitar</string>
@@ -147,10 +147,10 @@
     <string translatable="false" name="settings_seen_pickup_description">@string/settings_category_seen_pickup_description</string>
 
     <string name="settings_hide_aod_title">Ocultar AOD</string>
-    <string name="settings_hide_aod_description">Quando a tela estiver desligada, ocultar Always On Display e mostrar somente a animação</string>
+    <string name="settings_hide_aod_description">Quando a tela estiver desligada, oculta o Always On Display e mostra somente a animação</string>
 
     <string name="notice_dialog_title">Aviso</string>
-    <string name="notice_aod_required_message"><![CDATA[A configuração atual requer <b>Always On Display</b> para ser habilitada.<br><br>Por favor vá para <b>Configurações -> Tela de bloqueio -> Always On Display</b> e selecione <b>Exibitr sempre</b> (ou <b>Toque para exibir</b> se preferir).<br><br>Por favor, certifique-se de que <b>Orientação da tela</b> esteja configurada como <b>Retrato</b>.<br><br>Você também pode configurar o agendamento e o brilho do AOD.]]></string>
+    <string name="notice_aod_required_message"><![CDATA[A configuração atual requer <b>Always On Display</b> para ser habilitada.<br><br>Por favor vá para <b>Configurações -> Tela de bloqueio -> Always On Display</b> e selecione <b>Exibir sempre</b> (ou <b>Toque para exibir</b> se preferir).<br><br>Por favor, certifique-se de que <b>Orientação da tela</b> esteja configurada como <b>Retrato</b>.<br><br>Você também pode configurar o agendamento e o brilho do AOD.]]></string>
     <string name="notice_aod_with_image_required_message"><![CDATA[A configuração atual requer que uma imagem seja aplicada ao <b>Always On Display</b>.<br><br>Por favor vá para <b>Temas (No AOD)</b>, <b>baixe</b> qualquer tema gratuito e <b>aplique</b> como <b>Apenas imagem</b>.<br><br>Se você aplicar como ambos <b>Relógio e imagem</b>, o relógio ficará visível.]]></string>
     <string name="open_android_settings">Abrir as configurações do Android</string>
     <string name="open_theme_store">Abrir Galaxy Themes</string>
@@ -160,11 +160,47 @@
 
     <string name="setup_wizard_title">Assistente de configuração</string>
     <string name="setup_wizard_description">Ajuda você a configurar o Holey Light</string>
-    <string name="setup_wizard_welcome"><![CDATA[Bem-vindo ao <b>Holey Light</b>! Vamos montar sua configuração.<br><br>Um aviso, este aplicativo requer algumas permissões extremas para funcionar. Se você não está de acordo com isso, você não deve continuar.<br><br>Note que o código fonte deste aplicativo está disponível gratuitamente para qualquer um.<br><br>Vários pop-ups surgirão, isso levará alguns minutos!]]></string>
+    <string name="setup_wizard_welcome"><![CDATA[Bem-vindo ao <b>Holey Light</b>! Vamos montar sua configuração.<br><br>Aviso! Este aplicativo requer algumas permissões extremas para funcionar. Se você não está de acordo com isso, você não deve continuar.<br><br>O código fonte deste aplicativo está disponível gratuitamente para qualquer um.<br><br>Vários pop-ups surgirão, isso levará alguns minutos!]]></string>
     <string name="setup_wizard_run_while_screen_off"><![CDATA[Podemos mostrar notificações enquanto a tela está desligada, mas isso utiliza <b>1%</b> e <b>5.5%</b> de bateria por <b>hora</b>, dependendo da sua configuração.<br><br>Isso também requer que o <b>Always On Display</b> seja habilitado. Se você não gosta do <b>AOD</b>, nós podemos esconder ele depois!<br><br>Você quer mostrar as notificações enquanto a tela estiver desligada?]]></string>
-    <string name="setup_wizard_choose_notification_style"><![CDATA[Por favor, escolha o estilo da animação quando a tela estiver desligada.<br><br><b>Redemoinho</b> é uma luz que circula a câmera, e utiliza até <b>5.5%</b> de bateria por hora (pior cenário).<br><br><b>Piscar</b> é um círculo que fica piscando em torno da câmera, e utiliza até <b>3.5%</b> de bateria por hora (pior cenário).<br><br><b>Unholy Light</b> é um grande círculo no meio da tela. Não tem animaçõa, mas utiliza menos de <b>1%</b> de bateria por hora. Essa opção <i>sempre</i> <b>ocultará o AOD</b>, que é <i>opcional</i> para as duas outras animações.]]></string>
+    <string name="setup_wizard_choose_notification_style"><![CDATA[Por favor, escolha o estilo da animação quando a tela estiver desligada.<br><br><b>Redemoinho</b> é uma luz que circula a câmera, e utiliza até <b>5.5%</b> de bateria por hora (pior cenário).<br><br><b>Piscar</b> é um círculo que fica piscando em torno da câmera, e utiliza até <b>3.5%</b> de bateria por hora (pior cenário).<br><br><b>Unholey Light</b> é um grande círculo no meio da tela. Não tem animação, mas utiliza menos de <b>1%</b> de bateria por hora. Essa opção <i>sempre</i> <b>ocultará o AOD</b>, que é <i>opcional</i> para as duas outras animações.]]></string>
     <string name="setup_wizard_hide_aod"><![CDATA[<b>Always On Display</b> é um recurso da Samsung que pode exibir várias informações enquanto a tela está desligada, usando menos de 1% de bateria por hora. Alguns acham útil, outros acham isso um incômodo.<br><br>Podemos mostrar o AOD junto com a luz de notificação, ou podemos <b>ocultar o AOD</b> e mostrar apenas a luz de notificação e uma tela preta.]]></string>
     <string name="setup_wizard_option_show_aod">Mostrar AOD</string>
     <string name="setup_wizard_option_hide_aod">Ocultar AOD</string>
     <string name="setup_wizard_complete"><![CDATA[Nós terminamos com a configuração inicial. Mais pop-ups surgirão para ajudá-lo a configurar as permissões e outras configurações do Android para permitir que este aplicativo funcione.<br><br>Existem mais configurações para você explorar por conta própria!]]></string>
+
+    <!-- v0.65 -->
+
+    <string name="colors_longpress"><![CDATA[<br><br>>Toque para mudar de cor, pressione e segure para opções adicionais.]]></string>
+    <string name="colors_copy">Copiar cor</string>
+    <string name="colors_paste">Colar cor</string>
+    <string name="colors_hex">Editar valor hex</string>
+    <string name="colors_set_default"><![CDATA[Definir como padrão para <b>%s</b> para <b>novas</b> entradas]]></string>
+    <string name="colors_apply"><![CDATA[Aplicar a todas as <b>%s</b> entradas]]></string>
+    <string name="colors_apply_short">Aplicar a todos</string>
+    <string name="colors_apply_include_black"><![CDATA[Incluir o atual <b>preto</b> (desabilitar) entradas?]]></string>
+    <string name="colors_disable">Desabilitar</string>
+
+    <string name="hide_aod_full_title">Completo</string>
+    <string name="hide_aod_full_description">Oculta o AOD completamente</string>
+
+    <string name="hide_aod_partial_title">Parcial</string>
+    <string name="hide_aod_partial_description">Continua carregando as informações e deixa a impressão digital visível</string>
+
+    <string name="settings_seen_if_screen_on_title">Se a tela estiver ligada</string>
+    <string name="settings_seen_if_screen_on_description">Ignora as notificações que chegarem enquanto a tela estiver ligada</string>
+
+    <string name="settings_category_schedule">Agendar</string>
+    <string name="settings_schedule_aod_title">Always On Display</string>
+    <string name="settings_schedule_aod_description"><![CDATA[A exibição agendada (quando a tela estiver desligada) é controlada pelo AOD, <b>Configurações -> Tela de bloqueio -> Always On Display -> Modo de exibição</b>.]]></string>
+    <string name="settings_schedule_aod_none">Nenhum agendamento definido</string>
+    <string name="settings_schedule_dnd_title">Respeitar o modo Não perturbe</string>
+    <string name="settings_schedule_dnd_description"><![CDATA[Não mostrar notificações enquanto o modo <i>Não perturbe</i> estiver habilitado]]></string>
+
+    <string name="settings_seen_on_timeout_title">No tempo limite</string>
+    <string name="settings_seen_on_timeout_description">Mostrar notificações apenas por um período definido</string>
+    <string name="settings_seen_on_timeout_none">Sem tempo limite</string>
+
+    <string name="x_seconds">%d segundos</string>
+    <string name="x_minutes">%d minutos</string>
+    <string name="x_hours">%d horas</string>
 </resources>
