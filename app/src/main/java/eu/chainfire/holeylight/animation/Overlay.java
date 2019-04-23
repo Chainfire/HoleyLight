@@ -149,7 +149,6 @@ public class Overlay {
     private boolean kill = false;
     private boolean lastState = false;
     private int[] lastColors = new int[0];
-    private boolean lastInAODSchedule = false;
     private SpritePlayer.Mode lastMode = SpritePlayer.Mode.SWIRL;
     private int lastDpAdd = 0;
     private boolean added = false;
@@ -377,16 +376,10 @@ public class Overlay {
             lastVisibleTime = SystemClock.elapsedRealtime();
         }
         boolean allowHideAOD = settings.isEnabledWhileScreenOff();
-        boolean screenTimeOut = false;
-        boolean inAODSchedule = AODControl.inAODSchedule(context, refreshAll);
-        if (!visible && settings.isHideAOD() && allowHideAOD) {
-            // we will be visible soon, but if it doesn't happen within 10 seconds, give up
-            if ((SystemClock.elapsedRealtime() - lastVisibleTime < 10000) || (inAODSchedule != lastInAODSchedule)) {
-                visible = true;
-                doze = true;
-            } else {
-                screenTimeOut = true;
-            }
+        if (!visible && settings.isHideAOD() && allowHideAOD && AODControl.inAODSchedule(context, false)) {
+            // we will be visible soon
+            visible = true;
+            doze = true;
         }
         boolean lockscreen = on && keyguardManager.isKeyguardLocked();
         boolean charging = Battery.isCharging(context);
@@ -402,11 +395,11 @@ public class Overlay {
         }
 
         boolean lockscreenOk = !on || !lockscreen || settings.isEnabledOnLockscreen();
-        boolean wantedEffective = (wanted || activeHide) && settings.isEnabledWhile(mode) && lockscreenOk && (on || inAODSchedule || activeHide);
+        boolean wantedEffective = (wanted || activeHide) && settings.isEnabledWhile(mode) && lockscreenOk;
 
         if (visible && wantedEffective && ((colors.length > 0) || activeHide)) {
             int dpAdd = (doze ? 1 : 0);
-            if (!lastState || colorsChanged() || renderMode != lastMode || (dpAdd != lastDpAdd) || (inAODSchedule != lastInAODSchedule)) {
+            if (!lastState || colorsChanged() || renderMode != lastMode || (dpAdd != lastDpAdd)) {
                 animation.setMode(renderMode);
                 createOverlay();
                 if (settings.isHideAOD() && doze && allowHideAOD) {
@@ -421,7 +414,6 @@ public class Overlay {
                 lastState = true;
                 lastMode = renderMode;
                 lastDpAdd = dpAdd;
-                lastInAODSchedule = inAODSchedule;
             }
         } else {
             if (lastState) {
@@ -438,11 +430,10 @@ public class Overlay {
                     if (immediately) removeOverlay();
                 }
                 lastState = false;
-                lastInAODSchedule = inAODSchedule;
             }
         }
 
-        if (wantedEffective) handler.postDelayed(evaluateLoop, screenTimeOut ? 60000 : 500);
+        if (wantedEffective) handler.postDelayed(evaluateLoop, 500);
     }
 
     public void show(int[] colors) {

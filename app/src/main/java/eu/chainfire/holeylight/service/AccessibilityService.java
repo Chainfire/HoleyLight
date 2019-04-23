@@ -63,6 +63,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             Slog.d("Access", String.format(Locale.ENGLISH, "display %s --> %s [%d/%s]", lastState != null ? lastState.toString() : "null", state.toString(), event.getEventType(), event.getPackageName() != null ? event.getPackageName() : "null"));
             lastState = state;
             Overlay.getInstance(this).evaluate(true);
+            NotificationListenerService.checkNotifications();
         }
 
         if ((lastState == Display.State.ON) || (lastState == Display.State.OTHER)) {

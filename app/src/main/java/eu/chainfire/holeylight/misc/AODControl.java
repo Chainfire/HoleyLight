@@ -36,6 +36,7 @@ public class AODControl {
     private static Boolean helperPackageFound = null;
     private static long lastInScheduleCheck = 0L;
     private static boolean lastInSchedule = true;
+    private static Date lastAlarm = null;
 
     private static Intent getIntent(boolean enabled) {
         Intent intent = new Intent("eu.chainfire.holeylight.aodhelper.SET_AOD");
@@ -78,29 +79,6 @@ public class AODControl {
                 }
             }
         }, null, 0, null, null);
-
-        if (!enabled) {
-            // Schedule an alarm to wake up according to AOD schedule, if we're using the helper
-            // (otherwise we're hidden instead of really off)
-            int[] schedule = getAODSchedule(context);
-            if ((schedule != null) && (haveHelperPackage(context, false))) {
-                AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-
-                Date now = new Date(System.currentTimeMillis());
-                int nowInt = (now.getHours() * 60) + now.getMinutes();
-                if (nowInt >= schedule[0]) {
-                    now = new Date(now.getTime() + (24 * 60 * 60 * 1000));
-                }
-                Date when = new Date(now.getYear(), now.getMonth(), now.getDate(), schedule[0] / 60, schedule[0] % 60, 0);
-
-                Intent intent = new Intent(AlarmReceiver.ACTION);
-                intent.setClass(context, AlarmReceiver.class);
-
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-                alarmManager.cancel(pendingIntent);
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, when.getTime(), pendingIntent);
-            }
-        }
     }
 
     public static boolean isAODEnabled(Context context) {
@@ -145,5 +123,38 @@ public class AODControl {
             lastInSchedule = (cmp >= schedule[0]) || (cmp <= schedule[1]);
         }
         return lastInSchedule;
+    }
+    
+    private static Date nextAlarmTime(int forSchedule) {
+        Date now = new Date(System.currentTimeMillis());
+        int nowInt = (now.getHours() * 60) + now.getMinutes();
+        if (nowInt >= forSchedule) {
+            now = new Date(now.getTime() + (24 * 60 * 60 * 1000));
+        }
+        return new Date(now.getYear(), now.getMonth(), now.getDate(), forSchedule / 60, forSchedule % 60, 0);
+    }
+
+    public static void setAODAlarm(Context context) {
+        // Schedule an alarm to wake up according to AOD schedule
+        int[] schedule = getAODSchedule(context);
+        if (schedule != null) {
+            AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+
+            // Add one minute so we're sure to be after the event
+            Date next0 = nextAlarmTime(schedule[0] + 1);
+            Date next1 = nextAlarmTime(schedule[1] + 1);
+            Date when = next0.before(next1) ? next0 : next1;
+
+            if ((lastAlarm != null) && (lastAlarm.equals(when))) return;
+
+            Intent intent = new Intent(AlarmReceiver.ACTION);
+            intent.setClass(context, AlarmReceiver.class);
+
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+            alarmManager.cancel(pendingIntent);
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, when.getTime(), pendingIntent);
+
+            lastAlarm = when;
+        }
     }
 }

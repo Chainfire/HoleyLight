@@ -41,6 +41,7 @@ import java.util.List;
 
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.animation.Overlay;
+import eu.chainfire.holeylight.misc.AODControl;
 import eu.chainfire.holeylight.misc.Battery;
 import eu.chainfire.holeylight.misc.Display;
 import eu.chainfire.holeylight.misc.MotionSensor;
@@ -53,7 +54,13 @@ public class NotificationListenerService extends android.service.notification.No
     public static NotificationListenerService getInstance() {
         return instance;
     }
-    private ContentObserver doNotDisturbObserver = null;
+    public static void checkNotifications() {
+        if (instance != null) {
+            instance.handleLEDNotifications();
+        }
+    }
+
+    private ContentObserver refreshLEDObserver = null;
 
     public static class ActiveNotification {
         private final String packageName;
@@ -148,7 +155,7 @@ public class NotificationListenerService extends android.service.notification.No
 
         settings.registerOnSettingsChangedListener(this);
 
-        doNotDisturbObserver = new ContentObserver(handler) {
+        refreshLEDObserver = new ContentObserver(handler) {
            @Override
            public boolean deliverSelfNotifications() {
                return true;
@@ -194,7 +201,8 @@ public class NotificationListenerService extends android.service.notification.No
         registerReceiver(broadcastReceiver, intentFilter);
         handleLEDNotifications();
         startMotionSensor();
-        getContentResolver().registerContentObserver(android.provider.Settings.Global.getUriFor("zen_mode"), false, doNotDisturbObserver);
+        getContentResolver().registerContentObserver(android.provider.Settings.Global.getUriFor("zen_mode"), false, refreshLEDObserver);
+        getContentResolver().registerContentObserver(android.provider.Settings.Global.getUriFor("aod_show_state"), false, refreshLEDObserver);
     }
 
     @Override
@@ -202,7 +210,7 @@ public class NotificationListenerService extends android.service.notification.No
         log("onListenerDisconnected");
         instance = null;
         connected = false;
-        getContentResolver().unregisterContentObserver(doNotDisturbObserver);
+        getContentResolver().unregisterContentObserver(refreshLEDObserver);
         stopMotionSensor();
         unregisterReceiver(broadcastReceiver);
         overlay.hide(true);
@@ -270,12 +278,13 @@ public class NotificationListenerService extends android.service.notification.No
 
         log("handleLEDNotifications");
 
+        int mode = settings.getMode(Battery.isCharging(this), !Display.isDoze(this));
         boolean dnd = settings.isRespectDoNotDisturb() && (android.provider.Settings.Global.getInt(getContentResolver(), "zen_mode", 0) > 0);
+        boolean inAODSchedule = AODControl.inAODSchedule(this, true) || (!Display.isOff(this, false));
+        int timeout = settings.getSeenTimeout(mode);
 
         List<Integer> colors = new ArrayList<>();
         activeNotifications.clear();
-
-        int timeout = settings.getSeenTimeout(settings.getMode(Battery.isCharging(this), !Display.isDoze(this)));
 
         try {
             StatusBarNotification[] sbns = tracker.prune(
@@ -347,7 +356,7 @@ public class NotificationListenerService extends android.service.notification.No
                 Integer color = c;
                 log("%s [%s] (%s) --> #%08X / #%08X --> #%08X", sbn.getKey(), sbn.getPackageName(), channelName, cChan, not.color, c);
                 if (!colors.contains(color)) {
-                    if (!dnd) {
+                    if (!dnd && inAODSchedule) {
                         colors.add(color);
                     }
                 }
@@ -379,6 +388,7 @@ public class NotificationListenerService extends android.service.notification.No
         if ((currentColors.length > 0) && (timeout > 0)) {
             handler.postDelayed(this::handleLEDNotifications, timeout);
         }
+        AODControl.setAODAlarm(this);
     }
 
     private void apply() {
