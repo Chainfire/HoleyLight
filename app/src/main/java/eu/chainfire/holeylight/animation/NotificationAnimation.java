@@ -99,16 +99,16 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
             dpShiftHorizontal = 0;
         } else if (device.startsWith("beyond2")) { // s10+
             json = jsonBeyond2;
-            dpAddScaleBase = 4;
+            dpAddScaleBase = 5;
             dpAddScaleHorizontal = 1;
-            dpShiftVertical = 0;
-            dpShiftHorizontal = -1;
+            dpShiftVertical = 0.25f;
+            dpShiftHorizontal = -1.75f;
         } else if (device.startsWith("beyondx")) { // s10 x
             json = jsonBeyond2;
-            dpAddScaleBase = 4;
+            dpAddScaleBase = 5;
             dpAddScaleHorizontal = 1;
-            dpShiftVertical = 0;
-            dpShiftHorizontal = -1;
+            dpShiftVertical = 0.25f;
+            dpShiftHorizontal = -1.75f;
         } else {
             json = null;
             dpAddScaleBase = 0;
