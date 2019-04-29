@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="permission_required">Permissions requises</string>
-    <string name="permission_battery"><![CDATA[Sur le prochain écran veuillez autoriser <b>Holey Light</b> l\'arrêt d\'optimisation de la batterie. Cela est nécessaire pour conserver l\'animation de notification allumée.]]></string>
+    <string name="permission_battery"><![CDATA[Sur le prochain écran veuillez autoriser <b>Holey Light</b> à l\'arrêt d\'optimisation de la batterie. Cela est nécessaire pour conserver l\'animation de notification allumée.]]></string>
     <string name="permission_associate"><![CDATA[Sur le prochain écranliez <b>Holey Light</b> avec <b>n\'importe quel</b> appareil. Cela est nécessaire pour accéder les notifications colorées. Votre choix n\'a aucune importance.<br><br>Veuillez <b>activer le Wifi et le Bluetooth</b> avant de continuer; mais vous pouvez les désactiver par la suite.<br><br>Si aucune popup n\'apparaît, assurez vous que <b>La recherche des appareils proches</b> est activée.]]></string>
     <string name="permission_notifications"><![CDATA[Sur le prochain écran, veuillez autoriser <b>Holey Light</b> à accéder aux notifications. Cela est nécessaire pour détécter les notifications.]]></string>
     
@@ -70,7 +70,7 @@
 
     <string name="colors_header_active">Notifié actuellement</string>
     <string name="colors_header_inactive">Non notifié</string>
-    <string name="colors_help"><![CDATA[<i>Les applications</i> peuvent avoir plusieurs <i>cannaux</i>. Chaque <i>canal</i> est listé individuellement ici. Les entrées sont ajoutés que lorsqu\'une nouvelle notification est <i>signalée</i>. Vous <b>ne pouvez pas</b> ajouter des entrées manuellement les noms de <i>canal</i> ne peuvent être devinés à l\'avance. Paramétrez une entrée complétement <b>noir</b> pour désactiver la notification.]]></string>
+    <string name="colors_help"><![CDATA[<i>Les applications</i> peuvent avoir plusieurs <i>cannaux</i>. Chaque <i>canal</i> est listé individuellement ici. Les entrées sont ajoutés que lorsqu\'une nouvelle notification est <i>signalée</i>. Vous <b>ne pouvez pas</b> ajouter des entrées manuellement les noms de <i>canal</i> ne peuvent être devinés à l\'avance. Paramétrez une entrée complètement <b>noir</b> pour désactiver la notification.]]></string>
     <string name="settings_animation_colors_description_v3">Ajuster la couleur de notification par application et par canal</string>
 
     <string name="permission_accessibility_v2"><![CDATA[Sur le prochain écran, allez dans <b>Services installés</b>, et activez <b>Holey Light</b>. Cela est nécessaire pour afficher les animation de notification. Si cela ne fonctionne pas essayez de redémarrer votre téléphone.]]></string>
@@ -112,7 +112,7 @@
     <string name="setup_wizard_welcome"><![CDATA[Bienvenue sur <b>Holey Light</b>! Commençons votre installation.<br><br>Un petit mot d\'averstissemnt, cette application nécessite certaines permissions pour fonctionner correctement. Si vous n\'êtes pas à l\'aise avec cela vous ne devriez pas continuer.<br><br>Le code source de cette application est disponbile gratuitement à quiconque souhaitant le consulter (github).<br><br>Plusieurs popups vont suivre, cela prendra quelques minutes!]]></string>
     <string name="setup_wizard_run_while_screen_off"><![CDATA[Nous pouvons afficher les notifications lorsque l\'écran est éteint, mais cela utilise entre <b>1%</b> et <b>5.5%</b> de batterie par <b>heure</b>, en fonction de vos paramètres.<br><br>Cela nécessite également que la fonctionnalité <b>Always On Display</b> soit activée. Si vous n\'aimez pas <b>AOD</b>, nous pouvons la cacher plus tard!<br><br>Voulez vous afficher les notifications lorsque l\'écran est étein?]]></string>
     <string name="setup_wizard_choose_notification_style"><![CDATA[Choisissez votre style d\'animation lorsque l\'écran est éteint.<br><br><b>Tourbillon</b> est une lumière qui tourne autour de la caméra frontale, et utilise jusqu\'à <b>5.5%</b> de batterie par heure (dans le pire des cas).<br><br><b>Clignotant</b> est un cercle clignotant autour de la caméra frontale , et utilise jusqu\'à <b>3.5%</b> de batterie par heure (dans le pire des cas).<br><br><b>Unholy Light</b> est un grand cercle lumineux au centre de votre écran. Il n\'est pas animé mais consomme moins de <b>1%</b> batterie par heure. Cette option cache <i>toujours</i> <b>AOD</b>, ce qui est <i>optionnel</i> pour les deux autres.]]></string>
-    <string name="setup_wizard_hide_aod"><![CDATA[<b>Always On Display</b> est une fonctionnalité Samsun qui afficher certaines informations sur l\'ecran lorsque ce dernier est éteint et consomme moins de 1% de batterie par heure. Certains le trouvent utile alors que d\'autre non.<br><br>Nous pouvons <b>afficher AOD</b> en même temps que le témoin lumineux, ou nous pouvons <b>cacher AOD</b> et activier juste le témoin lumineux.]]></string>
+    <string name="setup_wizard_hide_aod"><![CDATA[<b>Always On Display</b> est une fonctionnalité Samsung qui affiche certaines informations sur l\'ecran lorsque ce dernier est éteint et consomme moins de 1% de batterie par heure. Certains le trouvent utile alors que d\'autre non.<br><br>Nous pouvons <b>afficher AOD</b> en même temps que le témoin lumineux, ou nous pouvons <b>cacher AOD</b> et activier juste le témoin lumineux.]]></string>
     <string name="setup_wizard_option_show_aod">Afficher AOD</string>
     <string name="setup_wizard_option_hide_aod">Cacher AOD</string>
     <string name="setup_wizard_complete"><![CDATA[L\'installation initiale est maintenant terminée. D\'autres popups vont suivre pour paramétrer les permission Android nécessaire au bon fonctionnement de l\'application.<br><br>Après quoi, il y a d\'autres paramètres à explorer de votre propre chef!]]></string>
@@ -130,7 +130,7 @@
     <string name="colors_disable">Désactiver</string>
 
     <string name="hide_aod_full_title">Complet</string>
-    <string name="hide_aod_full_description">Cache AOD complétement</string>
+    <string name="hide_aod_full_description">Cache AOD complètement</string>
 
     <string name="hide_aod_partial_title">Partiel</string>
     <string name="hide_aod_partial_description">Conserver les informations de charges visibles</string>
@@ -140,13 +140,13 @@
 
     <string name="settings_category_schedule">Plannification</string>
     <string name="settings_schedule_aod_title">Always On Display</string>
-    <string name="settings_schedule_aod_description"><![CDATA[La planficcation d\'affichage est gérée par AOD, <b>Paramètres -> Ecran de vérouillage -> Always On Display -> Mode d\'affichage</b>.]]></string>
+    <string name="settings_schedule_aod_description"><![CDATA[La planification d\'affichage est gérée par AOD, <b>Paramètres -> Ecran de vérouillage -> Always On Display -> Mode d\'affichage</b>.]]></string>
     <string name="settings_schedule_aod_none">Aucune plannfication paramétrée</string>
     <string name="settings_schedule_dnd_title">Prendre en compte le mode "Ne pas déranger"</string>
     <string name="settings_schedule_dnd_description"><![CDATA[N\'affiche pas les notification lorsque le mode <i>Ne pas déranger</i> est activé]]></string>
 
     <string name="settings_seen_on_timeout_title">Durée</string>
-    <string name="settings_seen_on_timeout_description">Afficher les notification pour une période donnée seuelement</string>
+    <string name="settings_seen_on_timeout_description">Afficher les notification pour une période donnée seulement</string>
     <string name="settings_seen_on_timeout_none">Pas de durée</string>
 
     <string name="x_seconds">%d secondes</string>
