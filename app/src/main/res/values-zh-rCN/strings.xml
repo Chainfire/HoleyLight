@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- entries marked obsolete are no longer used and should not be translated,
+         entries with 'translatable="false"' also need no translation. -->
+
+    <string translatable="false" name="app_name">Holey Light</string>
+    <string translatable="false" name="app_details">Copyright © 2019 – Chainfire\nTwitter: @ChainfireXDA\nSources: github.com/Chainfire/HoleyLight\nTap to visit XDA thread</string>
+    <string translatable="false" name="app_website_url">https://forum.xda-developers.com/galaxy-s10/themes/app-holey-light-t3917675</string>
+
+    <string name="permission_required">权限请求</string>
+    <string name="permission_battery"><![CDATA[在下一个对话框，请允许 <b>Holey Light</b> 停止优化电池使用量，这样才能保持通知动画的运行。]]></string>
+    <string name="permission_associate"><![CDATA[在下一个对话框，请连接 <b>Holey Light</b> 到 <b>任意</b> 设备（选择哪一个设备并不重要），这样才能根据应用图标存取通知灯的颜色。<br><br>进行下一步之前请<b>打开 Wi-Fi 和 蓝牙</b>，在设置完成之后您可以关闭它们。<br><br>如果没有窗口弹出, 请确认<b>扫描附近的设备</b>是否已经开启，并与蓝牙设备配对。]]></string>
+    <string name="permission_notifications"><![CDATA[在下一个界面中, 请允许 <b>Holey Light</b> 获取通知权限，这样才能检测是否有通知。]]></string>
+<!-- obsolete --><string translatable="false" name="permission_accessibility"><![CDATA[In the next screen, please go to <b>Installed services</b>, and enable <b>Holey Light</b>. This is required to show the notification animation. If this doesn\'t work right, try rebooting.]]></string>
+
+    <string name="notification_test_title">Holey Light: 测试</string>
+    <string name="notification_test_description">测试通知, 白色灯光</string>
+
+    <string translatable="false" name="notification_permissions_title">@string/app_name</string>
+    <string name="notification_permissions_description">某些权限需要更新。点击处理</string>
+
+    <string name="error">错误</string>
+    <string name="error_hide_notch"><![CDATA[<b>Holey Light</b> 在“刘海”隐藏时无法正常工作。取消 <b>设置</b> - <b>显示</b> - <b>全屏应用程序</b> - <b>隐藏前置摄像头</b>.]]></string>
+    <string name="error_unsupported_device"><![CDATA[<b>Holey Light</b> 似乎不支持您的设备。如果您使用的是 <b>S10</b> 系列，请将此错误代码上报到这个 XDA 主题:<br><br>[ <b>%s</b> ]]]></string>
+
+<!-- obsolete --><string name="help_basic_title">帮助</string>
+<!-- obsolete --><string name="help_basic_descrption">一些建议</string>
+<!-- obsolete --><string translatable="false" name="help_basic_message"><![CDATA[
+        <b>Holey Light</b> piggybacks on <b>Always On Display (AOD)</b> (see Android Settings) to show notifications when the screen is off,
+        so AOD must be enabled for those modes to work.<br>
+        <br>
+        AOD\'s <b>Show Always</b>, <b>Tap to show</b> and <b>Show as scheduled</b> modes are all supported. If you\'re not using <b>Tap to show</b>
+        mode, it is <i>strongly</i> advised to enable the <b>schedule</b> to turn off AOD while you are sleeping. This may help prevent
+        screen burn-in!<br>
+        <br>
+        While a lot of effort has been put into reducing battery use as much as possible, <b>Holey Light</b> <i>does</i> use additionally battery
+        compared to only using <b>AOD</b>.
+    ]]></string>
+
+    <string name="enabled">启用</string>
+    <string name="disabled">关闭</string>
+
+    <string name="charging_screen_on">充电: 屏幕亮起</string>
+    <string name="charging_screen_off">充电: 屏幕关闭</string>
+    <string name="battery_screen_on">电池: 屏幕亮起</string>
+    <string name="battery_screen_off">电池: 屏幕关闭</string>
+
+<!-- obsolete --><string translatable="false" name="settings_category_operation_title">Operation</string>
+<!-- obsolete --><string translatable="false" name="settings_screen_on_title">Screen on</string>
+<!-- obsolete --><string translatable="false" name="settings_screen_on_description">Show notification light while the phone is in normal use</string>
+    <string translatable="false" name="settings_screen_off_charging_title">@string/charging_screen_off</string>
+    <string name="settings_screen_off_charging_description">在充电并且屏幕关闭时显示通知灯</string>
+    <string translatable="false" name="settings_screen_off_battery_title">@string/battery_screen_off</string>
+    <string name="settings_screen_off_battery_description">在电池供电并且屏幕关闭时显示通知灯，将会消耗额外的电量</string>
+    <string name="settings_lockscreen_on_title">锁屏</string>
+    <string name="settings_lockscreen_on_description">在锁屏上显示通知灯。如果启用了面部解锁，将会出现奇怪的显示</string>
+
+<!-- obsolete --><string translatable="false" name="settings_category_seen_pickup_title">Mark as seen: Pickup</string>
+    <string name="settings_category_seen_pickup_description">静止时间大于10秒</string>
+    <string translatable="false" name="settings_seen_pickup_screen_on_charging_title">@string/charging_screen_on</string>
+    <string name="settings_seen_pickup_screen_on_charging_description">充电时手机放在可以看到的地方才有意义</string>
+    <string translatable="false" name="settings_seen_pickup_screen_off_charging_title">@string/charging_screen_off</string>
+    <string name="settings_seen_pickup_screen_off_charging_description">充电时手机放在可以看到的地方才有意义</string>
+    <string translatable="false" name="settings_seen_pickup_screen_on_battery_title">@string/battery_screen_on</string>
+    <string name="settings_seen_pickup_screen_on_battery_description">消耗额外的一点电量</string>
+    <string translatable="false" name="settings_seen_pickup_screen_off_battery_title">@string/battery_screen_off</string>
+    <string name="settings_seen_pickup_screen_off_battery_description">消耗额外的一点电量</string>
+
+<!-- obsolete --><string translatable="false" name="settings_category_seen_lockscreen_title">Mark as seen: Lockscreen</string>
+    <string name="settings_seen_on_lockscreen_title">锁屏</string>
+    <string name="settings_seen_on_lockscreen_description">每次锁屏时</string>
+    <string name="settings_seen_on_user_present_title">解锁</string>
+    <string name="settings_seen_on_user_present_description">每次屏幕解锁后</string>
+
+    <string name="settings_category_animation_title">动画</string>
+    <string name="settings_animation_tune_title">Tune</string>
+    <string name="settings_animation_tune_description">Fine-tune 大小，位置，速度</string>
+    <string name="settings_animation_colors_title">颜色</string>
+<!-- obsolete --><string translatable="false" name="settings_animation_colors_description">Adjust per-package notification colors (use full black to hide)</string>
+
+<!-- obsolete --><string translatable="false" name="settings_animation_powersave_title">Power saving animation</string>
+<!-- obsolete --><string translatable="false" name="settings_animation_powersave_description">Use power saving animation instead of swirl, significantly reduces battery use</string>
+<!-- obsolete --><string translatable="false" name="settings_animation_powersave_screen_on_charging">@string/charging_screen_on</string>
+<!-- obsolete --><string translatable="false" name="settings_animation_powersave_screen_off_charging">@string/charging_screen_off</string>
+<!-- obsolete --><string translatable="false" name="settings_animation_powersave_screen_on_battery">@string/battery_screen_on</string>
+<!-- obsolete --><string translatable="false" name="settings_animation_powersave_screen_off_battery">@string/battery_screen_off</string>
+
+    <string name="settings_category_chainfire_title">Chainfire</string>
+    <string name="settings_playstore_title">我的应用</string>
+    <string name="settings_playstore_description">查看我在 Google Play 上提供的所有应用</string>
+    <string name="settings_follow_twitter_title">在推特上关注我</string>
+    <string name="settings_follow_twitter_description">及时了解我的开发进程</string>
+
+    <string name="tune_notice">需要经过完整的动画周期后才能查看到新效果！</string>
+    <string name="tune_scale_base">基础缩放: %.2fdp</string>
+    <string name="tune_scale_horizontal">横向缩放: %.2fdp</string>
+    <string name="tune_shift_vertical">纵向移动: %.2fdp</string>
+    <string name="tune_shift_horizontal">横向移动: %.2fdp</string>
+    <string name="tune_speed">速度: %.1fx</string>
+
+    <!-- v0.50 -->
+
+    <string name="reset">重置</string>
+    <string name="refresh">刷新</string>
+<!-- obsolete --><string translatable="false" name="settings_animation_colors_description_v2">Adjust per-channel notification colors (use full black to hide)</string>
+
+    <!-- v0.51 -->
+
+<!-- obsolete --><string translatable="false" name="temp_settings_hide_aod_title">Automatic AOD - WORK IN PROGRESS</string>
+<!-- obsolete --><string translatable="false" name="temp_settings_hide_aod_description">Requires AOD Helper package. You need to configure an image without a clock on AOD first. Takes control of AOD.</string>
+
+    <!-- v0.55 -->
+
+    <string name="translation">翻译:</string>
+
+    <!-- Your name (or xda/twitter/reddit/github/etc username) here -->
+    <string name="translation_by">Temoa</string>
+
+    <string name="never">永不</string>
+
+    <string name="colors_header_active">当前显示通知的应用</string>
+    <string name="colors_header_inactive">当前未显示通知的应用</string>
+    <string name="colors_help"><![CDATA[<i>应用</i>可以拥有多个<i>通知频道</i>，每一个<i>通知频道</i>都会在这里单独地列出来。只有被<i>“看到”</i>的新通知才会被添加进来。您<b>无法</b>手动添加, 因为<i>通知频道</i>的名称不能事先知道。设置成<b>纯黑色</b>可以不启用通知。]]></string>
+    <string name="settings_animation_colors_description_v3">调整每个应用和通知频道的通知灯颜色</string>
+
+    <string name="permission_accessibility_v2"><![CDATA[在下一个界面中, 请前往<b>已安装的服务</b>，并启动 <b>Holey Light</b>。这样才能显示通知，并且显示在 AOD(Always On Display) 上。如果不能正常工作，请尝试重启手机。]]></string>
+
+    <string translatable="false" name="settings_screen_on_charging_title">@string/charging_screen_on</string>
+    <string name="settings_screen_on_charging_description">在充电并且屏幕亮起时显示通知灯</string>
+    <string translatable="false" name="settings_screen_on_battery_title">@string/battery_screen_on</string>
+    <string name="settings_screen_on_battery_description">在电池供电并且屏幕关闭时显示通知灯，将会消耗额外的电量</string>
+
+    <string name="settings_category_operation_title_v2">显示</string>
+    <string name="operation_mode_disabled_title">关闭</string>
+    <string name="operation_mode_disabled_description">不显示通知</string>
+
+    <string name="animation_style_swirl_title">涡状形</string>
+    <string name="animation_style_blink_title">闪烁形</string>
+    <string name="animation_style_single_title">圆饼状</string>
+    <string name="animation_style_tsp_title">Unholey Light</string>
+    <string name="animation_style_location_camera">摄像头</string>
+    <string name="animation_style_location_screen_center">屏幕中心</string>
+    <string name="animation_style_percentage_up_to">消耗高达 %.1f%% 电量/小时</string>
+    <string name="animation_style_percentage_below">消耗低于 %.0f%% 电量/小时</string>
+
+    <string name="settings_category_seen_title">标记已查看</string>
+    <string name="settings_category_seen_description">将通知标记为已查看</string>
+    <string name="settings_seen_pickup_title">拿起手机时</string>
+    <string translatable="false" name="settings_seen_pickup_description">@string/settings_category_seen_pickup_description</string>
+
+    <string name="settings_hide_aod_title">隐藏息屏提醒(Always On Display)</string>
+    <string name="settings_hide_aod_description">当屏幕关闭时, 从屏幕隐藏，只显示我们设置的动画</string>
+
+    <string name="notice_dialog_title">注意</string>
+    <string name="notice_aod_required_message"><![CDATA[当前设置需要启用<b>息屏提醒(Always On Display)</b>。<br><br>请前往<b>设置 -> 锁定屏幕 -> 息屏提醒</b> 启用<b>息屏提醒</b>（如有需要开启<b>点击来显示</b>）。<br><br>还要确保<b>屏幕方向</b>为<b>纵向</b>。<br><br>您还可以设置息屏提醒的日程和亮度。]]></string>
+    <string name="notice_aod_with_image_required_message"><![CDATA[当前设置需要将图片应用与<b>息屏提醒(Always On Display)</b><br><br>请前往<b>主题（息屏提醒页）</b>， <b>下载</b> 任意一个（免费）主题, 并<b>应用</b>为<b>仅图像</b>。<br><br>如果您同时将其应用为<b>时钟和图像</b>，时钟将会一直显示。]]></string>
+    <string name="open_android_settings">打开安卓系统设置</string>
+    <string name="open_theme_store">打开三星盖乐世主题设置</string>
+
+    <string name="yes">好的</string>
+    <string name="no">拒绝</string>
+
+    <string name="setup_wizard_title">设置向导</string>
+    <string name="setup_wizard_description">帮助您设置 Holey Light</string>
+    <string name="setup_wizard_welcome"><![CDATA[欢迎使用 <b>Holey Light</b>！向导将帮助您进行设置。<br><br>丑话说在前，应用需要一些敏感的权限才能够正常运行。如果您不愿意这样，则不应该继续使用此应用。<br><br>请注意，此应用的源代码可供任给何人免费查看。<br><br>随后一些窗口将出弹出，可能需要几分种完成设置。]]></string>
+    <string name="setup_wizard_run_while_screen_off"><![CDATA[在屏幕关闭时我们能够显示通知, 根据设置的不同，将会消耗额外的 <b>1%</b> 到 <b>5.5%</b> 电量/<b>小时</b>。<br><br>同时还需要开启息屏提醒(Always On Display)，如果您不喜欢息屏提醒，我们在之后的设置中可以隐藏它！<br><br>您想在屏幕关闭时显示通知吗？]]></string>
+    <string name="setup_wizard_choose_notification_style"><![CDATA[请选择屏幕关闭时的动画样式。<br><br><b>涡状形</b>是环绕摄像头的灯环, 消耗<b>5.5%</b>电量/小时（最差的情况下）。<br><br><b>闪烁形</b>是环绕摄像头的闪烁灯环, 消耗<b>3.5%</b>电量/小时（最差的情况下）。<br><br><b>Unholy Light</b> 是在屏幕中间的大圆圈。它没有动画，仅消耗小于<b>1%</b>的电量/小时。此选项将会一直隐藏息屏提醒(Always On Display)，其他两个选项可以<i>手动设置</i>。]]></string>
+    <string name="setup_wizard_hide_aod"><![CDATA[<b>息屏提醒(Always On Display)</b>是三星手机的一项功能，可以在屏幕关闭的时候显示各种信息，并且每小时仅使用不到1%的电量。一些人发现它很有用，一些人觉得它让人分心。<br><br>我们可以<b>显示息屏提醒</b>的同时显示通知灯, 也可以<b>隐藏息屏提醒</b>只展示通知灯或者黑屏]]></string>
+    <string name="setup_wizard_option_show_aod">显示息屏提醒</string>
+    <string name="setup_wizard_option_hide_aod">隐藏息屏提醒</string>
+    <string name="setup_wizard_complete"><![CDATA[我们已完成初始化的设置。随后将显示其他对话框，以帮助您设置应用权限和其他安卓系统设置，从而更好的使用 <b>Holey Light</b>。<br><br>在这之后, 您可以自行探索更多的设置项目！]]></string>
+
+    <!-- v0.65 -->
+
+    <string name="colors_longpress"><![CDATA[<br><br>点击修改颜色值，长按显示更多选项]]></string>
+    <string name="colors_copy">复制颜色值</string>
+    <string name="colors_paste">粘贴颜色值</string>
+    <string name="colors_hex">编辑十六进制颜色值</string>
+    <string name="colors_set_default"><![CDATA[设置<b>新</b>项目的默认值为 <b>%s</b> 的颜色值]]></string>
+    <string name="colors_apply"><![CDATA[将 <b>%s</b> 颜色值应用到所有项目]]></string>
+    <string name="colors_apply_short">全部应用</string>
+    <string name="colors_apply_include_black"><![CDATA[包括当前设置为<b>纯黑色</b>(不启用) 的项目？]]></string>
+    <string name="colors_disable">关闭</string>
+
+    <string name="hide_aod_full_title">全部</string>
+    <string name="hide_aod_full_description">隐藏整个息屏提醒(Always On Display)</string>
+
+    <string name="hide_aod_partial_title">局部</string>
+    <string name="hide_aod_partial_description">保持充电信息和指纹图标可见</string>
+
+    <string name="settings_seen_if_screen_on_title">屏幕亮起</string>
+    <string name="settings_seen_if_screen_on_description">忽略屏幕亮起时到达的通知</string>
+
+    <string name="settings_category_schedule">日程</string>
+    <string name="settings_schedule_aod_title">息屏提醒</string>
+    <string name="settings_schedule_aod_description"><![CDATA[显示模式（何时关闭屏幕）由息屏提醒(Always On Display)控制, <b>设置 -> 锁定屏幕 -> 息屏提醒 -> 显示模式</b>.]]></string>
+    <string name="settings_schedule_aod_none">无日程设置</string>
+    <string name="settings_schedule_dnd_title">遵守“请勿打扰”模式</string>
+    <string name="settings_schedule_dnd_description"><![CDATA[<i>请勿打扰</i>模式开启时不显示通知]]></string>
+
+    <string name="settings_seen_on_timeout_title">超时</string>
+    <string name="settings_seen_on_timeout_description">仅在一段时间内显示通知</string>
+    <string name="settings_seen_on_timeout_none">不超时</string>
+
+    <string name="x_seconds">%d 秒</string>
+    <string name="x_minutes">%d 分钟</string>
+    <string name="x_hours">%d 小时</string>
+</resources>
