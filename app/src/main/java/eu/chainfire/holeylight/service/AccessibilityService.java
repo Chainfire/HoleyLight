@@ -19,6 +19,7 @@
 package eu.chainfire.holeylight.service;
 
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -31,6 +32,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Locale;
 
+import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.animation.Overlay;
 import eu.chainfire.holeylight.misc.Display;
 import eu.chainfire.holeylight.misc.Slog;
@@ -41,6 +43,42 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     private Handler handler = null;
     private Handler handlerMain = null;
     private Display.State lastState = null;
+
+    private void inspectNode(AccessibilityNodeInfo node, Rect outerBounds, int level) {
+        if (
+                (node == null) ||
+                (node.getClassName() == null) ||
+                (!BuildConfig.DEBUG && (
+                        (!node.getClassName().equals("android.widget.FrameLayout")) &&
+                        (!node.getClassName().equals("com.android.internal.widget.ViewPager"))
+                ))
+        ) return;
+
+        node.refresh();
+
+        Rect bounds = new Rect();
+        node.getBoundsInScreen(bounds);
+
+        if (BuildConfig.DEBUG) {
+            String l = "";
+            for (int i = 0; i < level; i++) {
+                l += "--";
+            }
+            if (l.length() > 0) l += " ";
+            Slog.d("AOD_TSP", "Node " + l + node.getClassName().toString() + " " + bounds.toString());
+        }
+
+        if (node.getClassName().equals("com.android.internal.widget.ViewPager")) {
+            if ((outerBounds.left == -1) || (bounds.left < outerBounds.left)) outerBounds.left = bounds.left;
+            if ((outerBounds.top == -1) || (bounds.top < outerBounds.top)) outerBounds.top = bounds.top;
+            if ((outerBounds.right == -1) || (bounds.right > outerBounds.right)) outerBounds.right = bounds.right;
+            if ((outerBounds.bottom == -1) || (bounds.bottom > outerBounds.bottom)) outerBounds.bottom = bounds.bottom;
+        } else if (node.getClassName().equals("android.widget.FrameLayout") || BuildConfig.DEBUG)  {
+            for (int i = 0; i < node.getChildCount(); i++) {
+                inspectNode(node.getChild(i), outerBounds, level + 1);
+            }
+        }
+    }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -91,28 +129,32 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
 
                     Rect outerBounds = new Rect(-1, -1, -1, -1);
 
-                    for (int i = 0; i < root.getChildCount(); i++) {
-                        AccessibilityNodeInfo node = root.getChild(i);
-                        if (
-                                (node == null) ||
-                                (node.getClassName() == null) ||
-                                (
-                                    (!node.getClassName().equals("android.support.v4.view.ViewPager")) &&
-                                    (!node.getClassName().equals("android.widget.ImageView"))
-                                )
-                        ) continue;
+                    if (Build.VERSION.SDK_INT < 29) { // Android 9
+                        for (int i = 0; i < root.getChildCount(); i++) {
+                            AccessibilityNodeInfo node = root.getChild(i);
+                            if (
+                                    (node == null) ||
+                                    (node.getClassName() == null) ||
+                                    (
+                                        (!node.getClassName().equals("android.support.v4.view.ViewPager")) &&
+                                        (!node.getClassName().equals("android.widget.ImageView"))
+                                    )
+                            ) continue;
 
-                        node.refresh();
+                            node.refresh();
 
-                        Rect bounds = new Rect();
-                        node.getBoundsInScreen(bounds);
+                            Rect bounds = new Rect();
+                            node.getBoundsInScreen(bounds);
 
-                        if ((outerBounds.left == -1) || (bounds.left < outerBounds.left)) outerBounds.left = bounds.left;
-                        if ((outerBounds.top == -1) || (bounds.top < outerBounds.top)) outerBounds.top = bounds.top;
-                        if ((outerBounds.right == -1) || (bounds.right > outerBounds.right)) outerBounds.right = bounds.right;
-                        if ((outerBounds.bottom == -1) || (bounds.bottom > outerBounds.bottom)) outerBounds.bottom = bounds.bottom;
+                            if ((outerBounds.left == -1) || (bounds.left < outerBounds.left)) outerBounds.left = bounds.left;
+                            if ((outerBounds.top == -1) || (bounds.top < outerBounds.top)) outerBounds.top = bounds.top;
+                            if ((outerBounds.right == -1) || (bounds.right > outerBounds.right)) outerBounds.right = bounds.right;
+                            if ((outerBounds.bottom == -1) || (bounds.bottom > outerBounds.bottom)) outerBounds.bottom = bounds.bottom;
 
-                        Slog.d("AOD_TSP", "Node " + node.getClassName().toString() + " " + bounds.toString());
+                            Slog.d("AOD_TSP", "Node " + node.getClassName().toString() + " " + bounds.toString());
+                        }
+                    } else { // Android 10+
+                        inspectNode(root, outerBounds, 0);
                     }
 
                     if (
