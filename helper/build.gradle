@@ -19,12 +19,13 @@ android {
         variant.outputs.all { output ->
             if (variant.buildType.name == 'release') {
                 outputFileName = "HoleyLight-AODHelper" + "-v" + android.defaultConfig.versionName + "-" + (new Date()).format('yyyyMMddHHmmss') + ".apk"
-                //TODO the line below warns about deprecation, fix. Bloody Gradle and their breakage every other week.
-                variant.assemble.doLast {
-                    copy {
-                        from 'build/outputs/mapping/release'
-                        into 'proguard'
-                        include '**/mapping.txt'
+                variant.getAssembleProvider().configure() {
+                    it.doLast {
+                        copy {
+                            from 'build/outputs/mapping/release'
+                            into 'proguard'
+                            include '**/mapping.txt'
+                        }
                     }
                 }
             }
