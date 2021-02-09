@@ -22,6 +22,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.TypedValue;
 import android.view.View;
@@ -348,12 +349,13 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         }
     }
 
-    public void play(int[] colors, boolean once, boolean immediately) {
+    public void play(int[] colors, Drawable[] icons, boolean once, boolean immediately) {
         synchronized (getSynchronizer()) {
             if ((colors == null) || (colors.length == 0)) {
                 stop(true);
                 return;
             }
+            spritePlayer.setIcons(icons);
             if (spritePlayer.isMultiColorMode(mode)) {
                 immediately = true;
             }

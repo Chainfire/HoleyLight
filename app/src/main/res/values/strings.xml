@@ -205,4 +205,9 @@
     <string name="x_seconds">%d seconds</string>
     <string name="x_minutes">%d minutes</string>
     <string name="x_hours">%d hours</string>
+
+    <!-- v0.70 -->
+
+    <string name="settings_animation_unholey_light_icons_title">Unholey Light: Icons</string>
+    <string name="settings_animation_unholey_light_icons_description">Show notification icons inside the Unholey Light</string>
 </resources>

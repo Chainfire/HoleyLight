@@ -29,6 +29,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -91,6 +92,7 @@ public class SpritePlayer extends RelativeLayout {
     private volatile int width = -1;
     private volatile int height = -1;
     private volatile int[] colors = null;
+    private volatile Drawable[] icons = null;
     private volatile float speed = 1.0f;
     private volatile Mode drawMode = Mode.SWIRL;
     private volatile boolean drawBackground = false;
@@ -231,6 +233,32 @@ public class SpritePlayer extends RelativeLayout {
                     paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
                 }
                 canvas.drawCircle(cx, cy, radius, paint);
+
+                int drawableIcons = 0;
+                for (int i = 0; i < icons.length; i++) {
+                    if (icons[i] != null) {
+                        drawableIcons++;
+                    }
+                }
+
+                for (int i = 0; i < icons.length; i++) {
+                    if (icons[i] != null) {
+                        int x = (int)(right + left)/2;
+                        int y = (int)(bottom + top)/2;
+                        if (drawableIcons > 1) {
+                            x += (int)(Math.cos(Math.toRadians(startAngle + 270 + (anglePerColor * i) + anglePerColor/2)) * radius/2);
+                            y += (int)(Math.sin(Math.toRadians(startAngle + 270 + (anglePerColor * i) + anglePerColor/2)) * radius/2);
+                        }
+
+                        int w = icons[i].getIntrinsicWidth();
+                        int h = icons[i].getIntrinsicHeight();
+                        int l = x - w/2;
+                        int t = y - h/2;
+                        icons[i].setBounds(l, t, l + w, h + t);
+                        icons[i].setTint(colors[i]);
+                        icons[i].draw(canvas);
+                    }
+                }
             }
         } else if (spriteSheet != null) {
             paint.setXfermode(null);
@@ -528,6 +556,12 @@ public class SpritePlayer extends RelativeLayout {
         synchronized (sync) {
             this.colors = colors;
             callNextFrame(true);
+        }
+    }
+
+    public void setIcons(Drawable[] icons) {
+        synchronized (sync) {
+            this.icons = icons;
         }
     }
 

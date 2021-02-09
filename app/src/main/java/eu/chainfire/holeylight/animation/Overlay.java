@@ -32,6 +32,7 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -145,6 +146,7 @@ public class Overlay {
     private NotificationAnimation animation;
 
     private int[] colors = new int[0];
+    private Drawable[] icons = new Drawable[0];
     private boolean wanted = false;
     private boolean kill = false;
     private boolean lastState = false;
@@ -409,7 +411,7 @@ public class Overlay {
                     animation.setHideAOD(spritePlayer.isTSPMode(renderMode), settings.isHideAODFully());
                 }
                 animation.setDpAdd(dpAdd);
-                animation.play(activeHide ? new int[] { Color.BLACK } : colors, false, (renderMode != lastMode));
+                animation.play(activeHide ? new int[] { Color.BLACK } : colors, settings.isUnholeyLightIcons() ? icons : new Drawable[0], false, (renderMode != lastMode));
                 lastColors = colors;
                 lastState = true;
                 lastMode = renderMode;
@@ -436,9 +438,10 @@ public class Overlay {
         if (wantedEffective) handler.postDelayed(evaluateLoop, 500);
     }
 
-    public void show(int[] colors) {
+    public void show(int[] colors, Drawable[] icons) {
         handler.removeCallbacks(evaluateLoop);
         this.colors = colors;
+        this.icons = icons;
         wanted = true;
         kill = false;
         evaluate(true);

@@ -332,6 +332,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             startActivity(new Intent(getActivity(), ColorActivity.class));
             return false;
         });
+        check(catAnimation, R.string.settings_animation_unholey_light_icons_title, R.string.settings_animation_unholey_light_icons_description, Settings.UNHOLEY_LIGHT_ICONS, Settings.UNHOLEY_LIGHT_ICONS_DEFAULT, true);
 
         PreferenceCategory catMarkAsSeen;
 

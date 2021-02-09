@@ -184,6 +184,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     private static final String SETUP_WIZARD_COMPLETE = "setup_wizard_complete";
 
+    public static final String UNHOLEY_LIGHT_ICONS = "unholey_icons";
+    public static final Boolean UNHOLEY_LIGHT_ICONS_DEFAULT = true;
+
     private static Settings instance;
     public static Settings getInstance(Context context) {
         synchronized (Settings.class) {
@@ -612,5 +615,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         } finally {
             save(true);
         }
+    }
+
+    public boolean isUnholeyLightIcons() {
+        return prefs.getBoolean(UNHOLEY_LIGHT_ICONS, UNHOLEY_LIGHT_ICONS_DEFAULT);
     }
 }

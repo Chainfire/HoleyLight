@@ -28,6 +28,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -36,8 +38,10 @@ import android.os.UserHandle;
 import android.service.notification.StatusBarNotification;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.animation.Overlay;
@@ -63,14 +67,28 @@ public class NotificationListenerService extends android.service.notification.No
     private ContentObserver refreshLEDObserver = null;
 
     public static class ActiveNotification {
+        private static final Map<String, Drawable> drawableCache = new HashMap<>();
+
+        private final String key;
         private final String packageName;
         private final String channelName;
         private final CharSequence tickerText;
+        private int color = 0;
+        private Icon icon = null;
 
-        public ActiveNotification(String packageName, String channelName, CharSequence tickerText) {
+        public ActiveNotification(String key, String packageName, String channelName, CharSequence tickerText) {
+            this.key = key;
             this.packageName = packageName;
             this.channelName = channelName;
             this.tickerText = tickerText;
+        }
+
+        public String toCompare() {
+            return packageName + "::" + channelName;
+        }
+
+        public String getKey() {
+            return key;
         }
 
         public String getPackageName() {
@@ -84,6 +102,50 @@ public class NotificationListenerService extends android.service.notification.No
         public CharSequence getTickerText() {
             return tickerText;
         }
+
+        public boolean isVisible() {
+            return (color & 0xFFFFFF) != 0;
+        }
+
+        public int getColor() {
+            return color;
+        }
+
+        public void setColor(int color) {
+            this.color = color;
+        }
+
+        public Icon getIcon() {
+            return icon;
+        }
+
+        public void setIcon(Icon icon) {
+            this.icon = icon;
+        }
+
+        public String getIconId() {
+            int id = 0;
+            try {
+                id = icon.getResId();
+                if (id < 0) id = 0;
+            } catch (Exception e) {
+            }
+            if (id == 0) return null;
+            return getPackageName() + ":" + id;
+        }
+
+        public Drawable getIconDrawable(Context context) {
+            Drawable d = drawableCache.get(toCompare());
+            if (d == null && icon != null) {
+                try {
+                    d = icon.loadDrawable(context);
+                    drawableCache.put(toCompare(), d);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            return d;
+        }
     }
 
     public synchronized List<ActiveNotification> getCurrentlyActiveNotifications() {
@@ -95,7 +157,7 @@ public class NotificationListenerService extends android.service.notification.No
     private NotificationTracker tracker = null;
     private MotionSensor motionSensor = null;
     private KeyguardManager keyguardManager = null;
-    private int[] currentColors = new int[0];
+    private List<ActiveNotification> currentNotifications = new ArrayList<>();
     private boolean enabled = true;
     private long settingsKey = 0L;
     private boolean isUserPresent = false;
@@ -338,7 +400,8 @@ public class NotificationListenerService extends android.service.notification.No
                     }
                 }
 
-                activeNotifications.add(new ActiveNotification(sbn.getPackageName(), channelName, not.tickerText));
+                ActiveNotification actNot = new ActiveNotification(sbn.getKey(), sbn.getPackageName(), channelName, not.tickerText);
+                activeNotifications.add(actNot);
 
                 // Save to prefs, or get overridden value from prefs
                 c = settings.getColorForPackageAndChannel(sbn.getPackageName(), channelName, c, (cChan & 0x00FFFFFF) != 0x000000);
@@ -348,44 +411,61 @@ public class NotificationListenerService extends android.service.notification.No
                 c = c | 0xFF000000;
 
                 // user has set notification to full black, skip
+                log("%s [%s] (%s) --> #%08X / #%08X --> #%08X [%s]", sbn.getKey(), sbn.getPackageName(), channelName, cChan, not.color, c, not.getSmallIcon() != null ? "I" : "x");
                 if ((c & 0xFFFFFF) == 0) {
                     continue;
                 }
 
                 // Log and save
-                Integer color = c;
-                log("%s [%s] (%s) --> #%08X / #%08X --> #%08X", sbn.getKey(), sbn.getPackageName(), channelName, cChan, not.color, c);
-                if (!colors.contains(color)) {
-                    if (!dnd && inAODSchedule) {
-                        colors.add(color);
-                    }
-                }
+                actNot.setColor(c);
+                actNot.setIcon(not.getSmallIcon());
             }
         } catch (SecurityException e) {
             // CompanionDeviceManager.getAssociations().size() == 0
         }
 
-        int[] sorted = new int[colors.size()];
-        for (int i = 0; i < sorted.length; i++) {
-            sorted[i] = colors.get(i);
+        List<ActiveNotification> visibleNotifications = new ArrayList<>();
+        if (!dnd) {
+            for (ActiveNotification not : activeNotifications) {
+                if (not.isVisible()) {
+                    boolean found = false;
+                    for (ActiveNotification vis : visibleNotifications) {
+                        if (not.toCompare().equals(vis.toCompare()) || (
+                                not.getIconId() != null &&
+                                not.getIconId().equals(vis.getIconId())
+                        )) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        visibleNotifications.add(not);
+                    }
+                }
+            }
         }
-        Arrays.sort(sorted);
+        visibleNotifications.sort(new Comparator<ActiveNotification>() {
+            @Override
+            public int compare(ActiveNotification o1, ActiveNotification o2) {
+                return Integer.compare(o1.color & 0xFFFFFF, o2.color & 0xFFFFFF);
+            }
+        });
 
-        boolean changes = (sorted.length != currentColors.length);
+        boolean changes = (visibleNotifications.size() != currentNotifications.size());
         if (!changes) {
-            for (int i = 0; i < currentColors.length; i++) {
-                if (currentColors[i] != sorted[i]) {
+            for (int i = 0; i < currentNotifications.size(); i++) {
+                if (!currentNotifications.get(i).toCompare().equals(visibleNotifications.get(i).toCompare())) {
                     changes = true;
                     break;
                 }
             }
         }
         if (changes) {
-            currentColors = sorted;
+            currentNotifications = visibleNotifications;
             motionSensor.resetDuration();
             apply();
         }
-        if ((currentColors.length > 0) && (timeout > 0)) {
+        if ((currentNotifications.size() > 0) && (timeout > 0)) {
             handler.postDelayed(this::handleLEDNotifications, timeout);
         }
         AODControl.setAODAlarm(this);
@@ -393,7 +473,13 @@ public class NotificationListenerService extends android.service.notification.No
 
     private void apply() {
         if (enabled) {
-            overlay.show(currentColors);
+            int[] currentColors = new int[currentNotifications.size()];
+            Drawable[] currentIcons = new Drawable[currentNotifications.size()];
+            for (int i = 0; i < currentNotifications.size(); i++) {
+                currentColors[i] = currentNotifications.get(i).getColor();
+                currentIcons[i] = currentNotifications.get(i).getIconDrawable(this);
+            }
+            overlay.show(currentColors, currentIcons);
         } else {
             overlay.hide(true);
         }
@@ -453,6 +539,6 @@ public class NotificationListenerService extends android.service.notification.No
     }
 
     private boolean wantMotionSensor() {
-        return (enabled && (currentColors.length > 0) && canMarkAsReadFromPickup());
+        return (enabled && (currentNotifications.size() > 0) && canMarkAsReadFromPickup());
     }
 }
