@@ -23,11 +23,14 @@ import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.display.DisplayManager;
+import android.os.Build;
 import android.view.Display;
 
 import java.util.List;
 
 import androidx.core.view.WindowInsetsCompat;
+
+import static java.lang.Math.round;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class CameraCutout {
@@ -101,7 +104,7 @@ public class CameraCutout {
     public CameraCutout(Context context) {
         this.display = ((DisplayManager)context.getSystemService(Context.DISPLAY_SERVICE)).getDisplay(0);
 
-        int id;
+        int id, id2;
         Resources res = context.getResources();
 
         // below is Samsung S10(?) specific. Newer firmwares on other Samsung devices also seem to have these values present.
@@ -110,7 +113,8 @@ public class CameraCutout {
         nativeMarginTop = id > 0 ? res.getDimensionPixelSize(id) : 0;
 
         id = res.getIdentifier("status_bar_camera_padding", "dimen", "android");
-        nativeMarginRight = id > 0 ? res.getDimensionPixelSize(id) : 0;
+        id2 = res.getIdentifier("status_bar_camera_side_padding", "dimen", "android");
+        nativeMarginRight = id > 0 ? res.getDimensionPixelSize(id) : id2 > 0 ? res.getDimensionPixelSize(id2) : 0;
     }
 
     public Point getNativeResolution() {
@@ -139,8 +143,14 @@ public class CameraCutout {
         Rect r = new Rect(rect);
 
         // convert margins from native to current resolution, and apply to rect; without this we'd get a big notch rather than just the camera area
-        r.right -= (int)((float)nativeMarginRight * ((float)currentRes.x / (float)nativeRes.x));
-        r.top += (int)((float)nativeMarginTop * ((float)currentRes.y / (float)nativeRes.y));
+        if (Build.VERSION.SDK_INT >= 30) {
+            float top = (float)nativeMarginTop * ((float)currentRes.y / (float)nativeRes.y);
+            r.top += round(top);
+            r.right = r.left + round((float)r.bottom - top);
+        } else {
+            r.right -= (int)((float)nativeMarginRight * ((float)currentRes.x / (float)nativeRes.x));
+            r.top += (int)((float)nativeMarginTop * ((float)currentRes.y / (float)nativeRes.y));
+        }
 
         cutout = new Cutout(r, currentRes);
     }
