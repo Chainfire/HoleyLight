@@ -43,8 +43,11 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     private Handler handler = null;
     private Handler handlerMain = null;
     private Display.State lastState = null;
+    private String previousNodeClass = null;
 
-    private void inspectNode(AccessibilityNodeInfo node, Rect outerBounds, int level) {
+    private void inspectNode(AccessibilityNodeInfo node, Rect outerBounds, int level, boolean a11) {
+        if (level == 0 && a11) previousNodeClass = null;
+
         if (
                 (node == null) ||
                 (node.getClassName() == null) ||
@@ -68,16 +71,29 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             Slog.d("AOD_TSP", "Node " + l + node.getClassName().toString() + " " + bounds.toString());
         }
 
-        if (node.getClassName().equals("com.android.internal.widget.ViewPager")) {
-            if ((outerBounds.left == -1) || (bounds.left < outerBounds.left)) outerBounds.left = bounds.left;
-            if ((outerBounds.top == -1) || (bounds.top < outerBounds.top)) outerBounds.top = bounds.top;
-            if ((outerBounds.right == -1) || (bounds.right > outerBounds.right)) outerBounds.right = bounds.right;
-            if ((outerBounds.bottom == -1) || (bounds.bottom > outerBounds.bottom)) outerBounds.bottom = bounds.bottom;
+        if (node.getClassName().equals("com.android.internal.widget.ViewPager") || (
+                a11 &&
+                node.getClassName().equals("android.widget.FrameLayout") && (
+                        (
+                                previousNodeClass != null &&
+                                previousNodeClass.equals("android.widget.ImageView") &&
+                                outerBounds.left == -1
+                        ) || (
+                                outerBounds.left >= 0
+                        )
+                )
+        )) {
+            if ((bounds.left >= 0) && ((outerBounds.left == -1) || (bounds.left < outerBounds.left))) outerBounds.left = bounds.left;
+            if ((bounds.top >= 0) && ((outerBounds.top == -1) || (bounds.top < outerBounds.top))) outerBounds.top = bounds.top;
+            if ((bounds.right >= 0) && ((outerBounds.right == -1) || (bounds.right > outerBounds.right))) outerBounds.right = bounds.right;
+            if ((bounds.bottom >= 0) && ((outerBounds.bottom == -1) || (bounds.bottom > outerBounds.bottom))) outerBounds.bottom = bounds.bottom;
+            Slog.d("AOD_TSP", "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         } else if (node.getClassName().equals("android.widget.FrameLayout") || BuildConfig.DEBUG)  {
             for (int i = 0; i < node.getChildCount(); i++) {
-                inspectNode(node.getChild(i), outerBounds, level + 1);
+                inspectNode(node.getChild(i), outerBounds, level + 1, a11);
             }
         }
+        previousNodeClass = node.getClassName().toString();
     }
 
     @Override
@@ -87,6 +103,9 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         //
         // The area of the combined ViewPager and ImageViews is saved to the screen when it goes
         // into DOZE_SUSPEND mode, and requires no power nor CPU to keep displaying it.
+        //
+        // Update: on Android 11 it seems the ViewPager is no longer used as container, the
+        // elements are now part of a FrameLayout directly.
         //
         // Of course it is possible we're getting the wrong views inside some random Android
         // activity, so we make sure elsewhere the system is actually in doze mode before using it.
@@ -146,15 +165,19 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                             Rect bounds = new Rect();
                             node.getBoundsInScreen(bounds);
 
-                            if ((outerBounds.left == -1) || (bounds.left < outerBounds.left)) outerBounds.left = bounds.left;
-                            if ((outerBounds.top == -1) || (bounds.top < outerBounds.top)) outerBounds.top = bounds.top;
-                            if ((outerBounds.right == -1) || (bounds.right > outerBounds.right)) outerBounds.right = bounds.right;
-                            if ((outerBounds.bottom == -1) || (bounds.bottom > outerBounds.bottom)) outerBounds.bottom = bounds.bottom;
+                            if ((bounds.left >= 0) && ((outerBounds.left == -1) || (bounds.left < outerBounds.left))) outerBounds.left = bounds.left;
+                            if ((bounds.top >= 0) && ((outerBounds.top == -1) || (bounds.top < outerBounds.top))) outerBounds.top = bounds.top;
+                            if ((bounds.right >= 0) && ((outerBounds.right == -1) || (bounds.right > outerBounds.right))) outerBounds.right = bounds.right;
+                            if ((bounds.bottom >= 0) && ((outerBounds.bottom == -1) || (bounds.bottom > outerBounds.bottom))) outerBounds.bottom = bounds.bottom;
 
                             Slog.d("AOD_TSP", "Node " + node.getClassName().toString() + " " + bounds.toString());
                         }
                     } else { // Android 10+
-                        inspectNode(root, outerBounds, 0);
+                        inspectNode(root, outerBounds, 0, false);
+                        if (outerBounds.left == -1 && Build.VERSION.SDK_INT >= 30) {
+                            // Android 11+
+                            inspectNode(root, outerBounds, 0, true);
+                        }
                     }
 
                     if (
