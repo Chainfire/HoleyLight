@@ -35,6 +35,7 @@ import java.util.Locale;
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.animation.Overlay;
 import eu.chainfire.holeylight.misc.Display;
+import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.misc.Slog;
 
 @SuppressWarnings("FieldCanBeLocal")
@@ -205,8 +206,16 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         // When the service is created, it *should* setup the WindowManager with the correct token.
         // The source and the docs say so. But for reasons unknown that doesn't happen or work.
         // There doesn't appear to be a clean way to retrieve the token normally either. So we use
-        // some reflection. This is bad, but it does work.
+        // some reflection. This is bad, but it *did* work pre-Android 11.
 
+        // Since reflection has been crippled in Android 11, we're now ensuring the WindowManager
+        // is created by the correct context (this one), which also solves the problem. Likely
+        // this also fixes the problem on Android 9/10, but as there's no way to test that right
+        // now I'm leaving in the old code.
+
+        boolean done = false;
+
+        // Android 10-
         try {
             Class<?> clazz = AccessibilityService.class.getSuperclass();
             if (clazz != null) {
@@ -215,12 +224,19 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                 IBinder windowToken = (IBinder)token.get(AccessibilityService.this);
                 if (windowToken != null) {
                     Overlay.getInstance(AccessibilityService.this, windowToken);
+                    done = true;
                 }
             }
         } catch (Exception e) {
-            // we're pretty much screwed if we end up here
             e.printStackTrace();
         }
+
+        // Android 11+
+        if (!done) {
+            Overlay.getInstance(AccessibilityService.this);
+        }
+
+        Settings.getInstance(this).incAccessibilityServiceCounter();
     }
 
     @Override

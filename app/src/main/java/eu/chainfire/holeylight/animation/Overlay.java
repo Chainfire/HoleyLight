@@ -57,15 +57,16 @@ import static android.content.Context.POWER_SERVICE;
 @SuppressWarnings({"WeakerAccess", "unused", "FieldCanBeLocal"})
 public class Overlay {
     private static Overlay instance;
+    public static Overlay getInstance() {
+        return getInstance(null, null);
+    }
     public static Overlay getInstance(Context context) {
         return getInstance(context, null);
     }
     public static Overlay getInstance(Context context, IBinder windowToken) {
         synchronized (Overlay.class) {
-            if (instance == null) {
-                instance = new Overlay(context);
-            }
             if (context instanceof AccessibilityService) {
+                if (instance == null) instance = new Overlay(context);
                 instance.initActualOverlay(context, windowToken);
             }
             return instance;
@@ -193,7 +194,7 @@ public class Overlay {
 
     private void initActualOverlay(Context context, IBinder windowToken) {
         synchronized (this) {
-            this.windowToken = windowToken;
+            if (this.windowToken == null && windowToken != null) this.windowToken = windowToken;
             if (spritePlayer != null) return;
 
             spritePlayer = new SpritePlayer(context);
@@ -302,7 +303,7 @@ public class Overlay {
                 , PixelFormat.TRANSLUCENT);
         params.gravity = Gravity.LEFT | Gravity.TOP;
         params.setTitle("HoleyLight");
-        params.token = windowToken;
+        if (windowToken != null) params.token = windowToken;
         try { // disable animation when we move/resize
             int currentFlags = (Integer)params.getClass().getField("privateFlags").get(params);
             params.getClass().getField("privateFlags").set(params, currentFlags | 0x00000040); /* PRIVATE_FLAG_NO_MOVE_ANIMATION */

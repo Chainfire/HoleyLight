@@ -153,7 +153,7 @@ public class NotificationListenerService extends android.service.notification.No
     }
 
     private Settings settings = null;
-    private Overlay overlay = null;
+    private int accessibilityServiceCounter = 0;
     private NotificationTracker tracker = null;
     private MotionSensor motionSensor = null;
     private KeyguardManager keyguardManager = null;
@@ -201,7 +201,6 @@ public class NotificationListenerService extends android.service.notification.No
         super.onCreate();
         settings = Settings.getInstance(this);
         enabled = settings.isEnabled();
-        overlay = Overlay.getInstance(this);
         motionSensor = MotionSensor.getInstance(this);
         keyguardManager = (KeyguardManager)getSystemService(KEYGUARD_SERVICE);
 
@@ -249,6 +248,11 @@ public class NotificationListenerService extends android.service.notification.No
             settingsKey = newKey;
             apply();
         }
+        int counter = settings.getAccessibilityServiceCounter();
+        if (counter != accessibilityServiceCounter) {
+            apply();
+        }
+        accessibilityServiceCounter = counter;
         if (connected) handleLEDNotifications();
     }
 
@@ -275,7 +279,8 @@ public class NotificationListenerService extends android.service.notification.No
         getContentResolver().unregisterContentObserver(refreshLEDObserver);
         stopMotionSensor();
         unregisterReceiver(broadcastReceiver);
-        overlay.hide(true);
+        Overlay overlay = Overlay.getInstance();
+        if (overlay != null) overlay.hide(true);
         tracker.clear();
         super.onListenerDisconnected();
     }
@@ -472,6 +477,8 @@ public class NotificationListenerService extends android.service.notification.No
     }
 
     private void apply() {
+        if (!connected) return;
+        Overlay overlay = Overlay.getInstance();
         if (enabled) {
             int[] currentColors = new int[currentNotifications.size()];
             Drawable[] currentIcons = new Drawable[currentNotifications.size()];
@@ -479,9 +486,9 @@ public class NotificationListenerService extends android.service.notification.No
                 currentColors[i] = currentNotifications.get(i).getColor();
                 currentIcons[i] = currentNotifications.get(i).getIconDrawable(this);
             }
-            overlay.show(currentColors, currentIcons);
+            if (overlay != null) overlay.show(currentColors, currentIcons);
         } else {
-            overlay.hide(true);
+            if (overlay != null) overlay.hide(true);
         }
         startMotionSensor();
     }

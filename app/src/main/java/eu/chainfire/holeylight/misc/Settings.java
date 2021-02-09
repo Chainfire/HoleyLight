@@ -187,6 +187,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final String UNHOLEY_LIGHT_ICONS = "unholey_icons";
     public static final Boolean UNHOLEY_LIGHT_ICONS_DEFAULT = true;
 
+    public static final String ACCESSIBILITY_SERVICE_COUNTER = "accessibility_service_counter";
+    public static final int ACCESSIBILITY_SERVICE_COUNTER_DEFAULT = 0;
+
     private static Settings instance;
     public static Settings getInstance(Context context) {
         synchronized (Settings.class) {
@@ -619,5 +622,18 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public boolean isUnholeyLightIcons() {
         return prefs.getBoolean(UNHOLEY_LIGHT_ICONS, UNHOLEY_LIGHT_ICONS_DEFAULT);
+    }
+
+    public int getAccessibilityServiceCounter() {
+        return prefs.getInt(ACCESSIBILITY_SERVICE_COUNTER, ACCESSIBILITY_SERVICE_COUNTER_DEFAULT);
+    }
+
+    public void incAccessibilityServiceCounter() {
+        edit();
+        try {
+            editor.putInt(ACCESSIBILITY_SERVICE_COUNTER, (getAccessibilityServiceCounter() + 1) % 1000);
+        } finally {
+            save(true);
+        }
     }
 }
