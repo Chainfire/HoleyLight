@@ -22,6 +22,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
@@ -29,6 +30,8 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.Shader;
+import android.graphics.SweepGradient;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -76,6 +79,7 @@ public class SpritePlayer extends RelativeLayout {
     private volatile OnAnimationListener onAnimationListener = null;
 
     private final Paint paint = new Paint();
+    private final Paint paintTsp = new Paint();
     private final float dpToPx;
 
     private volatile int frame = -1;
@@ -115,6 +119,10 @@ public class SpritePlayer extends RelativeLayout {
         paint.setAntiAlias(false);
         paint.setDither(false);
         paint.setFilterBitmap(false);
+
+        paintTsp.setAntiAlias(true);
+        paintTsp.setDither(false);
+        paintTsp.setFilterBitmap(false);
 
         handlerRender.post(() -> {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
@@ -207,8 +215,8 @@ public class SpritePlayer extends RelativeLayout {
             // We delay a short time to prevent the circle jumping around on first show, due to
             // AOD start TSP rect updates
             if ((drawMode == Mode.TSP) && (SystemClock.elapsedRealtime() - modeStart > TSP_FIRST_DRAW_DELAY)) {
-                paint.setColorFilter(null);
-                paint.setXfermode(null);
+                paintTsp.setColorFilter(null);
+                paintTsp.setXfermode(null);
 
                 float left = radiusDecrease;
                 float top = radiusDecrease;
@@ -221,18 +229,36 @@ public class SpritePlayer extends RelativeLayout {
                 float radius = (width / 2f) - (8f * dpToPx);
 
                 float anglePerColor = 360f / colors.length;
-                for (int i = 0; i < colors.length; i++) {
-                    paint.setColor(colors[i]);
-                    canvas.drawArc(left, top, right, bottom, startAngle + 270 + (anglePerColor * i), anglePerColor, true, paint);
+
+                int[] sweepColors;
+                if (colors.length == 1) {
+                    sweepColors = new int[] { colors[0], colors[0] };
+                } else {
+                    sweepColors = new int[colors.length*7 + 1];
+                    for (int i = 0; i < 4; i++) sweepColors[i] = colors[0];
+                    for (int i = 1; i < colors.length; i++) {
+                        for (int j = 4 + (i - 1)*7; j < 4 + i*7; j++) {
+                            sweepColors[j] = colors[i];
+                        }
+                    }
+                    for (int i = sweepColors.length - 4; i < sweepColors.length; i++) sweepColors[i] = colors[0];
                 }
 
+                Shader sweep = new SweepGradient(cx, cy, sweepColors, null);
+                Matrix matrix = new Matrix();
+                matrix.preRotate(startAngle + 270, cx, cy);
+                sweep.setLocalMatrix(matrix);
+                paintTsp.setShader(sweep);
+                canvas.drawArc(left, top, right, bottom, 0f, 360f, true, paintTsp);
+                paintTsp.setShader(null);
+
                 if (drawBackground) {
-                    paint.setColor(Color.BLACK);
+                    paintTsp.setColor(Color.BLACK);
                 } else {
-                    paint.setColor(Color.TRANSPARENT);
-                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+                    paintTsp.setColor(Color.TRANSPARENT);
+                    paintTsp.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
                 }
-                canvas.drawCircle(cx, cy, radius, paint);
+                canvas.drawCircle(cx, cy, radius, paintTsp);
 
                 int drawableIcons = 0;
                 for (int i = 0; i < icons.length; i++) {
@@ -246,8 +272,8 @@ public class SpritePlayer extends RelativeLayout {
                         int x = (int)(right + left)/2;
                         int y = (int)(bottom + top)/2;
                         if (drawableIcons > 1) {
-                            x += (int)(Math.cos(Math.toRadians(startAngle + 270 + (anglePerColor * i) + anglePerColor/2)) * radius/2);
-                            y += (int)(Math.sin(Math.toRadians(startAngle + 270 + (anglePerColor * i) + anglePerColor/2)) * radius/2);
+                            x += (int)(Math.cos(Math.toRadians(startAngle + 270 + (anglePerColor * i))) * radius/2);
+                            y += (int)(Math.sin(Math.toRadians(startAngle + 270 + (anglePerColor * i))) * radius/2);
                         }
 
                         int w = icons[i].getIntrinsicWidth();
