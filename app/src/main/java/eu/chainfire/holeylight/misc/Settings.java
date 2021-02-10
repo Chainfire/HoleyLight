@@ -21,7 +21,7 @@ package eu.chainfire.holeylight.misc;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Rect;
+import android.graphics.RectF;
 import android.text.Html;
 
 import java.util.ArrayList;
@@ -154,10 +154,10 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final String SEEN_ON_USER_PRESENT = "seen_on_user_present";
     private static final boolean SEEN_ON_USER_PRESENT_DEFAULT = false;
 
-    private static final String CUTOUT_AREA_LEFT = "cutout_area_left";
-    private static final String CUTOUT_AREA_TOP = "cutout_area_top";
-    private static final String CUTOUT_AREA_RIGHT = "cutout_area_right";
-    private static final String CUTOUT_AREA_BOTTOM = "cutout_area_bottom";
+    private static final String CUTOUT_AREA_LEFT = "cutout_area_left_f";
+    private static final String CUTOUT_AREA_TOP = "cutout_area_top_f";
+    private static final String CUTOUT_AREA_RIGHT = "cutout_area_right_f";
+    private static final String CUTOUT_AREA_BOTTOM = "cutout_area_bottom_f";
 
     private static final String DP_ADD_SCALE_BASE = "dp_add_scale_base_float";
     private static final String DP_ADD_SCALE_HORIZONTAL = "dp_add_scale_horizontal_float";
@@ -271,22 +271,22 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         editor = null;
     }
 
-    public Rect getCutoutAreaRect() {
-        return new Rect(
-            prefs.getInt(CUTOUT_AREA_LEFT, -1),
-            prefs.getInt(CUTOUT_AREA_TOP, -1),
-            prefs.getInt(CUTOUT_AREA_RIGHT, -1),
-            prefs.getInt(CUTOUT_AREA_BOTTOM, -1)
+    public RectF getCutoutAreaRect() {
+        return new RectF(
+            prefs.getFloat(CUTOUT_AREA_LEFT, -1f),
+            prefs.getFloat(CUTOUT_AREA_TOP, -1f),
+            prefs.getFloat(CUTOUT_AREA_RIGHT, -1f),
+            prefs.getFloat(CUTOUT_AREA_BOTTOM, -1f)
         );
     }
 
-    public Settings setCutoutAreaRect(Rect rect) {
+    public Settings setCutoutAreaRect(RectF rect) {
         edit();
         try {
-            editor.putInt(CUTOUT_AREA_LEFT, rect.left);
-            editor.putInt(CUTOUT_AREA_TOP, rect.top);
-            editor.putInt(CUTOUT_AREA_RIGHT, rect.right);
-            editor.putInt(CUTOUT_AREA_BOTTOM, rect.bottom);
+            editor.putFloat(CUTOUT_AREA_LEFT, rect.left);
+            editor.putFloat(CUTOUT_AREA_TOP, rect.top);
+            editor.putFloat(CUTOUT_AREA_RIGHT, rect.right);
+            editor.putFloat(CUTOUT_AREA_BOTTOM, rect.bottom);
         } finally {
             save(true);
         }

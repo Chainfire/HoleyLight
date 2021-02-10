@@ -22,44 +22,47 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.hardware.display.DisplayManager;
-import android.os.Build;
 import android.view.Display;
 
 import java.util.List;
 
 import androidx.core.view.WindowInsetsCompat;
 
-import static java.lang.Math.round;
-
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class CameraCutout {
     public static class Cutout {
-        private final Rect area;
+        private final RectF area;
         private final Point resolution;
 
         public Cutout(Rect area, Point resolution) {
+            this(new RectF(area), resolution);
+        }
+
+        public Cutout(RectF area, Point resolution) {
             this.area = area;
             this.resolution = resolution;
         }
 
         public Cutout(Cutout src) {
-            this.area = new Rect(src.getArea());
+            this.area = new RectF(src.getAreaF());
             this.resolution = new Point(src.getResolution());
         }
 
-        public Rect getArea() { return area; }
+        public Rect getArea() { return new Rect((int)area.left, (int)area.top, (int)area.right, (int)area.bottom); }
+        public RectF getAreaF() { return area; }
         public Point getResolution() { return resolution; }
 
         public Cutout scaleTo(Point resolution) {
             if (this.resolution.equals(resolution)) return this;
             float sX = (float)resolution.x / (float)this.resolution.x;
             float sY = (float)resolution.y / (float)this.resolution.y;
-            return new Cutout(new Rect(
-                    (int)((float)area.left * sX),
-                    (int)((float)area.top * sY),
-                    (int)((float)area.right * sX),
-                    (int)((float)area.bottom * sY)
+            return new Cutout(new RectF(
+                    area.left * sX,
+                    area.top * sY,
+                    area.right * sX,
+                    area.bottom * sY
             ), resolution);
         }
 
@@ -75,17 +78,17 @@ public class CameraCutout {
                     a = a.scaleTo(b.getResolution());
                 }
             }
-            Rect rA = a.getArea();
-            Rect rB = b.getArea();
+            RectF rA = a.getAreaF();
+            RectF rB = b.getAreaF();
             return
-                    Math.abs(rA.left - rB.left) <= 2 &&
-                    Math.abs(rA.top - rB.top) <= 2 &&
-                    Math.abs(rA.right - rB.right) <= 2 &&
-                    Math.abs(rA.bottom - rB.bottom) <= 2;                          
+                    Math.abs(rA.left - rB.left) <= 2f &&
+                    Math.abs(rA.top - rB.top) <= 2f &&
+                    Math.abs(rA.right - rB.right) <= 2f &&
+                    Math.abs(rA.bottom - rB.bottom) <= 2f;
         }
 
         public boolean isCircular() {
-            return Math.abs(area.width() - area.height()) <= 2;
+            return Math.abs(area.width() - area.height()) <= 2f;
         }
     }
 
@@ -137,25 +140,27 @@ public class CameraCutout {
     }
 
     public void updateFromBoundingRect(Rect rect) {
+        updateFromBoundingRect(new RectF(rect));
+    }
+
+    public void updateFromBoundingRect(RectF rect) {
         Point nativeRes = getNativeResolution();
         Point currentRes = getCurrentResolution();
 
-        Rect r = new Rect(rect);
+        RectF r = new RectF(rect);
 
         // convert margins from native to current resolution, and apply to rect; without this we'd get a big notch rather than just the camera area
-        if (Build.VERSION.SDK_INT >= 30) {
-            float top = (float)nativeMarginTop * ((float)currentRes.y / (float)nativeRes.y);
-            r.top += round(top);
-            r.right = r.left + round((float)r.bottom - top);
-        } else {
-            r.right -= (int)((float)nativeMarginRight * ((float)currentRes.x / (float)nativeRes.x));
-            r.top += (int)((float)nativeMarginTop * ((float)currentRes.y / (float)nativeRes.y));
-        }
+        r.right -= (float)nativeMarginRight * ((float)currentRes.x / (float)nativeRes.x);
+        r.top += (float)nativeMarginTop * ((float)currentRes.y / (float)nativeRes.y);
 
         cutout = new Cutout(r, currentRes);
     }
 
     public void updateFromAreaRect(Rect rect) {
+        updateFromAreaRect(new RectF(rect));
+    }
+
+    public void updateFromAreaRect(RectF rect) {
         cutout = new Cutout(rect, getCurrentResolution());
     }
 
