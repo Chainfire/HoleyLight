@@ -280,6 +280,10 @@ public class SpritePlayer extends RelativeLayout {
 
                         int w = icons[i].getIntrinsicWidth();
                         int h = icons[i].getIntrinsicHeight();
+                        if (drawableIcons == 1) {
+                            w *= 2;
+                            h *= 2;
+                        }
                         int l = x - w/2;
                         int t = y - h/2;
                         icons[i].setBounds(l, t, l + w, h + t);
