@@ -46,6 +46,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
+import eu.chainfire.holeylight.misc.Settings;
 
 @SuppressWarnings({ "deprecation", "FieldCanBeLocal", "unused", "UnusedReturnValue" })
 public class SpritePlayer extends RelativeLayout {
@@ -208,6 +209,7 @@ public class SpritePlayer extends RelativeLayout {
             // on hardware accelerated canvas the content is already cleared
             canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         }
+        if (Settings.DEBUG_OVERLAY) canvas.drawColor(0x80808080);
         if (isTSPMode()) {
             // TSP_HIDE is a no_op, background drawn already, we only handle it at all because
             // rendering here causes the rest of the screen to be updated as well
