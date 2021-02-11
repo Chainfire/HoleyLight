@@ -55,7 +55,10 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                         (!node.getClassName().equals("android.widget.FrameLayout")) &&
                         (!node.getClassName().equals("com.android.internal.widget.ViewPager"))
                 ))
-        ) return;
+        ) {
+            previousNodeClass = node.getClassName().toString();
+            return;
+        }
 
         node.refresh();
 
