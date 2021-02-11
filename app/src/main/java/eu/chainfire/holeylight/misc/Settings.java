@@ -31,13 +31,12 @@ import java.util.Locale;
 import java.util.Map;
 
 import androidx.preference.PreferenceManager;
-import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.SpritePlayer;
 
 @SuppressWarnings({"WeakerAccess", "unused", "UnusedReturnValue"})
 public class Settings implements SharedPreferences.OnSharedPreferenceChangeListener {
-    public static final boolean DEBUG = BuildConfig.DEBUG;
+    public static final boolean DEBUG = true; //BuildConfig.DEBUG;
     public static final boolean DEBUG_OVERLAY = false;
 
     public interface OnSettingsChangedListener {
@@ -193,6 +192,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public static final String ACCESSIBILITY_SERVICE_COUNTER = "accessibility_service_counter";
     public static final int ACCESSIBILITY_SERVICE_COUNTER_DEFAULT = 0;
+
+    public static final String USING_VI_DIRECTOR = "using_vidirector";
+    public static final boolean USING_VI_DIRECTOR_DEFAULT = false;
 
     private static Settings instance;
     public static Settings getInstance(Context context) {
@@ -636,6 +638,22 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         edit();
         try {
             editor.putInt(ACCESSIBILITY_SERVICE_COUNTER, (getAccessibilityServiceCounter() + 1) % 1000);
+        } finally {
+            save(true);
+        }
+    }
+
+    public boolean isUsingVIDirector() {
+        return prefs.getBoolean(USING_VI_DIRECTOR, USING_VI_DIRECTOR_DEFAULT);
+    }
+
+    public void setUsingVIDirector(boolean value) {
+        if (value == isUsingVIDirector()) return;
+
+        edit();
+        try {
+            editor.putBoolean(USING_VI_DIRECTOR, value);
+            resetTuning();
         } finally {
             save(true);
         }
