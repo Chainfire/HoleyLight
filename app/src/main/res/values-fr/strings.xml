@@ -18,7 +18,7 @@
     <string name="disabled">Desactivé</string>
 
     <string name="charging_screen_on">Chargement: Ecran allumé</string>
-    <string name="charging_screen_off">Charging: Ecran éteint</string>
+    <string name="charging_screen_off">Chargement: Ecran éteint</string>
     <string name="battery_screen_on">Batterie: Ecran allumé</string>
     <string name="battery_screen_off">Batterie: Ecran éteint</string>
 
