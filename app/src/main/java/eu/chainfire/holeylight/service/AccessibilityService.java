@@ -32,7 +32,6 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Locale;
 
-import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.animation.Overlay;
 import eu.chainfire.holeylight.misc.Display;
 import eu.chainfire.holeylight.misc.Settings;
@@ -52,7 +51,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         if (
                 (node == null) ||
                 (node.getClassName() == null) ||
-                (!BuildConfig.DEBUG && (
+                (!Settings.DEBUG && (
                         (!node.getClassName().equals("android.widget.FrameLayout")) &&
                         (!node.getClassName().equals("com.android.internal.widget.ViewPager"))
                 ))
@@ -63,7 +62,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         Rect bounds = new Rect();
         node.getBoundsInScreen(bounds);
 
-        if (BuildConfig.DEBUG) {
+        if (Settings.DEBUG) {
             String l = "";
             for (int i = 0; i < level; i++) {
                 l += "--";
@@ -89,7 +88,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             if ((bounds.right >= 0) && ((outerBounds.right == -1) || (bounds.right > outerBounds.right))) outerBounds.right = bounds.right;
             if ((bounds.bottom >= 0) && ((outerBounds.bottom == -1) || (bounds.bottom > outerBounds.bottom))) outerBounds.bottom = bounds.bottom;
             Slog.d("AOD_TSP", "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        } else if (node.getClassName().equals("android.widget.FrameLayout") || BuildConfig.DEBUG)  {
+        } else if (node.getClassName().equals("android.widget.FrameLayout") || Settings.DEBUG)  {
             for (int i = 0; i < node.getChildCount(); i++) {
                 inspectNode(node.getChild(i), outerBounds, level + 1, a11);
             }

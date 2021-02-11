@@ -31,11 +31,15 @@ import java.util.Locale;
 import java.util.Map;
 
 import androidx.preference.PreferenceManager;
+import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.SpritePlayer;
 
 @SuppressWarnings({"WeakerAccess", "unused", "UnusedReturnValue"})
 public class Settings implements SharedPreferences.OnSharedPreferenceChangeListener {
+    public static final boolean DEBUG = BuildConfig.DEBUG;
+    public static final boolean DEBUG_OVERLAY = false;
+
     public interface OnSettingsChangedListener {
         void onSettingsChanged();
     }

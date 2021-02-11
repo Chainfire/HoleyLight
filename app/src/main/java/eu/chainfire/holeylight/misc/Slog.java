@@ -20,17 +20,15 @@ package eu.chainfire.holeylight.misc;
 
 import java.util.Locale;
 
-import eu.chainfire.holeylight.BuildConfig;
-
 // Existed originally for compatibility with AOSP-copied code, but is now also used by my own code
 @SuppressWarnings({ "WeakerAccess", "UnusedReturnValue", "unused" })
 public class Slog {
-    public static int d(String tag, String fmt, Object... params) {
-        if (BuildConfig.DEBUG) {
+    public static int d(String tag, String msg, Object... params) {
+        if (Settings.DEBUG) {
             if ((params == null) || (params.length == 0)) {
-                return android.util.Log.d("HoleyLight/" + tag, fmt);
+                return android.util.Log.d("HoleyLight/" + tag, msg);
             } else {
-                return android.util.Log.d("HoleyLight/" + tag, String.format(Locale.ENGLISH, fmt, params));
+                return android.util.Log.d("HoleyLight/" + tag, String.format(Locale.ENGLISH, msg, params));
             }
         }
         return 0;
@@ -44,6 +42,14 @@ public class Slog {
     public static int i(String tag, String msg, Object... params) {
         d(tag, msg, params);
         return 0;
+    }
+
+    public static int e(String tag, String msg, Object... params) {
+        if ((params == null) || (params.length == 0)) {
+            return android.util.Log.e("HoleyLight/" + tag, msg);
+        } else {
+            return android.util.Log.e("HoleyLight/" + tag, String.format(Locale.ENGLISH, msg, params));
+        }
     }
 }
 
