@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
             case COMPANION_DEVICE:
                 (currentDialog = newAlert(false)
                         .setTitle(getString(R.string.permission_required) + " 1/4")
-                        .setMessage(Html.fromHtml(getString(R.string.permission_associate)))
+                        .setMessage(Html.fromHtml(getString(R.string.permission_associate) + getString(R.string.permission_associate_2)))
                         .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                             CompanionDeviceManager companionDeviceManager = (CompanionDeviceManager)getSystemService(COMPANION_DEVICE_SERVICE);
                             companionDeviceManager.associate((new AssociationRequest.Builder()).build(), new CompanionDeviceManager.Callback() {

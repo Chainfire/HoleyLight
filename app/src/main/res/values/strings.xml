@@ -210,4 +210,7 @@
 
     <string name="settings_animation_unholey_light_icons_title">Unholey Light: Icons</string>
     <string name="settings_animation_unholey_light_icons_description">Show notification icons inside the Unholey Light</string>
+
+    <!-- v0.71 -->
+    <string name="permission_associate_2"><![CDATA[<br><br><b>Location</b> may also need to be (temporarily) enabled for the popup to show.]]></string>
 </resources>
