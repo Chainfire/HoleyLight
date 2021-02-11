@@ -213,4 +213,8 @@
 
     <!-- v0.71 -->
     <string name="permission_associate_2"><![CDATA[<br><br><b>Location</b> may also need to be (temporarily) enabled for the popup to show.]]></string>
+
+    <string name="settings_category_debug">Debug</string>
+    <string name="logcat_dump_title">Dump logcat</string>
+    <string name="logcat_dump_description">Dump partial logcat to file and exit. A full adb logcat is always preferred!</string>
 </resources>

@@ -436,6 +436,17 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return false;
         });
 
+        if (Settings.DEBUG) {
+            PreferenceCategory catDebug = category(root, R.string.settings_category_debug, 0);
+            pref(catDebug, R.string.logcat_dump_title, R.string.logcat_dump_description, null, true, preference -> {
+                Activity activity = getActivity();
+                if (activity instanceof MainActivity) {
+                    ((MainActivity)activity).logcatDumpRequest();
+                }
+                return false;
+            });
+        }
+
         updatePrefs(null);
         prefs.registerOnSharedPreferenceChangeListener(this);
         return root;

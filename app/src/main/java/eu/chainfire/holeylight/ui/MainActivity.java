@@ -19,6 +19,7 @@
 package eu.chainfire.holeylight.ui;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
 import android.companion.AssociationRequest;
 import android.companion.CompanionDeviceManager;
@@ -33,6 +34,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -45,6 +52,8 @@ import eu.chainfire.holeylight.misc.Permissions;
 import eu.chainfire.holeylight.misc.Settings;
 
 public class MainActivity extends AppCompatActivity implements Settings.OnSettingsChangedListener {
+    private static final int LOGCAT_DUMP_REQUEST_CODE = 12345;
+
     private Handler handler = null;
     private Settings settings = null;
     private SwitchCompat switchMaster = null;
@@ -91,23 +100,60 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
                         currentDialog = null;
                     }
                     if (finishOnDismiss) {
-                        MainActivity.this.finish();
+                        if (!inLogcatDump) MainActivity.this.finish();
                     }
         });
     }
 
     private Runnable checkPermissionsRunnable = this::checkPermissions;
 
+    private boolean inLogcatDump = false;
+
+    public void logcatDumpRequest() {
+        inLogcatDump = true;
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TITLE, "holeylight_logcat.txt");
+        startActivityForResult(intent, LOGCAT_DUMP_REQUEST_CODE);
+    }
+
+    private void logcatDump(Uri uri) {
+        OutputStream outputStream;
+        try {
+            outputStream = getContentResolver().openOutputStream(uri);
+            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+
+            Process process = Runtime.getRuntime().exec("logcat -d");
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                bufferedWriter.write(line + "\r\n");
+            }
+
+            bufferedWriter.flush();
+            bufferedWriter.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        inLogcatDump = false;
+        finish();
+    }
+
     @SuppressWarnings("deprecation")
     private void checkPermissions() {
+        if (inLogcatDump) return;
         if (setupWizard()) return;
 
         switch (Permissions.detect(this)) {
             case DEVICE_SUPPORT:
-                (currentDialog = newAlert(true)
+                (currentDialog = newAlert(!Settings.DEBUG)
                         .setTitle(R.string.error)
                         .setMessage(Html.fromHtml(getString(R.string.error_unsupported_device, Build.DEVICE)))
-                        .setPositiveButton(android.R.string.ok, null)
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            if (Settings.DEBUG) logcatDumpRequest();
+                        })
                         .show()).setCanceledOnTouchOutside(false);
                 break;
             case UNHIDE_NOTCH:
@@ -376,7 +422,13 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        checkPermissions();
+        if (requestCode == LOGCAT_DUMP_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                if (data != null && data.getData() != null) logcatDump(data.getData());
+            }
+        } else {
+            checkPermissions();
+        }
     }
 
     @Override
