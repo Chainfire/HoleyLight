@@ -17,7 +17,7 @@
 
     <string name="error">Error</string>
     <string name="error_hide_notch"><![CDATA[<b>Holey Light</b> no puede funcionar cuando la muesca de la cámara está oculta. Desactive la opción <b>Ajustes</b> - <b>Pantalla</b> - <b>Apps a pantalla completa</b> - <b>Ocultar cámara frontal</b>.]]></string>
-    <string name="error_unsupported_device"><![CDATA[<b>Holey Light</b> parece que no es compatible con su dispositivo. Si está usando una variante del <b>S10</b> por favor, reporta este código en el hilo en XDA:<br><br>[ <b>%s</b> ]]]></string>
+    <string name="error_unsupported_device"><![CDATA[<b>Holey Light</b> parece que no es compatible con su dispositivo. Si está usando una variante del <b>Samsung</b> por favor, reporta este código en el hilo en XDA:<br><br>[ <b>%s</b> ]]]></string>
 
     <string name="enabled">Activado</string>
     <string name="disabled">Desactivado</string>

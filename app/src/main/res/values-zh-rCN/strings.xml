@@ -21,7 +21,7 @@
 
     <string name="error">错误</string>
     <string name="error_hide_notch"><![CDATA[<b>Holey Light</b> 在“刘海”隐藏时无法正常工作。取消 <b>设置</b> - <b>显示</b> - <b>全屏应用程序</b> - <b>隐藏前置摄像头</b>.]]></string>
-    <string name="error_unsupported_device"><![CDATA[<b>Holey Light</b> 似乎不支持您的设备。如果您使用的是 <b>S10</b> 系列，请将此错误代码上报到这个 XDA 主题:<br><br>[ <b>%s</b> ]]]></string>
+    <string name="error_unsupported_device"><![CDATA[<b>Holey Light</b> 似乎不支持您的设备。如果您使用的是 <b>Samsung</b> 系列，请将此错误代码上报到这个 XDA 主题:<br><br>[ <b>%s</b> ]]]></string>
 
 <!-- obsolete --><string name="help_basic_title">帮助</string>
 <!-- obsolete --><string name="help_basic_descrption">一些建议</string>

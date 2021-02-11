@@ -21,7 +21,7 @@
 
     <string name="error">Errore</string>
     <string name="error_hide_notch"><![CDATA[<b>Holey Light</b> non può funzionare se hai attivato la barra nera superiore. Vai in <b>Impostazioni</b> - <b>Schermo</b> - <b>Applicazioni a schermo intero</b> e disattiva <b>Nascondi fotocamera anteriore</b>.]]></string>
-    <string name="error_unsupported_device"><![CDATA[<b>Sembra che <b>Holey Light</b> non supporti il tuo smartphone. Se stai usando una variante dell\'<b>S10</b> riporta per favore nella discussione (in lingua inglese) su XDA questo codice:<br><br>[ <b>%s</b> ]]]></string>
+    <string name="error_unsupported_device"><![CDATA[<b>Sembra che <b>Holey Light</b> non supporti il tuo smartphone. Se stai usando una variante dell\'<b>Samsung</b> riporta per favore nella discussione (in lingua inglese) su XDA questo codice:<br><br>[ <b>%s</b> ]]]></string>
 
 <!-- obsolete --><string name="help_basic_title">Help</string>
 <!-- obsolete --><string name="help_basic_descrption">Some basic advice</string>

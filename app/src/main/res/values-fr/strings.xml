@@ -12,7 +12,7 @@
 
     <string name="error">Erreur</string>
     <string name="error_hide_notch"><![CDATA[<b>Holey Light</b> ne fonctionne pas tant que l\'appareil photo avant est masqué par la barre noire. Désactivez <b>Paramètres</b> - <b>Affichage</b> - <b>Applications en plein écran</b> - <b>Masquage appareil photo avant</b>.]]></string>
-    <string name="error_unsupported_device"><![CDATA[<b>Holey Light</b> ne semble pas être disponible pour votre appareil. Si vous utilisez une variante du <b>S10</b> reportez ce code dans la discussion du forum XDA:<br><br>[ <b>%s</b> ]]]></string>
+    <string name="error_unsupported_device"><![CDATA[<b>Holey Light</b> ne semble pas être disponible pour votre appareil. Si vous utilisez une variante du <b>Samsung</b> reportez ce code dans la discussion du forum XDA:<br><br>[ <b>%s</b> ]]]></string>
 
     <string name="enabled">Activé</string>
     <string name="disabled">Desactivé</string>
