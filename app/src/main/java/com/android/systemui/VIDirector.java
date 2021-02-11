@@ -61,12 +61,19 @@ public class VIDirector {
     public static VIDirector create(Context context) {
         try {
             Class<?> clazz = Class.forName("com.android.keyguard.punchhole.VIDirectorFactory", true, systemUiClassLoader(context));
+
+            try {
+                // Kotlin-based code found in newer firmwares
+                Field fCompanion = clazz.getDeclaredField("Companion");
+                Object oCompanion = fCompanion.get(null);
     
-            Field fCompanion = clazz.getDeclaredField("Companion");
-            Object oCompanion = fCompanion.get(null);
-    
-            Method mCreateVIDirector = oCompanion.getClass().getDeclaredMethod("createVIDirector", Context.class);
-            return new VIDirector(context, mCreateVIDirector.invoke(oCompanion, context));
+                Method mCreateVIDirector = oCompanion.getClass().getDeclaredMethod("createVIDirector", Context.class);
+                return new VIDirector(context, mCreateVIDirector.invoke(oCompanion, context));
+            } catch (NoSuchFieldException e) {
+                // Java-based code found in older firmwares
+                Method mCreateVIDirector = clazz.getDeclaredMethod("createVIDirector", Context.class);
+                return new VIDirector(context, mCreateVIDirector.invoke(null, context));
+            }
         } catch (Exception e) {
             Slog.e("VIDirector", "Could not create instance :: %s", e);
             e.printStackTrace();

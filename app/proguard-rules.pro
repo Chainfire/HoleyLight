@@ -22,3 +22,4 @@
 
 -keep public class com.android.systemui.LsRune
 -keep public class com.android.systemui.wallpaper.WallpaperUtils
+-keep public class com.android.systemui.util.DeviceState
