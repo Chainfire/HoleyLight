@@ -60,8 +60,10 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                         (!node.getClassName().equals("com.android.internal.widget.ViewPager"))
                 ))
         ) {
-            previousNodeClass = node.getClassName().toString();
-            seenXViewPager |= node.getClassName().equals("androidx.viewpager.widget.ViewPager");
+            if ((node != null) && (node.getClassName() != null)) {
+                previousNodeClass = node.getClassName().toString();
+                seenXViewPager |= node.getClassName().equals("androidx.viewpager.widget.ViewPager");
+            }
             return;
         }
 
@@ -107,8 +109,10 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             }
         }
 
-        previousNodeClass = node.getClassName().toString();
-        seenXViewPager |= node.getClassName().equals("androidx.viewpager.widget.ViewPager");
+        if ((node != null) && (node.getClassName() != null)) {
+            previousNodeClass = node.getClassName().toString();
+            seenXViewPager |= node.getClassName().equals("androidx.viewpager.widget.ViewPager");
+        }
     }
 
     @Override
