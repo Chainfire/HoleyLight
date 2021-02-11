@@ -44,9 +44,13 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     private Handler handlerMain = null;
     private Display.State lastState = null;
     private String previousNodeClass = null;
+    private boolean seenXViewPager = false;
 
     private void inspectNode(AccessibilityNodeInfo node, Rect outerBounds, int level, boolean a11) {
-        if (level == 0 && a11) previousNodeClass = null;
+        if (level == 0 && a11) {
+            previousNodeClass = null;
+            seenXViewPager = false;
+        }
 
         if (
                 (node == null) ||
@@ -57,6 +61,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                 ))
         ) {
             previousNodeClass = node.getClassName().toString();
+            seenXViewPager |= node.getClassName().equals("androidx.viewpager.widget.ViewPager");
             return;
         }
 
@@ -78,25 +83,32 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                 a11 &&
                 node.getClassName().equals("android.widget.FrameLayout") && (
                         (
-                                previousNodeClass != null &&
-                                previousNodeClass.equals("android.widget.ImageView") &&
-                                outerBounds.left == -1
+                                outerBounds.left == -1 &&
+                                (
+                                        previousNodeClass != null &&
+                                        previousNodeClass.equals("android.widget.ImageView")
+                                ) || (
+                                        seenXViewPager &&
+                                        level == 2
+                                )
                         ) || (
                                 outerBounds.left >= 0
                         )
                 )
         )) {
-            if ((bounds.left >= 0) && ((outerBounds.left == -1) || (bounds.left < outerBounds.left))) outerBounds.left = bounds.left;
-            if ((bounds.top >= 0) && ((outerBounds.top == -1) || (bounds.top < outerBounds.top))) outerBounds.top = bounds.top;
-            if ((bounds.right >= 0) && ((outerBounds.right == -1) || (bounds.right > outerBounds.right))) outerBounds.right = bounds.right;
-            if ((bounds.bottom >= 0) && ((outerBounds.bottom == -1) || (bounds.bottom > outerBounds.bottom))) outerBounds.bottom = bounds.bottom;
+            if ((bounds.left >= 0) && (bounds.right >= 0) && ((outerBounds.left == -1) || (bounds.left < outerBounds.left))) outerBounds.left = bounds.left;
+            if ((bounds.top >= 0) && (bounds.bottom >= 0) && ((outerBounds.top == -1) || (bounds.top < outerBounds.top))) outerBounds.top = bounds.top;
+            if ((bounds.left >= 0) && (bounds.right >= 0) && ((outerBounds.right == -1) || (bounds.right > outerBounds.right))) outerBounds.right = bounds.right;
+            if ((bounds.top >= 0) && (bounds.bottom >= 0) && ((outerBounds.bottom == -1) || (bounds.bottom > outerBounds.bottom))) outerBounds.bottom = bounds.bottom;
             Slog.d("AOD_TSP", "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         } else if (node.getClassName().equals("android.widget.FrameLayout") || Settings.DEBUG)  {
             for (int i = 0; i < node.getChildCount(); i++) {
                 inspectNode(node.getChild(i), outerBounds, level + 1, a11);
             }
         }
+
         previousNodeClass = node.getClassName().toString();
+        seenXViewPager |= node.getClassName().equals("androidx.viewpager.widget.ViewPager");
     }
 
     @Override
