@@ -3,7 +3,7 @@
     android:description="@string/app_name"
     android:packageNames="com.android.systemui"
     android:accessibilityEventTypes="typeWindowContentChanged"
-    android:accessibilityFlags="flagDefault|flagRetrieveInteractiveWindows"
+    android:accessibilityFlags="flagDefault|flagRetrieveInteractiveWindows|flagReportViewIds"
     android:accessibilityFeedbackType="feedbackAllMask"
     android:notificationTimeout="100"
     android:canRetrieveWindowContent="true"

@@ -78,20 +78,24 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                 l += "--";
             }
             if (l.length() > 0) l += " ";
-            Slog.d("AOD_TSP", "Node " + l + node.getClassName().toString() + " " + bounds.toString());
+            Slog.d("AOD_TSP", "Node " + l + node.getClassName().toString() + " " + bounds.toString() + " " + node.getViewIdResourceName());
         }
 
         if (node.getClassName().equals("com.android.internal.widget.ViewPager") || (
                 a11 &&
                 node.getClassName().equals("android.widget.FrameLayout") && (
                         (
-                                outerBounds.left == -1 &&
-                                (
-                                        previousNodeClass != null &&
-                                        previousNodeClass.equals("android.widget.ImageView")
-                                ) || (
-                                        seenXViewPager &&
-                                        level == 2
+                                outerBounds.left == -1 && (
+                                        (
+                                                previousNodeClass != null &&
+                                                previousNodeClass.equals("android.widget.ImageView")
+                                        ) || (
+                                                seenXViewPager &&
+                                                level == 2
+                                        ) || (
+                                                node.getViewIdResourceName() != null &&
+                                                node.getViewIdResourceName().equals("com.samsung.android.app.aodservice:id/common_clock_widget_container")
+                                        )
                                 )
                         ) || (
                                 outerBounds.left >= 0
@@ -123,8 +127,8 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         // The area of the combined ViewPager and ImageViews is saved to the screen when it goes
         // into DOZE_SUSPEND mode, and requires no power nor CPU to keep displaying it.
         //
-        // Update: on Android 11 it seems the ViewPager is no longer used as container, the
-        // elements are now part of a FrameLayout directly.
+        // Update: on Android 11 it seems the ViewPager is no longer always used as container, the
+        // elements are now often part of a FrameLayout directly.
         //
         // Of course it is possible we're getting the wrong views inside some random Android
         // activity, so we make sure elsewhere the system is actually in doze mode before using it.
