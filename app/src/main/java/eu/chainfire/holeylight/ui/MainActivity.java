@@ -181,6 +181,9 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
 
                                 @Override
                                 public void onFailure(CharSequence error) {
+                                    // If the users cancels we also get an error
+                                    if ((error != null) && (error.toString().contains("Future.cancel"))) return;
+
                                     (new AlertDialog.Builder(MainActivity.this))
                                             .setTitle(getString(R.string.error))
                                             .setMessage(error)
