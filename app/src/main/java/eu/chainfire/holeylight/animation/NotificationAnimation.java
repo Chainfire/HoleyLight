@@ -35,6 +35,7 @@ import com.android.systemui.VIDirector;
 
 import androidx.core.view.WindowInsetsCompat;
 import eu.chainfire.holeylight.misc.CameraCutout;
+import eu.chainfire.holeylight.misc.Fold;
 import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.misc.Slog;
 
@@ -68,6 +69,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private final float dpShiftHorizontal;
     private volatile float dpAdd = 0;
     private final VIDirector viDirector;
+    private final VIDirector viDirector2;
 
     private volatile LottieComposition lottieComposition;
     private volatile boolean play = false;
@@ -91,22 +93,40 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
         String viJson = null;
         VIDirector viDirector = null;
+        VIDirector viDirector2 = null;
         if (OVERRIDE_DEVICE == null) {
-            try {
-                viDirector = VIDirector.create(context);
-                if (viDirector != null) {
-                    Rect r = viDirector.getVIViewLocation();
-                    if (r.width() > 0) {
-                        viJson = viDirector.getFaceRecognitionJson();
+            if (Fold.isFold()) {
+                try {
+                    viDirector = VIDirector.create(context, true);
+                    viDirector2 = VIDirector.create(context, false);
+                    if ((viDirector != null) && (viDirector2 != null)) {
+                        Rect r = viDirector.getVIViewLocation();
+                        Rect r2 = viDirector2.getVIViewLocation();
+                        if (r.width() > 0 && r2.width() > 0) {
+                            viJson = viDirector.getFaceRecognitionJson();
+                        }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } else {
+                try {
+                    viDirector = VIDirector.create(context, null);
+                    if (viDirector != null) {
+                        Rect r = viDirector.getVIViewLocation();
+                        if (r.width() > 0) {
+                            viJson = viDirector.getFaceRecognitionJson();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 
         if (viJson != null) {
             this.viDirector = viDirector;
+            this.viDirector2 = viDirector2;
             json = viJson;
             dpAddScaleBase = 0;
             dpAddScaleHorizontal = 0;
@@ -115,6 +135,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
             settings.setUsingVIDirector(true);
         } else {
             this.viDirector = null;
+            this.viDirector2 = null;
             settings.setUsingVIDirector(false);
 
             String device = OVERRIDE_DEVICE != null ? OVERRIDE_DEVICE : Build.DEVICE;
@@ -300,7 +321,13 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                     height = squareSize;
                 } else {
                     if (viDirector != null) {
-                        Rect r = viDirector.getVIViewLocation();
+                        Rect r;
+                        boolean is2 = false;
+                        if ((viDirector2 != null) && Fold.isFolded(viDirector.getScreenWidth(), viDirector.getScreenHeight())) {
+                            r = viDirector2.getVIViewLocation();
+                        } else {
+                            r = viDirector.getVIViewLocation();
+                        }
                         left = r.left;
                         top = r.top;
                         width = r.width();

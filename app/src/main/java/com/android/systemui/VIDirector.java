@@ -58,7 +58,7 @@ public class VIDirector {
         return classLoader;
     }
 
-    public static VIDirector create(Context context) {
+    public static VIDirector create(Context context, Boolean flag) {
         try {
             Class<?> clazz = Class.forName("com.android.keyguard.punchhole.VIDirectorFactory", true, systemUiClassLoader(context));
 
@@ -66,13 +66,23 @@ public class VIDirector {
                 // Kotlin-based code found in newer firmwares
                 Field fCompanion = clazz.getDeclaredField("Companion");
                 Object oCompanion = fCompanion.get(null);
-    
-                Method mCreateVIDirector = oCompanion.getClass().getDeclaredMethod("createVIDirector", Context.class);
-                return new VIDirector(context, mCreateVIDirector.invoke(oCompanion, context));
+
+                if (flag == null) {
+                    Method mCreateVIDirector = oCompanion.getClass().getDeclaredMethod("createVIDirector", Context.class);
+                    return new VIDirector(context, mCreateVIDirector.invoke(oCompanion, context));
+                } else {
+                    Method mCreateVIDirector = oCompanion.getClass().getDeclaredMethod("createVIDirector", Context.class, boolean.class);
+                    return new VIDirector(context, mCreateVIDirector.invoke(oCompanion, context, flag));
+                }
             } catch (NoSuchFieldException e) {
                 // Java-based code found in older firmwares
-                Method mCreateVIDirector = clazz.getDeclaredMethod("createVIDirector", Context.class);
-                return new VIDirector(context, mCreateVIDirector.invoke(null, context));
+                if (flag == null) {
+                    Method mCreateVIDirector = clazz.getDeclaredMethod("createVIDirector", Context.class);
+                    return new VIDirector(context, mCreateVIDirector.invoke(null, context));
+                } else {
+                    Method mCreateVIDirector = clazz.getDeclaredMethod("createVIDirector", Context.class, boolean.class);
+                    return new VIDirector(context, mCreateVIDirector.invoke(null, context, flag));
+                }
             }
         } catch (Exception e) {
             Slog.e("VIDirector", "Could not create instance :: %s", e);

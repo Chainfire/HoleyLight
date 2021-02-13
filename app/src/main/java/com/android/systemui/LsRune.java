@@ -18,7 +18,10 @@
 
 package com.android.systemui;
 
+import eu.chainfire.holeylight.misc.Fold;
+
 // This class is needed to prevent a crash on S10 when loading VIDirector
+// And is used on Fold to determine if this device folds or not
 public class LsRune {
-    public static final boolean SECURITY_SUB_DISPLAY_LOCK = false;
+    public static final boolean SECURITY_SUB_DISPLAY_LOCK = Fold.isFold();
 }
