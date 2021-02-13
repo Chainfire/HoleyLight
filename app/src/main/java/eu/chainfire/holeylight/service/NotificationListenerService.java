@@ -84,7 +84,15 @@ public class NotificationListenerService extends android.service.notification.No
         }
 
         public String toCompare() {
-            return packageName + "::" + channelName;
+            return toCompare(false);
+        }
+
+        public String toCompare(boolean withColor) {
+            if (withColor) {
+                return packageName + "::" + channelName + "::" + color;
+            } else {
+                return packageName + "::" + channelName;
+            }
         }
 
         public String getKey() {
@@ -459,7 +467,7 @@ public class NotificationListenerService extends android.service.notification.No
         boolean changes = (visibleNotifications.size() != currentNotifications.size());
         if (!changes) {
             for (int i = 0; i < currentNotifications.size(); i++) {
-                if (!currentNotifications.get(i).toCompare().equals(visibleNotifications.get(i).toCompare())) {
+                if (!currentNotifications.get(i).toCompare(true).equals(visibleNotifications.get(i).toCompare(true))) {
                     changes = true;
                     break;
                 }
