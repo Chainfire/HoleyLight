@@ -430,7 +430,7 @@ public class NotificationListenerService extends android.service.notification.No
         }
 
         List<ActiveNotification> visibleNotifications = new ArrayList<>();
-        if (!dnd) {
+        if (!dnd && inAODSchedule) {
             for (ActiveNotification not : activeNotifications) {
                 if (not.isVisible()) {
                     boolean found = false;
