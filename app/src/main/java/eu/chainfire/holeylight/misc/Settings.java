@@ -174,6 +174,12 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     private static final String CHANNEL_COLOR_FMT = CHANNEL_COLOR + "%s:%s";
     public static final String CHANNEL_NAME_DEFAULT = "default";
 
+    private static final String CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE = "RESPECT_NOTIFICATION_COLOR_STATE:";
+    private static final String CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE_FMT = CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE + "%s:%s";
+    private static final String[] CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE_PACKAGES = new String[] {
+            "com.facebook.orca"
+    };
+
     public static final String HIDE_AOD = "hide_aod";
     private static final boolean HIDE_AOD_DEFAULT = false;
 
@@ -474,7 +480,26 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         }
         return ret;
     }
+
+    public boolean isRespectNotificationColorStateForPackageAndChannel(String packageName, String channelName) {
+        boolean defaultValue = false;
+        for (String pkg : CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE_PACKAGES) {
+            if (pkg.equals(packageName)) {
+                defaultValue = true;
+            }
+        }
+        return prefs.getBoolean(String.format(CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE_FMT, packageName, channelName), defaultValue);
+    }
     
+    public void setRespectNotificationColorStateForPackageAndChannel(String packageName, String channelName, boolean value) {
+        edit();
+        try {
+            editor.putBoolean(String.format(CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE_FMT, packageName, channelName), value);
+        } finally {
+            save(true);
+        }
+    }
+
     public String getSeenPickupWhileKey(int mode) {
         return String.format(Locale.ENGLISH, SEEN_PICKUP_WHILE_FMT, SCREEN_AND_POWER_STATE[mode]);
     }

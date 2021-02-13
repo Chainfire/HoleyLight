@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -191,7 +192,20 @@ public class ColorActivity extends AppCompatActivity {
                 } else {
                     holder.tvChannel.setText(Html.fromHtml("<small>" + holder.appItem.channelName + "</small>"));
                 }
+
+                boolean respectNotificationColor;
                 holder.ivColor.setBackgroundColor(holder.appItem.color);
+                ViewGroup.LayoutParams params = holder.ivColor.getLayoutParams();
+                ViewGroup.LayoutParams paramsParent = ((FrameLayout)holder.ivColor.getParent()).getLayoutParams();
+                if (settings.isRespectNotificationColorStateForPackageAndChannel(holder.appItem.packageName, holder.appItem.channelName)) {
+                    params.width = paramsParent.width / 2;
+                    respectNotificationColor = true;
+                } else {
+                    params.width = paramsParent.width;
+                    respectNotificationColor = false;
+                }
+                holder.ivColor.setLayoutParams(params);
+
                 final AppItem item = holder.appItem;
                 holder.view.setOnClickListener(v -> {
                     ColorPickerPopup popup = (new ColorPickerPopup.Builder(ColorActivity.this))
@@ -231,14 +245,15 @@ public class ColorActivity extends AppCompatActivity {
                     }
                 });
                 holder.view.setOnLongClickListener(v -> {
-                    CharSequence[] entries = new CharSequence[colorCopy == null ? 5 : 6];
+                    CharSequence[] entries = new CharSequence[colorCopy == null ? 6 : 7];
                     entries[0] = getString(R.string.colors_disable);
                     entries[1] = getString(R.string.colors_hex);
-                    entries[2] = Html.fromHtml(getString(R.string.colors_set_default, holder.appItem.title));
-                    entries[3] = Html.fromHtml(getString(R.string.colors_apply, holder.appItem.title));
-                    entries[4] = getString(R.string.colors_copy);
+                    entries[2] = Html.fromHtml(getString(respectNotificationColor ? R.string.colors_ignore_notification_color_state : R.string.colors_respect_notification_color_state));
+                    entries[3] = Html.fromHtml(getString(R.string.colors_set_default, holder.appItem.title));
+                    entries[4] = Html.fromHtml(getString(R.string.colors_apply, holder.appItem.title));
+                    entries[5] = getString(R.string.colors_copy);
                     if (colorCopy != null) {
-                        entries[5] = getString(R.string.colors_paste);
+                        entries[6] = getString(R.string.colors_paste);
                     }
 
                     (new AlertDialog.Builder(v.getContext()))
@@ -276,11 +291,16 @@ public class ColorActivity extends AppCompatActivity {
                                             hexEdit.requestFocus();
                                         }
                                         break;
-                                    case 2: // default
+                                    case 2: // respect
+                                        settings.setRespectNotificationColorStateForPackageAndChannel(item.packageName, item.channelName, !settings.isRespectNotificationColorStateForPackageAndChannel(item.packageName, item.channelName));
+                                        forceOverlayReload();
+                                        notifyDataSetChanged();
+                                        break;
+                                    case 3: // default
                                         settings.setColorForPackageAndChannel(item.packageName, null, item.color, false);
                                         refresh();
                                         break;
-                                    case 3: // apply
+                                    case 4: // apply
                                         (new AlertDialog.Builder(v.getContext()))
                                                 .setTitle(R.string.colors_apply_short)
                                                 .setMessage(Html.fromHtml(getString(R.string.colors_apply_include_black)))
@@ -288,10 +308,10 @@ public class ColorActivity extends AppCompatActivity {
                                                 .setNegativeButton(R.string.no, (dialog1, which1) -> setColorForPackage(item.packageName, item.color, false))
                                                 .show();
                                         break;
-                                    case 4: // copy
+                                    case 5: // copy
                                         colorCopy = item.color;
                                         break;
-                                    case 5: // paste
+                                    case 6: // paste
                                         settings.setColorForPackageAndChannel(item.packageName, item.channelName, colorCopy, false);
                                         item.color = colorCopy;
                                         forceOverlayReload();

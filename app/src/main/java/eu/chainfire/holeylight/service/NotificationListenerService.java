@@ -358,7 +358,6 @@ public class NotificationListenerService extends android.service.notification.No
         boolean inAODSchedule = AODControl.inAODSchedule(this, true) || (!Display.isOff(this, false));
         int timeout = settings.getSeenTimeout(mode);
 
-        List<Integer> colors = new ArrayList<>();
         activeNotifications.clear();
 
         try {
@@ -419,6 +418,17 @@ public class NotificationListenerService extends android.service.notification.No
                 // Save to prefs, or get overridden value from prefs
                 c = settings.getColorForPackageAndChannel(sbn.getPackageName(), channelName, c, (cChan & 0x00FFFFFF) != 0x000000);
                 settings.setColorForPackageAndChannel(sbn.getPackageName(), channelName, c, true);
+
+                // Respect notification color being black? We normally don't want this as a lot of
+                // notifications that we do want to show would disappear, but sometimes the same
+                // channel is used with and without color. See Facebook Messenger in "bubble" mode,
+                // notification color is black if the bubble is active but there are no unseen
+                // messages
+                if (settings.isRespectNotificationColorStateForPackageAndChannel(sbn.getPackageName(), channelName)) {
+                    if ((not.color & 0xFFFFFF) == 0) {
+                        c = 0;
+                    }
+                }
 
                 // Make sure we have alpha (again)
                 c = c | 0xFF000000;
