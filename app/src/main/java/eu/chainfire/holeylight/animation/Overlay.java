@@ -78,7 +78,7 @@ public class Overlay {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() == null) return;
 
-            log("Intent: %s", intent.getAction());
+            Slog.d("Broadcast", "Intent: %s", intent.getAction());
 
             switch (intent.getAction()) {
                 case Intent.ACTION_CONFIGURATION_CHANGED:
@@ -87,6 +87,8 @@ public class Overlay {
                             ((resolutionNow.x != resolution.x) || (resolutionNow.y != resolution.y)) &&
                             ((resolutionNow.x != resolution.y) || (resolutionNow.y != resolution.x))
                     ) {
+                        Slog.d("Broadcast", "Resolution: %dx%d --> %dx%d", resolution.x, resolution.y, resolutionNow.x, resolutionNow.y);
+
                         // Resolution changed
                         // This is an extremely ugly hack, don't try this at home
                         // There are some internal states that are hard to figure out, including
