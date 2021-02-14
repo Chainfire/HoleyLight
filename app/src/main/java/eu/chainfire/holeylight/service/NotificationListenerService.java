@@ -373,6 +373,8 @@ public class NotificationListenerService extends android.service.notification.No
                 int cChan = c;
                 String channelName = "legacy";
 
+                Boolean shouldShowLights = null;
+
                 if (not.getChannelId() != null) {
                     channelName = sanitizeChannelId(not.getChannelId());
 
@@ -380,6 +382,7 @@ public class NotificationListenerService extends android.service.notification.No
                     for (NotificationChannel chan : chans) {
                         if (chan.getId().equals(not.getChannelId())) {
                             if (chan.shouldShowLights()) {
+                                shouldShowLights = true;
                                 c = chan.getLightColor();
                                 cChan = c;
 
@@ -407,6 +410,12 @@ public class NotificationListenerService extends android.service.notification.No
 
                                 // Make sure we have alpha
                                 c = c | 0xFF000000;
+                            } else {
+                                if (shouldShowLights == null) {
+                                    shouldShowLights = chan.shouldShowLights();
+                                } else {
+                                    shouldShowLights |= chan.shouldShowLights();
+                                }
                             }
                         }
                     }
@@ -425,7 +434,7 @@ public class NotificationListenerService extends android.service.notification.No
                 // notification color is black if the bubble is active but there are no unseen
                 // messages
                 if (settings.isRespectNotificationColorStateForPackageAndChannel(sbn.getPackageName(), channelName)) {
-                    if ((not.color & 0xFFFFFF) == 0) {
+                    if (((not.color & 0xFFFFFF) == 0) || (shouldShowLights != null && !shouldShowLights)) {
                         c = 0;
                     }
                 }
@@ -434,7 +443,7 @@ public class NotificationListenerService extends android.service.notification.No
                 c = c | 0xFF000000;
 
                 // user has set notification to full black, skip
-                log("%s [%s] (%s) --> #%08X / #%08X --> #%08X [%s]", sbn.getKey(), sbn.getPackageName(), channelName, cChan, not.color, c, not.getSmallIcon() != null ? "I" : "x");
+                log("%s [%s] (%s) --> #%08X / #%08X --> #%08X [%s][%s]", sbn.getKey(), sbn.getPackageName(), channelName, cChan, not.color, c, not.getSmallIcon() != null ? "I" : "x", shouldShowLights == null ? "x" : (shouldShowLights ? "Y" : "N"));
                 if ((c & 0xFFFFFF) == 0) {
                     continue;
                 }
