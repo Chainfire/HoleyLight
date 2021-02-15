@@ -353,7 +353,8 @@ public class NotificationListenerService extends android.service.notification.No
 
         log("handleLEDNotifications");
 
-        int mode = settings.getMode(Battery.isCharging(this), !Display.isDoze(this));
+        boolean screenOn = !Display.isDoze(this);
+        int mode = settings.getMode(Battery.isCharging(this), screenOn);
         boolean dnd = settings.isRespectDoNotDisturb() && (android.provider.Settings.Global.getInt(getContentResolver(), "zen_mode", 0) > 0);
         boolean inAODSchedule = AODControl.inAODSchedule(this, true) || (!Display.isOff(this, false));
         int timeout = settings.getSeenTimeout(mode);
@@ -364,7 +365,8 @@ public class NotificationListenerService extends android.service.notification.No
             StatusBarNotification[] sbns = tracker.prune(
                     getActiveNotifications(),
                     !Display.isOn(this, false) || !settings.isSeenIfScreenOn(true),
-                    timeout
+                    timeout,
+                    !settings.isSeenTimeoutTrackSeparately() ? null : screenOn
             );
             for (StatusBarNotification sbn : sbns) {
                 Notification not = sbn.getNotification();

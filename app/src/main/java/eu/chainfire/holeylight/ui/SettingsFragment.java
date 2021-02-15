@@ -29,6 +29,7 @@ import android.text.Html;
 import android.text.format.DateFormat;
 import android.util.TypedValue;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -132,6 +133,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     }
 
     private class TimeoutHelper {
+        public TimeoutHelper() { }
+
+        public void save() { }
+
+        public void close() { }
+    }
+
+    private class TimeoutTimeHelper extends TimeoutHelper {
         private final int[] VALUES = new int[] {
             0,
             5 * 1000,
@@ -150,14 +159,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         private final TextView textValue;
         private final int mode;
         private AlertDialog base = null;
-        private String title = null;
 
-        public TimeoutHelper(AlertDialog base, int seekBarId, int textValueId, int mode) {
+        public TimeoutTimeHelper(AlertDialog base, int seekBarId, int textValueId, int mode) {
+            super();
             seekBar = base.findViewById(seekBarId);
             textValue = base.findViewById(textValueId);
             this.mode = mode;
             this.base = base;
-            title = (String)base.getWindow().getAttributes().getTitle();
 
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
@@ -168,12 +176,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 @Override public void onStartTrackingTouch(SeekBar seekBar) {
                 }
                 @Override public void onStopTrackingTouch(SeekBar seekBar) {
-                    base.setTitle(title);
+                    base.setTitle(R.string.settings_seen_on_timeout_title);
                 }
             });
             seekBar.setMax(VALUES.length - 1);
             seekBar.setProgress(getIndexFromValue(settings.getSeenTimeout(mode)), false);
             textValue.setText(getDescriptionFromIndex(seekBar.getProgress()));
+            base.setTitle(R.string.settings_seen_on_timeout_title);
         }
 
         public int getIndexFromValue(int value) {
@@ -199,13 +208,34 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return getString(R.string.x_hours, ms / (60 * 60 * 1000));
         }
 
+        @Override
         public void save() {
             settings.setSeenTimeout(mode, getValue());
         }
 
+        @Override
         public void close() {
-            base.setTitle(title);
+            base.setTitle(R.string.settings_seen_on_timeout_title);
             base = null;
+        }
+    }
+
+    private class TimeoutTrackHelper extends TimeoutHelper {
+        private final CheckBox checkBox;
+
+        public TimeoutTrackHelper(AlertDialog base, int checkBoxId) {
+            super();
+            checkBox = base.findViewById(checkBoxId);
+            checkBox.setChecked(settings.isSeenTimeoutTrackSeparately());
+        }
+
+        @Override
+        public void save() {
+            settings.setSeenTimeoutTrackSeparately(checkBox.isChecked());
+        }
+
+        @Override
+        public void close() {
         }
     }
 
@@ -402,7 +432,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         prefSeenOnTimeout = check(catMarkAsSeen, R.string.settings_seen_on_timeout_title, R.string.settings_seen_on_timeout_description, null, false, true);
         prefSeenOnTimeout.setOnPreferenceChangeListener((preference, newValue) -> false);
         prefSeenOnTimeout.setOnPreferenceClickListener(preference -> {
-            ArrayList<TimeoutHelper> helpers = new ArrayList<>();
+            ArrayList<TimeoutHelper> timeoutHelpers = new ArrayList<>();
 
             AlertDialog dialog = (new AlertDialog.Builder(getContext()))
                     .setTitle(preference.getTitle())
@@ -411,7 +441,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                     .setPositiveButton(android.R.string.ok, (dialog1, which) -> {
                         settings.edit();
                         try {
-                            for (TimeoutHelper helper : helpers) {
+                            for (TimeoutHelper helper : timeoutHelpers) {
                                 helper.save();
                             }
                         } finally {
@@ -419,16 +449,17 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                         }
                     })
                     .setOnDismissListener(dialog1 -> {
-                        for (TimeoutHelper helper : helpers) {
+                        for (TimeoutHelper helper : timeoutHelpers) {
                             helper.close();
                         }
                     })
                     .show();
 
-            helpers.add(new TimeoutHelper(dialog, R.id.timeout_charging_screen_on_seek, R.id.timeout_charging_screen_on_value, Settings.SCREEN_ON_CHARGING));
-            helpers.add(new TimeoutHelper(dialog, R.id.timeout_charging_screen_off_seek, R.id.timeout_charging_screen_off_value, Settings.SCREEN_OFF_CHARGING));
-            helpers.add(new TimeoutHelper(dialog, R.id.timeout_battery_screen_on_seek, R.id.timeout_battery_screen_on_value, Settings.SCREEN_ON_BATTERY));
-            helpers.add(new TimeoutHelper(dialog, R.id.timeout_battery_screen_off_seek, R.id.timeout_battery_screen_off_value, Settings.SCREEN_OFF_BATTERY));
+            timeoutHelpers.add(new TimeoutTimeHelper(dialog, R.id.timeout_charging_screen_on_seek, R.id.timeout_charging_screen_on_value, Settings.SCREEN_ON_CHARGING));
+            timeoutHelpers.add(new TimeoutTimeHelper(dialog, R.id.timeout_charging_screen_off_seek, R.id.timeout_charging_screen_off_value, Settings.SCREEN_OFF_CHARGING));
+            timeoutHelpers.add(new TimeoutTimeHelper(dialog, R.id.timeout_battery_screen_on_seek, R.id.timeout_battery_screen_on_value, Settings.SCREEN_ON_BATTERY));
+            timeoutHelpers.add(new TimeoutTimeHelper(dialog, R.id.timeout_battery_screen_off_seek, R.id.timeout_battery_screen_off_value, Settings.SCREEN_OFF_BATTERY));
+            timeoutHelpers.add(new TimeoutTrackHelper(dialog, R.id.timeout_track_separately));
             return false;
         });
 

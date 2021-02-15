@@ -29,11 +29,11 @@ import eu.chainfire.holeylight.BuildConfig;
 @SuppressWarnings({"WeakerAccess"})
 public class NotificationTracker {
     public static class Item {
-        private String key;
-        private long posted;
-        private long when;
-        private long firstSeen;
-        private boolean seen = false;
+        private final String key;
+        private final long posted;
+        private final long when;
+        private final long firstSeen;
+        private final boolean[] seen = new boolean[] { false, false };
         private int shown = 0;
 
         public Item(StatusBarNotification sbn) {
@@ -46,11 +46,32 @@ public class NotificationTracker {
         public boolean match(StatusBarNotification sbn) {
             return key.equals(sbn.getKey()) && (posted == sbn.getPostTime()) && (when == sbn.getNotification().when);
         }
+
+        public boolean getSeen(Boolean screenOn) {
+            if (screenOn == null) {
+                return seen[0] || seen[1];
+            } else if (!screenOn) {
+                return seen[0];
+            } else {
+                return seen[1];
+            }
+        }
+
+        public void setSeen(Boolean screenOn) {
+            if (screenOn == null) {
+                seen[0] = true;
+                seen[1] = true;
+            } else if (!screenOn) {
+                seen[0] = true;
+            } else {
+                seen[1] = true;
+            }
+        }
     }
 
-    private List<Item> items = new ArrayList<>();
+    private final List<Item> items = new ArrayList<>();
 
-    public StatusBarNotification[] prune(StatusBarNotification[] active, boolean addNewNotifications, int timeout) {
+    public StatusBarNotification[] prune(StatusBarNotification[] active, boolean addNewNotifications, int timeout, Boolean screenOn) {
         long now = SystemClock.elapsedRealtime();
 
         // remove notifications from our own list that are no longer active
@@ -76,9 +97,9 @@ public class NotificationTracker {
             boolean found = false;
             for (Item item : items) {
                 if (item.match(sbn)) {
-                    if (!item.seen || sbn.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
+                    if (!item.getSeen(screenOn) || sbn.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
                         if ((timeout > 0) && (now - item.firstSeen > timeout) && (item.shown > 0) && !sbn.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
-                            item.seen = true;
+                            item.setSeen(screenOn);
                         } else {
                             item.shown++;
                             sbns.add(sbn);
@@ -93,7 +114,7 @@ public class NotificationTracker {
                 if (addNewNotifications || BuildConfig.APPLICATION_ID.equals(sbn.getPackageName())) {
                     sbns.add(sbn);
                 } else {
-                    item.seen = true;
+                    item.setSeen(screenOn);
                 }
                 items.add(item);
             }
@@ -107,7 +128,7 @@ public class NotificationTracker {
 
     public void markAllAsSeen() {
         for (Item item : items) {
-            item.seen = true;
+            item.setSeen(null);
         }
     }
 }

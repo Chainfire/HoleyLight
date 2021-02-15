@@ -203,6 +203,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final String USING_VI_DIRECTOR = "using_vidirector";
     public static final boolean USING_VI_DIRECTOR_DEFAULT = false;
 
+    private static final String SEEN_TIMEOUT_TRACK_SEPARATELY = "seen_timeout_track_separately";
+    private static final boolean SEEN_TIMEOUT_TRACK_SEPARATELY_DEFAULT = false;
+
     private static Settings instance;
     public static Settings getInstance(Context context) {
         synchronized (Settings.class) {
@@ -680,6 +683,19 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         try {
             editor.putBoolean(USING_VI_DIRECTOR, value);
             resetTuning();
+        } finally {
+            save(true);
+        }
+    }
+
+    public boolean isSeenTimeoutTrackSeparately() {
+        return prefs.getBoolean(SEEN_TIMEOUT_TRACK_SEPARATELY, SEEN_TIMEOUT_TRACK_SEPARATELY_DEFAULT);
+    }
+
+    public void setSeenTimeoutTrackSeparately(boolean value) {
+        edit();
+        try {
+            editor.putBoolean(SEEN_TIMEOUT_TRACK_SEPARATELY, value);
         } finally {
             save(true);
         }
