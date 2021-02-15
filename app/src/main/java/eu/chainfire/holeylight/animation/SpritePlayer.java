@@ -274,11 +274,11 @@ public class SpritePlayer extends RelativeLayout {
 
                     for (int i = 0; i < icons.length; i++) {
                         if (icons[i] != null) {
-                            int x = (int)(right + left)/2;
-                            int y = (int)(bottom + top)/2;
+                            float x = (right + left)/2;
+                            float y = (bottom + top)/2;
                             if (drawableIcons > 1) {
-                                x += (int)(Math.cos(Math.toRadians(startAngle + 270 + (anglePerColor * i))) * radius/2);
-                                y += (int)(Math.sin(Math.toRadians(startAngle + 270 + (anglePerColor * i))) * radius/2);
+                                x += Math.cos(Math.toRadians(startAngle + 270 + (anglePerColor * i))) * radius/2;
+                                y += Math.sin(Math.toRadians(startAngle + 270 + (anglePerColor * i))) * radius/2;
                             }
 
                             int w = icons[i].getIntrinsicWidth();
@@ -287,8 +287,8 @@ public class SpritePlayer extends RelativeLayout {
                                 w *= 2;
                                 h *= 2;
                             }
-                            int l = x - w/2;
-                            int t = y - h/2;
+                            int l = (int)(x - (float)w/2);
+                            int t = (int)(y - (float)h/2);
                             icons[i].setBounds(l, t, l + w, h + t);
                             icons[i].setTint(colors[i]);
                             icons[i].draw(canvas);
