@@ -262,33 +262,35 @@ public class SpritePlayer extends RelativeLayout {
                 }
                 canvas.drawCircle(cx, cy, radius, paintTsp);
 
-                int drawableIcons = 0;
-                for (int i = 0; i < icons.length; i++) {
-                    if (icons[i] != null) {
-                        drawableIcons++;
+                if (icons.length == colors.length) {
+                    int drawableIcons = 0;
+                    for (int i = 0; i < icons.length; i++) {
+                        if (icons[i] != null) {
+                            drawableIcons++;
+                        }
                     }
-                }
 
-                for (int i = 0; i < icons.length; i++) {
-                    if (icons[i] != null) {
-                        int x = (int)(right + left)/2;
-                        int y = (int)(bottom + top)/2;
-                        if (drawableIcons > 1) {
-                            x += (int)(Math.cos(Math.toRadians(startAngle + 270 + (anglePerColor * i))) * radius/2);
-                            y += (int)(Math.sin(Math.toRadians(startAngle + 270 + (anglePerColor * i))) * radius/2);
-                        }
+                    for (int i = 0; i < icons.length; i++) {
+                        if (icons[i] != null) {
+                            int x = (int)(right + left)/2;
+                            int y = (int)(bottom + top)/2;
+                            if (drawableIcons > 1) {
+                                x += (int)(Math.cos(Math.toRadians(startAngle + 270 + (anglePerColor * i))) * radius/2);
+                                y += (int)(Math.sin(Math.toRadians(startAngle + 270 + (anglePerColor * i))) * radius/2);
+                            }
 
-                        int w = icons[i].getIntrinsicWidth();
-                        int h = icons[i].getIntrinsicHeight();
-                        if (drawableIcons == 1) {
-                            w *= 2;
-                            h *= 2;
+                            int w = icons[i].getIntrinsicWidth();
+                            int h = icons[i].getIntrinsicHeight();
+                            if (drawableIcons == 1) {
+                                w *= 2;
+                                h *= 2;
+                            }
+                            int l = x - w/2;
+                            int t = y - h/2;
+                            icons[i].setBounds(l, t, l + w, h + t);
+                            icons[i].setTint(colors[i]);
+                            icons[i].draw(canvas);
                         }
-                        int l = x - w/2;
-                        int t = y - h/2;
-                        icons[i].setBounds(l, t, l + w, h + t);
-                        icons[i].setTint(colors[i]);
-                        icons[i].draw(canvas);
                     }
                 }
             }
