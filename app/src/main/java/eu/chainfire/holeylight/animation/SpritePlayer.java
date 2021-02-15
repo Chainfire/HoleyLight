@@ -658,7 +658,11 @@ public class SpritePlayer extends RelativeLayout {
         synchronized (sync) {
             if (mode != drawMode) {
                 frame = -1;
-                modeStart = SystemClock.elapsedRealtime();
+                if (mode == Mode.TSP && drawMode == Mode.TSP_HIDE) {
+                    modeStart = SystemClock.elapsedRealtime() - (TSP_FIRST_DRAW_DELAY / 4) * 3;
+                } else {
+                    modeStart = SystemClock.elapsedRealtime();
+                }
                 drawMode = mode;
                 surfaceInvalidated = true;
                 evaluate();

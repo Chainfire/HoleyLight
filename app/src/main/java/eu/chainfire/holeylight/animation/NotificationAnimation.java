@@ -486,7 +486,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                 this.colorsNext = colors;
                 this.playNext = !once;
             } else {
-                if (immediately) spritePlayer.cancelAnimation();
+                if (immediately && !spritePlayer.isTSPMode()) spritePlayer.cancelAnimation();
                 this.colors = colors;
                 play = !once;
                 colorIndex = 0;
