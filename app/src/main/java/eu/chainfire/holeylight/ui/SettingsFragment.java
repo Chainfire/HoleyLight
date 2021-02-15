@@ -149,19 +149,27 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         private final SeekBar seekBar;
         private final TextView textValue;
         private final int mode;
+        private AlertDialog base = null;
+        private String title = null;
 
         public TimeoutHelper(AlertDialog base, int seekBarId, int textValueId, int mode) {
             seekBar = base.findViewById(seekBarId);
             textValue = base.findViewById(textValueId);
             this.mode = mode;
+            this.base = base;
+            title = (String)base.getWindow().getAttributes().getTitle();
 
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     textValue.setText(getDescriptionFromIndex(progress));
+                    base.setTitle(getDescriptionFromIndex(progress));
                 }
-                @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-                @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+                @Override public void onStartTrackingTouch(SeekBar seekBar) {
+                }
+                @Override public void onStopTrackingTouch(SeekBar seekBar) {
+                    base.setTitle(title);
+                }
             });
             seekBar.setMax(VALUES.length - 1);
             seekBar.setProgress(getIndexFromValue(settings.getSeenTimeout(mode)), false);
@@ -193,6 +201,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         public void save() {
             settings.setSeenTimeout(mode, getValue());
+        }
+
+        public void close() {
+            base.setTitle(title);
+            base = null;
         }
     }
 
@@ -403,6 +416,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                             }
                         } finally {
                             settings.save(true);
+                        }
+                    })
+                    .setOnDismissListener(dialog1 -> {
+                        for (TimeoutHelper helper : helpers) {
+                            helper.close();
                         }
                     })
                     .show();
