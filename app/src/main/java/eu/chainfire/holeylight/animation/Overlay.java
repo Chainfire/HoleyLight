@@ -49,6 +49,7 @@ import eu.chainfire.holeylight.misc.Display;
 import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.misc.Slog;
 import eu.chainfire.holeylight.service.AccessibilityService;
+import eu.chainfire.holeylight.service.NotificationTracker;
 import eu.chainfire.holeylight.ui.DetectCutoutActivity;
 
 import static android.content.Context.KEYGUARD_SERVICE;
@@ -100,6 +101,8 @@ public class Overlay {
                         context.startActivity(start);
                         handler.postDelayed(() -> {
                             Context context1 = spritePlayer.getContext();
+                            Intent intent1 = new Intent(context1, DetectCutoutActivity.class);
+                            intent1.putExtra(BuildConfig.APPLICATION_ID + "/notifications", NotificationTracker.getInstance().saveToBytes());
                             AlarmManager alarmManager = (AlarmManager) context1.getSystemService(Service.ALARM_SERVICE);
                             alarmManager.setExactAndAllowWhileIdle(
                                     AlarmManager.ELAPSED_REALTIME,
@@ -107,7 +110,7 @@ public class Overlay {
                                     PendingIntent.getActivity(
                                             context1,
                                             0,
-                                            new Intent(context1, DetectCutoutActivity.class),
+                                            intent1,
                                             0
                                     )
                             );

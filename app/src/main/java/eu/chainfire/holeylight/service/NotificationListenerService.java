@@ -214,7 +214,7 @@ public class NotificationListenerService extends android.service.notification.No
 
         handler = new Handler(Looper.getMainLooper());
 
-        tracker = new NotificationTracker();
+        tracker = NotificationTracker.getInstance();
 
         intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);

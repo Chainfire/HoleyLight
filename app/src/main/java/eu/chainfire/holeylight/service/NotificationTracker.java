@@ -18,6 +18,8 @@
 
 package eu.chainfire.holeylight.service;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.os.SystemClock;
 import android.service.notification.StatusBarNotification;
 
@@ -28,7 +30,7 @@ import eu.chainfire.holeylight.BuildConfig;
 
 @SuppressWarnings({"WeakerAccess"})
 public class NotificationTracker {
-    public static class Item {
+    public static class Item implements Parcelable {
         private final String key;
         private final long posted;
         private final long when;
@@ -36,11 +38,31 @@ public class NotificationTracker {
         private final boolean[] seen = new boolean[] { false, false };
         private int shown = 0;
 
+        public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+            public Item createFromParcel(Parcel in) {
+                return new Item(in);
+            }
+
+            public Item[] newArray(int size) {
+                return new Item[size];
+            }
+        };
+
         public Item(StatusBarNotification sbn) {
             key = sbn.getKey();
             posted = sbn.getPostTime();
             when = sbn.getNotification().when;
             firstSeen = SystemClock.elapsedRealtime();
+        }
+
+        public Item(Parcel in) {
+            key = in.readString();
+            posted = in.readLong();
+            when = in.readLong();
+            firstSeen = in.readLong();
+            seen[0] = in.readInt() == 1;
+            seen[1] = in.readInt() == 1;
+            shown = in.readInt();
         }
 
         public boolean match(StatusBarNotification sbn) {
@@ -67,9 +89,79 @@ public class NotificationTracker {
                 seen[1] = true;
             }
         }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(key);
+            dest.writeLong(posted);
+            dest.writeLong(when);
+            dest.writeLong(firstSeen);
+            dest.writeInt(seen[0] ? 1 : 0);
+            dest.writeInt(seen[1] ? 1 : 0);
+            dest.writeInt(shown);
+        }
+    }
+
+    private static NotificationTracker instance = null;
+    public static NotificationTracker getInstance() {
+        if (instance == null) instance = new NotificationTracker();
+        return instance;
+    }
+
+    private NotificationTracker() {
     }
 
     private final List<Item> items = new ArrayList<>();
+
+    private void load(Item[] array) {
+        items.clear();
+        if (array != null) {
+            for (Item item : array) {
+                items.add(item);
+            }
+        }
+    }
+
+    private Item[] save() {
+        return items.toArray(new Item[0]);
+    }
+
+    public void loadFromBytes(byte[] bytes) {
+        // Using Parcelables with AlarmManager doesn't work these days
+
+        if (bytes == null) {
+            load(null);
+        } else {
+            Parcel parcel = Parcel.obtain();
+            parcel.unmarshall(bytes, 0, bytes.length);
+            parcel.setDataPosition(0);
+            Item[] items = new Item[parcel.readInt()];
+            for (int i = 0; i < items.length; i++) {
+                items[i] = (Item)Item.CREATOR.createFromParcel(parcel);
+            }
+            load(items);
+            parcel.recycle();
+        }
+    }
+
+    public byte[] saveToBytes() {
+        // Using Parcelables with AlarmManager doesn't work these days
+
+        Item[] items = save();
+        Parcel parcel = Parcel.obtain();
+        parcel.writeInt(items.length);
+        for (int i = 0; i < items.length; i++) {
+            items[i].writeToParcel(parcel, 0);
+        }
+        byte[] result = parcel.marshall();
+        parcel.recycle();
+        return result;
+    }
 
     public StatusBarNotification[] prune(StatusBarNotification[] active, boolean addNewNotifications, int timeout, Boolean screenOn) {
         long now = SystemClock.elapsedRealtime();
