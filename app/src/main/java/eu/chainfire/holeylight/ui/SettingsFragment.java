@@ -60,6 +60,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefLockscreenOn = null;
     private Preference prefAODSchedule = null;
     private CheckBoxPreference prefRespectDND = null;
+    private CheckBoxPreference prefOverlayLinger = null;
     private Preference prefSeenPickup = null;
     private CheckBoxPreference prefSeenOnLockscreen = null;
     private CheckBoxPreference prefSeenOnUserPresent = null;
@@ -239,6 +240,65 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         }
     }
 
+    private class TimeoutLingerHelper extends TimeoutHelper {
+        private final SeekBar seekBar;
+        private final TextView textValue;
+        private AlertDialog base = null;
+
+        public TimeoutLingerHelper(AlertDialog base, int seekBarId, int textValueId) {
+            super();
+            seekBar = base.findViewById(seekBarId);
+            textValue = base.findViewById(textValueId);
+            this.base = base;
+
+            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    textValue.setText(getDescriptionFromIndex(progress));
+                    base.setTitle(getDescriptionFromIndex(progress));
+                }
+                @Override public void onStartTrackingTouch(SeekBar seekBar) {
+                }
+                @Override public void onStopTrackingTouch(SeekBar seekBar) {
+                    base.setTitle(R.string.settings_animation_overlay_linger_title);
+                }
+            });
+            seekBar.setMax(20);
+            seekBar.setProgress(getIndexFromValue(settings.getOverlayLinger()), false);
+            textValue.setText(getDescriptionFromIndex(seekBar.getProgress()));
+            base.setTitle(R.string.settings_animation_overlay_linger_title);
+        }
+
+        public int getIndexFromValue(int value) {
+            return value / 25;
+        }
+
+        public int getValueFromIndex(int index) {
+            return index * 25;
+        }
+
+        public int getValue() {
+            return getValueFromIndex(seekBar.getProgress());
+        }
+
+        public String getDescriptionFromIndex(int index) {
+            int ms = getValueFromIndex(index);
+            if (ms == 0) return getString(R.string.disabled);
+            return getString(R.string.x_ms, ms);
+        }
+
+        @Override
+        public void save() {
+            settings.setOverlayLinger(getValue());
+        }
+
+        @Override
+        public void close() {
+            base.setTitle(R.string.settings_animation_overlay_linger_title);
+            base = null;
+        }
+    }
+
     @SuppressWarnings({"ConstantConditions", "deprecation"})
     private PreferenceScreen createPreferenceHierarchy() {
         PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
@@ -378,6 +438,35 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return false;
         });
         check(catAnimation, R.string.settings_animation_unholey_light_icons_title, R.string.settings_animation_unholey_light_icons_description, Settings.UNHOLEY_LIGHT_ICONS, Settings.UNHOLEY_LIGHT_ICONS_DEFAULT, true);
+        prefOverlayLinger = check(catAnimation, R.string.settings_animation_overlay_linger_title, 0, null, false, true);
+        prefOverlayLinger.setOnPreferenceChangeListener((preference, newValue) -> false);
+        prefOverlayLinger.setOnPreferenceClickListener(preference -> {
+            ArrayList<TimeoutHelper> helpers = new ArrayList<>();
+
+            AlertDialog dialog = (new AlertDialog.Builder(getContext()))
+                    .setTitle(preference.getTitle())
+                    .setView(R.layout.dialog_linger)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(android.R.string.ok, (dialog1, which) -> {
+                        settings.edit();
+                        try {
+                            for (TimeoutHelper helper : helpers) {
+                                helper.save();
+                            }
+                        } finally {
+                            settings.save(true);
+                        }
+                    })
+                    .setOnDismissListener(dialog1 -> {
+                        for (TimeoutHelper helper : helpers) {
+                            helper.close();
+                        }
+                    })
+                    .show();
+
+            helpers.add(new TimeoutLingerHelper(dialog, R.id.timeout_linger_seek, R.id.timeout_linger_value));
+            return false;
+        });
 
         PreferenceCategory catMarkAsSeen;
 
@@ -565,6 +654,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             }
 
             prefRespectDND.setEnabled(settings.isEnabled());
+
+            prefOverlayLinger.setChecked(settings.getOverlayLinger() > 0);
+            prefOverlayLinger.setSummary(getString(R.string.settings_animation_overlay_linger_description) + "\n[ " + (settings.getOverlayLinger() == 0 ? getString(R.string.disabled) : getString(R.string.x_ms, settings.getOverlayLinger())) + " ]");
 
             ArrayList<String> seenPickup = new ArrayList<>();
             for (int i = 0; i < Settings.SCREEN_AND_POWER_STATE_DESCRIPTIONS.length; i++) {

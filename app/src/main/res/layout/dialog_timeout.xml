@@ -133,6 +133,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginRight="10dp"
         android:text="@string/settings_seen_on_timeout_track_separately" />
 </LinearLayout>

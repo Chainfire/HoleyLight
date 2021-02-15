@@ -206,6 +206,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     private static final String SEEN_TIMEOUT_TRACK_SEPARATELY = "seen_timeout_track_separately";
     private static final boolean SEEN_TIMEOUT_TRACK_SEPARATELY_DEFAULT = false;
 
+    private static final String OVERLAY_LINGER = "overlay_linger";
+    private static final int OVERLAY_LINGER_DEFAULT = 125;
+
     private static Settings instance;
     public static Settings getInstance(Context context) {
         synchronized (Settings.class) {
@@ -696,6 +699,19 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         edit();
         try {
             editor.putBoolean(SEEN_TIMEOUT_TRACK_SEPARATELY, value);
+        } finally {
+            save(true);
+        }
+    }
+
+    public int getOverlayLinger() {
+        return prefs.getInt(OVERLAY_LINGER, OVERLAY_LINGER_DEFAULT);
+    }
+
+    public void setOverlayLinger(int value) {
+        edit();
+        try {
+            editor.putInt(OVERLAY_LINGER, value);
         } finally {
             save(true);
         }

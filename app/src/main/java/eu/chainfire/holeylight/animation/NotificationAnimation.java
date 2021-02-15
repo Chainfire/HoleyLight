@@ -430,7 +430,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                     update.set(0, 0, (int)width, (int)height);
                 }
 
-                Slog.d("Anim", "Apply/View " + update.toString());
+                Slog.d("Anim", "Apply/View %s [%s]", update.toString(), mode.toString());
                 spritePlayer.updateDisplayArea(update);
 
                 // Update parent view
@@ -454,7 +454,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                 params.y = update.top;
                 params.width = update.width();
                 params.height = update.height();
-                Slog.d("Anim", "Apply/Container " + update.toString());
+                Slog.d("Anim", "Apply/Container %s [%s]", update.toString(), mode.toString());
                 spritePlayer.setLayoutParams(params);
                 spritePlayer.setDrawBackground(hideAOD);
 

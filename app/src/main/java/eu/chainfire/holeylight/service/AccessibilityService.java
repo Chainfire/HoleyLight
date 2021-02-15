@@ -207,7 +207,9 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                             (outerBounds.left > -1) &&
                             (outerBounds.top > -1) &&
                             (outerBounds.right > -1) &&
-                            (outerBounds.bottom > -1)
+                            (outerBounds.bottom > -1) &&
+                            (outerBounds.width() > 0) &&
+                            (outerBounds.height() > 0)
                     ) {
                         Slog.d("AOD_TSP", "Access " + outerBounds.toString());
                         handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(outerBounds));

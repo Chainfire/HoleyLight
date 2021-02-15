@@ -121,7 +121,13 @@ public class Overlay {
                     }
                     break;
                 case Intent.ACTION_SCREEN_ON:
-                    animation.updateTSPRect(new Rect(0, 0, 0, 0));
+                    int linger = settings.getOverlayLinger();
+                    if (linger == 0) {
+                        removeTSP.run();
+                    } else if (handler != null) {
+                        // just in case evaluate doesn't run
+                        handler.postDelayed(removeTSP, linger + 250);
+                    }
                     evaluate(true);
                     break;
                 case Intent.ACTION_USER_PRESENT:
@@ -159,6 +165,7 @@ public class Overlay {
     private int[] lastColors = new int[0];
     private SpritePlayer.Mode lastMode = SpritePlayer.Mode.SWIRL;
     private int lastDpAdd = 0;
+    private boolean lastDoze = false;
     private boolean added = false;
     private Point resolution;
     private IBinder windowToken;
@@ -372,7 +379,16 @@ public class Overlay {
 
     private Runnable evaluateLoop = () -> evaluate(false);
 
+    private boolean evaluateDelayedPosted = false;
+    private Runnable evaluateDelayed = () -> { evaluate(true, true); evaluateDelayedPosted = false; };
+
+    private Runnable removeTSP = () -> animation.updateTSPRect(new Rect(0, 0, 0, 0));
+
     public void evaluate(boolean refreshAll) {
+        evaluate(refreshAll, false);
+    }
+
+    public void evaluate(boolean refreshAll, boolean isDelayed) {
         if (spritePlayer == null) {
             if (wanted) handler.postDelayed(evaluateLoop, 500);
             return;
@@ -409,6 +425,20 @@ public class Overlay {
             renderMode = SpritePlayer.Mode.TSP_HIDE;
         }
 
+        int linger = settings.getOverlayLinger();
+        if (linger > 0) {
+            handler.removeCallbacks(removeTSP);
+            if (!isDelayed && (spritePlayer.isTSPMode(lastMode) || (lastDoze && settings.isHideAOD())) && !(spritePlayer.isTSPMode(renderMode) || doze)) {
+                Slog.d("Overlay", "Linger: %d ms", linger);
+                handler.removeCallbacks(evaluateLoop);
+                if (!evaluateDelayedPosted) {
+                    handler.postDelayed(evaluateDelayed, linger);
+                    evaluateDelayedPosted = true;
+                }
+                return;
+            }
+        }
+
         boolean lockscreenOk = !on || !lockscreen || settings.isEnabledOnLockscreen();
         boolean wantedEffective = (wanted || activeHide) && settings.isEnabledWhile(mode) && lockscreenOk;
 
@@ -429,6 +459,7 @@ public class Overlay {
                 lastState = true;
                 lastMode = renderMode;
                 lastDpAdd = dpAdd;
+                lastDoze = doze;
             }
         } else {
             if (lastState) {
@@ -445,6 +476,7 @@ public class Overlay {
                     if (immediately) removeOverlay();
                 }
                 lastState = false;
+                lastDoze = doze;
             }
         }
 

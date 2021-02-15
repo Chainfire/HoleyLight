@@ -226,4 +226,9 @@
 
     <string name="settings_animation_brightness_title">Brightness: Screen off</string>
     <string name="settings_animation_brightness_description"><![CDATA[The display brightness (for when the screen is off) is controlled by AOD, <b>Settings -> Lock screen -> Always On Display -> Auto brightness</b>.]]></string>
+
+    <string name="settings_animation_overlay_linger_title">Hide AOD: Overlay linger time</string>
+    <string name="settings_animation_overlay_linger_description">Delay showing the lockscreen when hiding AOD, may prevent showing AOD on screen shortly</string>
+
+    <string name="x_ms">%d milliseconds</string>
 </resources>
