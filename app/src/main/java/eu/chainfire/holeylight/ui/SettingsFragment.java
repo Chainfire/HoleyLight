@@ -60,8 +60,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefLockscreenOn = null;
     private Preference prefAODSchedule = null;
     private CheckBoxPreference prefRespectDND = null;
+    private Preference prefTune = null;
+    private Preference prefColors = null;
+    private CheckBoxPreference prefUnholeyIcons = null;
     private CheckBoxPreference prefOverlayLinger = null;
-    private Preference prefSeenPickup = null;
+    private CheckBoxPreference prefSeenPickup = null;
     private CheckBoxPreference prefSeenOnLockscreen = null;
     private CheckBoxPreference prefSeenOnUserPresent = null;
     private CheckBoxPreference prefSeenIfScreenOn = null;
@@ -429,15 +432,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         PreferenceCategory catAnimation = category(root, R.string.settings_category_animation_title, 0);
         Preference prefAODBrightness = pref(catAnimation, R.string.settings_animation_brightness_title, 0, null, true, null);
         prefAODBrightness.setSummary(Html.fromHtml(getString(R.string.settings_animation_brightness_description)));
-        pref(catAnimation, R.string.settings_animation_tune_title, R.string.settings_animation_tune_description, null, true, preference -> {
+        prefTune = pref(catAnimation, R.string.settings_animation_tune_title, R.string.settings_animation_tune_description, null, true, preference -> {
             startActivity(new Intent(getActivity(), TuneActivity.class));
             return false;
         });
-        pref(catAnimation, R.string.settings_animation_colors_title, R.string.settings_animation_colors_description_v3, null, true, preference -> {
+        prefColors = pref(catAnimation, R.string.settings_animation_colors_title, R.string.settings_animation_colors_description_v3, null, true, preference -> {
             startActivity(new Intent(getActivity(), ColorActivity.class));
             return false;
         });
-        check(catAnimation, R.string.settings_animation_unholey_light_icons_title, R.string.settings_animation_unholey_light_icons_description, Settings.UNHOLEY_LIGHT_ICONS, Settings.UNHOLEY_LIGHT_ICONS_DEFAULT, true);
+        prefUnholeyIcons = check(catAnimation, R.string.settings_animation_unholey_light_icons_title, R.string.settings_animation_unholey_light_icons_description, Settings.UNHOLEY_LIGHT_ICONS, Settings.UNHOLEY_LIGHT_ICONS_DEFAULT, true);
         prefOverlayLinger = check(catAnimation, R.string.settings_animation_overlay_linger_title, 0, null, false, true);
         prefOverlayLinger.setOnPreferenceChangeListener((preference, newValue) -> false);
         prefOverlayLinger.setOnPreferenceClickListener(preference -> {
@@ -471,7 +474,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         PreferenceCategory catMarkAsSeen;
 
         catMarkAsSeen = category(root, R.string.settings_category_seen_title, R.string.settings_category_seen_description);
-        prefSeenPickup = pref(catMarkAsSeen, R.string.settings_seen_pickup_title, R.string.settings_seen_pickup_description, null, true, preference -> {
+        prefSeenPickup = check(catMarkAsSeen, R.string.settings_seen_pickup_title, R.string.settings_seen_pickup_description, null, false, true);
+        prefSeenPickup.setOnPreferenceChangeListener((preference, newValue) -> false);
+        prefSeenPickup.setOnPreferenceClickListener(preference -> {
             String FORMAT = "%s<br><small>%s</small>";
             AlertDialog alertDialog = (new AlertDialog.Builder(getContext()))
                     .setTitle(preference.getTitle())
@@ -655,6 +660,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
             prefRespectDND.setEnabled(settings.isEnabled());
 
+            prefTune.setEnabled(settings.isEnabled());
+            prefColors.setEnabled(settings.isEnabled());
+            prefUnholeyIcons.setEnabled(settings.isEnabled());
+
+            prefOverlayLinger.setEnabled(settings.isEnabled());
             prefOverlayLinger.setChecked(settings.getOverlayLinger() > 0);
             prefOverlayLinger.setSummary(getString(R.string.settings_animation_overlay_linger_description) + "\n[ " + (settings.getOverlayLinger() == 0 ? getString(R.string.disabled) : getString(R.string.x_ms, settings.getOverlayLinger())) + " ]");
 
@@ -665,6 +675,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 }
             }
             prefSeenPickup.setEnabled(settings.isEnabled());
+            prefSeenPickup.setChecked(seenPickup.size() > 0);
             prefSeenPickup.setSummary(getString(R.string.settings_seen_pickup_description) + "\n[ " + (seenPickup.size() > 0 ? String.join(", ", seenPickup) : getString(R.string.never)) + " ]");
 
             prefSeenOnLockscreen.setEnabled(settings.isEnabledWhileScreenOff());
