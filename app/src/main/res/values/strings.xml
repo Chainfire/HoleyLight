@@ -223,4 +223,7 @@
     <string name="colors_respect_notification_color_state"><![CDATA[<b>Respect</b> notification color state (current: <b>ignore</b>)]]></string>
 
     <string name="settings_seen_on_timeout_track_separately">Track separately</string>
+
+    <string name="settings_animation_brightness_title">Brightness: Screen off</string>
+    <string name="settings_animation_brightness_description"><![CDATA[The display brightness (for when the screen is off) is controlled by AOD, <b>Settings -> Lock screen -> Always On Display -> Auto brightness</b>.]]></string>
 </resources>

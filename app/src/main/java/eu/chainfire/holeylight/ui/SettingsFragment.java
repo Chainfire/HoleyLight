@@ -367,6 +367,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         prefRespectDND.setSummary(Html.fromHtml(getString(R.string.settings_schedule_dnd_description)));
 
         PreferenceCategory catAnimation = category(root, R.string.settings_category_animation_title, 0);
+        Preference prefAODBrightness = pref(catAnimation, R.string.settings_animation_brightness_title, 0, null, true, null);
+        prefAODBrightness.setSummary(Html.fromHtml(getString(R.string.settings_animation_brightness_description)));
         pref(catAnimation, R.string.settings_animation_tune_title, R.string.settings_animation_tune_description, null, true, preference -> {
             startActivity(new Intent(getActivity(), TuneActivity.class));
             return false;
