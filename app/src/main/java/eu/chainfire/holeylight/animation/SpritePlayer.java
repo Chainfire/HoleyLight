@@ -47,6 +47,7 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import eu.chainfire.holeylight.misc.Settings;
+import eu.chainfire.holeylight.misc.Slog;
 
 @SuppressWarnings({ "deprecation", "FieldCanBeLocal", "unused", "UnusedReturnValue" })
 public class SpritePlayer extends RelativeLayout {
@@ -103,6 +104,7 @@ public class SpritePlayer extends RelativeLayout {
     private volatile boolean drawBackground = false;
     private volatile long modeStart = 0L;
     private volatile boolean surfaceReady = false;
+    private volatile boolean tspBlank = false;
 
     public SpritePlayer(Context context) {
         super(context);
@@ -216,7 +218,7 @@ public class SpritePlayer extends RelativeLayout {
             //
             // We delay a short time to prevent the circle jumping around on first show, due to
             // AOD start TSP rect updates
-            if ((drawMode == Mode.TSP) && (SystemClock.elapsedRealtime() - modeStart > TSP_FIRST_DRAW_DELAY)) {
+            if (!tspBlank && (drawMode == Mode.TSP) && (SystemClock.elapsedRealtime() - modeStart > TSP_FIRST_DRAW_DELAY)) {
                 paintTsp.setColorFilter(null);
                 paintTsp.setXfermode(null);
 
@@ -741,5 +743,14 @@ public class SpritePlayer extends RelativeLayout {
 
     public boolean isMultiColorMode(Mode mode) {
         return (mode == Mode.SINGLE) || isTSPMode(mode);
+    }
+
+    public boolean isTSPBlank() {
+        return tspBlank;
+    }
+
+    public void setTSPBlank(boolean value) {
+        Slog.d("SpritePlayer", "tspBlank --> %s", value ? "TRUE" : "FALSE");
+        tspBlank = value;
     }
 }

@@ -220,7 +220,6 @@ public class Overlay {
                     if (added) {
                         try {
                             //TODO remove/add adjusts view layout better more consistently, but flickers?
-                            //TODO maybe loop this to fix Unholey Light location sometimes not updating?
                             windowManager.updateViewLayout(view, view.getLayoutParams());
                         } catch (IllegalArgumentException e) {
                             //TODO figure out why this happens
@@ -318,9 +317,10 @@ public class Overlay {
         if (windowToken != null) params.token = windowToken;
         try { // disable animation when we move/resize
             int currentFlags = (Integer)params.getClass().getField("privateFlags").get(params);
-            params.getClass().getField("privateFlags").set(params, currentFlags | 0x00000040); /* PRIVATE_FLAG_NO_MOVE_ANIMATION */
+            params.getClass().getField("privateFlags").setInt(params, currentFlags | 0x00000040); /* PRIVATE_FLAG_NO_MOVE_ANIMATION */
+            Slog.d("LayoutParams", "privateFlags set");
         } catch (Exception e) {
-            //do nothing. Probably using other version of android
+            Slog.e("LayoutParams", "Could not set privateFlags");
         }
         try {
             // begone "performDraw() was skipped by AOD_SHOW_STATE"

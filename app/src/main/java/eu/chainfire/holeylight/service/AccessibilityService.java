@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Locale;
 
 import eu.chainfire.holeylight.animation.Overlay;
+import eu.chainfire.holeylight.misc.AODControl;
 import eu.chainfire.holeylight.misc.Display;
 import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.misc.Slog;
@@ -45,6 +46,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     private Display.State lastState = null;
     private String previousNodeClass = null;
     private boolean seenXViewPager = false;
+    private boolean haveSeenContainer = false; // if seen, accept no substitute
 
     private void inspectNode(AccessibilityNodeInfo node, Rect outerBounds, int level, boolean a11) {
         if (level == 0 && a11) {
@@ -102,11 +104,16 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                         )
                 )
         )) {
-            if ((bounds.left >= 0) && (bounds.right >= 0) && ((outerBounds.left == -1) || (bounds.left < outerBounds.left))) outerBounds.left = bounds.left;
-            if ((bounds.top >= 0) && (bounds.bottom >= 0) && ((outerBounds.top == -1) || (bounds.top < outerBounds.top))) outerBounds.top = bounds.top;
-            if ((bounds.left >= 0) && (bounds.right >= 0) && ((outerBounds.right == -1) || (bounds.right > outerBounds.right))) outerBounds.right = bounds.right;
-            if ((bounds.top >= 0) && (bounds.bottom >= 0) && ((outerBounds.bottom == -1) || (bounds.bottom > outerBounds.bottom))) outerBounds.bottom = bounds.bottom;
-            Slog.d("AOD_TSP", "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+            if (outerBounds.left == -1 && !seenXViewPager && haveSeenContainer && !(node.getViewIdResourceName() != null && node.getViewIdResourceName().equals("com.samsung.android.app.aodservice:id/common_clock_widget_container"))) {
+                // skip
+            } else {
+                haveSeenContainer |= a11 && node.getViewIdResourceName() != null && node.getViewIdResourceName().equals("com.samsung.android.app.aodservice:id/common_clock_widget_container");
+                if ((bounds.left >= 0) && (bounds.right >= 0) && ((outerBounds.left == -1) || (bounds.left < outerBounds.left))) outerBounds.left = bounds.left;
+                if ((bounds.top >= 0) && (bounds.bottom >= 0) && ((outerBounds.top == -1) || (bounds.top < outerBounds.top))) outerBounds.top = bounds.top;
+                if ((bounds.left >= 0) && (bounds.right >= 0) && ((outerBounds.right == -1) || (bounds.right > outerBounds.right))) outerBounds.right = bounds.right;
+                if ((bounds.top >= 0) && (bounds.bottom >= 0) && ((outerBounds.bottom == -1) || (bounds.bottom > outerBounds.bottom))) outerBounds.bottom = bounds.bottom;
+                Slog.d("AOD_TSP", "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+            }
         } else if (node.getClassName().equals("android.widget.FrameLayout") || Settings.DEBUG)  {
             for (int i = 0; i < node.getChildCount(); i++) {
                 inspectNode(node.getChild(i), outerBounds, level + 1, a11);
@@ -213,6 +220,16 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                     ) {
                         Slog.d("AOD_TSP", "Access " + outerBounds.toString());
                         handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(outerBounds));
+                    } else if (
+                            haveSeenContainer &&
+                            (outerBounds.left == -1) &&
+                            (outerBounds.top == -1) &&
+                            (outerBounds.right == -1) &&
+                            (outerBounds.bottom == -1) &&
+                            AODControl.isAODTapToShow(this)
+                    ) {
+                        Slog.d("AOD_TSP", "Access " + outerBounds.toString());
+                        handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(new Rect(0, 0, 0, 0)));
                     }
                 }
             } catch (Exception e) {

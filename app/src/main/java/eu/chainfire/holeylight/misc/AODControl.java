@@ -86,6 +86,11 @@ public class AODControl {
         return (android.provider.Settings.System.getInt(resolver, "aod_mode", 0) > 0);
     }
 
+    public static boolean isAODTapToShow(Context context) {
+        ContentResolver resolver = context.getContentResolver();
+        return isAODEnabled(context) && (android.provider.Settings.System.getInt(resolver, "aod_tap_to_show_mode", 0) > 0);
+    }
+
     public static String getAODThemePackage(Context context) {
         ContentResolver resolver = context.getContentResolver();
         return android.provider.Settings.System.getString(resolver, "current_sec_aod_theme_package");

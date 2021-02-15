@@ -586,6 +586,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         Slog.d("AOD_TSP", "Anim " + rect.toString() + " apply:" + String.valueOf(apply));
         if (apply) {
             tspRect.set(rect);
+            spritePlayer.setTSPBlank(rect.height() == 0);
             applyDimensions();
         }
     }
