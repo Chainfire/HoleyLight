@@ -315,6 +315,13 @@ public class Overlay {
         } catch (Exception e) {
             //do nothing. Probably using other version of android
         }
+        try {
+            // begone "performDraw() was skipped by AOD_SHOW_STATE"
+            params.getClass().getDeclaredMethod("semAddExtensionFlags", int.class).invoke(params, 0x40000);
+            Slog.d("LayoutParams", "samsungFlags set");
+        } catch (Exception e) {
+            Slog.e("LayoutParams", "Could not set samsungFlags");
+        }
         spritePlayer.setLayoutParams(params);
     }
 
