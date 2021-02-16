@@ -48,7 +48,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     private boolean seenXViewPager = false;
     private boolean haveSeenContainer = false; // if seen, accept no substitute
 
-    private void inspectNode(AccessibilityNodeInfo node, Rect outerBounds, int level, boolean a11) {
+    private void inspectNode(AccessibilityNodeInfo node, Rect outerBounds, int level, boolean a11, boolean isTapToShow) {
         if (level == 0 && a11) {
             previousNodeClass = null;
             seenXViewPager = false;
@@ -104,7 +104,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                         )
                 )
         )) {
-            if (outerBounds.left == -1 && !seenXViewPager && haveSeenContainer && !(node.getViewIdResourceName() != null && node.getViewIdResourceName().equals("com.samsung.android.app.aodservice:id/common_clock_widget_container"))) {
+            if (outerBounds.left == -1 && !seenXViewPager && haveSeenContainer && isTapToShow && !(node.getViewIdResourceName() != null && node.getViewIdResourceName().equals("com.samsung.android.app.aodservice:id/common_clock_widget_container"))) {
                 // skip
             } else {
                 haveSeenContainer |= a11 && node.getViewIdResourceName() != null && node.getViewIdResourceName().equals("com.samsung.android.app.aodservice:id/common_clock_widget_container");
@@ -116,7 +116,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             }
         } else if (node.getClassName().equals("android.widget.FrameLayout") || Settings.DEBUG)  {
             for (int i = 0; i < node.getChildCount(); i++) {
-                inspectNode(node.getChild(i), outerBounds, level + 1, a11);
+                inspectNode(node.getChild(i), outerBounds, level + 1, a11, isTapToShow);
             }
         }
 
@@ -163,6 +163,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
 
         handler.post(() -> {
             try {
+                boolean isTapToShow = AODControl.isAODTapToShow(this);
                 List<AccessibilityWindowInfo> windows = getWindows();
                 for (AccessibilityWindowInfo window : windows) {
                     AccessibilityNodeInfo root = window.getRoot();
@@ -203,10 +204,10 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                             Slog.d("AOD_TSP", "Node " + node.getClassName().toString() + " " + bounds.toString());
                         }
                     } else { // Android 10+
-                        inspectNode(root, outerBounds, 0, false);
+                        inspectNode(root, outerBounds, 0, false, isTapToShow);
                         if (outerBounds.left == -1 && Build.VERSION.SDK_INT >= 30) {
                             // Android 11+
-                            inspectNode(root, outerBounds, 0, true);
+                            inspectNode(root, outerBounds, 0, true, isTapToShow);
                         }
                     }
 
@@ -226,7 +227,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                             (outerBounds.top == -1) &&
                             (outerBounds.right == -1) &&
                             (outerBounds.bottom == -1) &&
-                            AODControl.isAODTapToShow(this)
+                            isTapToShow
                     ) {
                         Slog.d("AOD_TSP", "Access " + outerBounds.toString());
                         handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(new Rect(0, 0, 0, 0)));
