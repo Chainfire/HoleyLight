@@ -89,6 +89,7 @@ public class SpritePlayer extends RelativeLayout {
     private volatile SpriteSheet spriteSheetBlink = null;
     private volatile SpriteSheet spriteSheetSingle = null;
     private volatile int spriteSheetLoading = 0;
+    private volatile long spriteSheetLoadingId = 0;
     private final Point lastSpriteSheetRequest = new Point(0, 0);
     private final Rect dest = new Rect();
     private final Rect destDouble = new Rect();
@@ -483,12 +484,14 @@ public class SpritePlayer extends RelativeLayout {
             dest.set(0, 0, width, height);
             destDouble.set(dest.centerX() - width, dest.centerY() - height, dest.centerX() + width, dest.centerY() + height);
             spriteSheetLoading++;
+            spriteSheetLoadingId++;
+            final long callbackId = spriteSheetLoadingId;
             handlerLoader.post(() -> {
                 OnSpriteSheetNeededListener listener;
                 synchronized (sync) {
                     listener = onSpriteSheetNeededListener;
                 }
-                if (listener != null) {
+                if ((listener != null) && (callbackId == spriteSheetLoadingId)) {
                     SpriteSheet spriteSheetSwirl = listener.onSpriteSheetNeeded(width, height, Mode.SWIRL);
                     SpriteSheet spriteSheetBlink = listener.onSpriteSheetNeeded(width, height, Mode.BLINK);
                     SpriteSheet spriteSheetSingle = listener.onSpriteSheetNeeded(width, height, Mode.SINGLE);
