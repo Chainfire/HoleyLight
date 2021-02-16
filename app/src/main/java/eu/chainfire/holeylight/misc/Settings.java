@@ -492,6 +492,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         for (String pkg : CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE_PACKAGES) {
             if (pkg.equals(packageName)) {
                 defaultValue = true;
+                break;
             }
         }
         return prefs.getBoolean(String.format(CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE_FMT, packageName, channelName), defaultValue);

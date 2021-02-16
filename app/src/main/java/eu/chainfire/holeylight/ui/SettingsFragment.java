@@ -162,7 +162,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         private final SeekBar seekBar;
         private final TextView textValue;
         private final int mode;
-        private AlertDialog base = null;
+        private AlertDialog base;
 
         public TimeoutTimeHelper(AlertDialog base, int seekBarId, int textValueId, int mode) {
             super();
@@ -246,7 +246,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private class TimeoutLingerHelper extends TimeoutHelper {
         private final SeekBar seekBar;
         private final TextView textValue;
-        private AlertDialog base = null;
+        private AlertDialog base;
 
         public TimeoutLingerHelper(AlertDialog base, int seekBarId, int textValueId) {
             super();

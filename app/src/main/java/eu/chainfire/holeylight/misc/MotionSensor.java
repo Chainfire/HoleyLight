@@ -64,15 +64,15 @@ public class MotionSensor {
     private static final int ANGLE_AGE_MILLIS = 1000;
 
     private final Object lock = new Object();
-    private Sensor accelSensor;
-    private SensorManager sensorManager;
-    private RunningSignalStats runningStats;
+    private final Sensor accelSensor;
+    private final SensorManager sensorManager;
+    private final RunningSignalStats runningStats;
+    private final Handler handler;
+    private final List<Vector3> history = new ArrayList<>();
+    private final List<OnMotionStateListener> listeners = new ArrayList<>();
     private boolean measurementInProgress;
-    private Handler handler;
-    private List<Vector3> history = new ArrayList<>();
     private MotionState motionState = MotionState.UNKNOWN;
     private long motionStateStart = 0;
-    private List<OnMotionStateListener> listeners = new ArrayList<>();
 
     private MotionSensor(Context context) {
         handler = new Handler(Looper.getMainLooper());

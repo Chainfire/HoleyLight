@@ -18,6 +18,7 @@
 
 package eu.chainfire.holeylight.ui;
 
+import android.annotation.SuppressLint;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -38,7 +39,6 @@ import android.widget.TextView;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -445,8 +445,8 @@ public class ColorActivity extends AppCompatActivity {
                 return sort;
             };
 
-            Collections.sort(activeItems, sorter);
-            Collections.sort(inactiveItems, sorter);
+            activeItems.sort(sorter);
+            inactiveItems.sort(sorter);
 
             items.clear();
             items.add(new AppItem("", null, null, null, null, 0, VIEW_TYPE_HELP));
@@ -481,6 +481,7 @@ public class ColorActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("AlwaysShowAction")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuItem menuItem = menu.add(R.string.refresh);

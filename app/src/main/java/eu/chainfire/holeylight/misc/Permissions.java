@@ -1,6 +1,7 @@
 package eu.chainfire.holeylight.misc;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -62,6 +63,7 @@ public class Permissions {
         return false;
     }
 
+    @SuppressLint("WrongConstant")
     public static Needed detect(Context context) {
         if (!(new NotificationAnimation(context, null, null)).isDeviceSupported()) {
             return Needed.DEVICE_SUPPORT;
@@ -87,7 +89,7 @@ public class Permissions {
     public static void notify(Context context) {
         if (isNotificationWorthy(detect(context))) {
             NotificationManagerCompat.from(context).deleteNotificationChannel(BuildConfig.APPLICATION_ID + ":permission");
-            final NotificationChannel chan = new NotificationChannel(BuildConfig.APPLICATION_ID + ":permission", context.getString(R.string.app_name), NotificationManager.IMPORTANCE_HIGH);
+            @SuppressLint("WrongConstant") final NotificationChannel chan = new NotificationChannel(BuildConfig.APPLICATION_ID + ":permission", context.getString(R.string.app_name), NotificationManager.IMPORTANCE_HIGH);
             chan.setDescription(context.getString(R.string.app_name));
             NotificationManagerCompat.from(context).createNotificationChannel(chan);
 

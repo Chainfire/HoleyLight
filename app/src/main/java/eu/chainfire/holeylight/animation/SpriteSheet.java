@@ -161,8 +161,8 @@ public class SpriteSheet {
         }
     }
 
-    private List<Sheet> sheets = new ArrayList<>();
-    private List<Sprite> sprites = new ArrayList<>();
+    private final List<Sheet> sheets = new ArrayList<>();
+    private final List<Sprite> sprites = new ArrayList<>();
 
     private final int width;
     private final int height;

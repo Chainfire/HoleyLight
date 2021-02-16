@@ -89,9 +89,9 @@ public class SpritePlayer extends RelativeLayout {
     private volatile SpriteSheet spriteSheetBlink = null;
     private volatile SpriteSheet spriteSheetSingle = null;
     private volatile int spriteSheetLoading = 0;
-    private volatile Point lastSpriteSheetRequest = new Point(0, 0);
-    private volatile Rect dest = new Rect();
-    private volatile Rect destDouble = new Rect();
+    private final Point lastSpriteSheetRequest = new Point(0, 0);
+    private final Rect dest = new Rect();
+    private final Rect destDouble = new Rect();
     private volatile boolean surfaceInvalidated = true;
     private volatile boolean draw = false;
     private volatile boolean wanted = false;
@@ -144,6 +144,7 @@ public class SpritePlayer extends RelativeLayout {
 
         while (choreographer == null) {
             try {
+                //noinspection BusyWait
                 Thread.sleep(1);
             } catch (InterruptedException e) {
                 // no action
@@ -164,7 +165,7 @@ public class SpritePlayer extends RelativeLayout {
         evaluate();
     }
 
-    private SurfaceHolder.Callback2 surfaceCallback = new SurfaceHolder.Callback2() {
+    private final SurfaceHolder.Callback2 surfaceCallback = new SurfaceHolder.Callback2() {
         @Override
         public void surfaceRedrawNeeded(SurfaceHolder holder) {
             surfaceInvalidated = true;
@@ -326,7 +327,7 @@ public class SpritePlayer extends RelativeLayout {
         }
     }
 
-    private Choreographer.FrameCallback frameCallback = new Choreographer.FrameCallback() {
+    private final Choreographer.FrameCallback frameCallback = new Choreographer.FrameCallback() {
         private long startTimeNanos = 0;
         private int lastFrameDrawn = -1;
         private int[] lastColors = null;
@@ -444,7 +445,7 @@ public class SpritePlayer extends RelativeLayout {
         }
     };
 
-    private Runnable tspFrame = () -> frameCallback.doFrame(System.nanoTime());
+    private final Runnable tspFrame = () -> frameCallback.doFrame(System.nanoTime());
 
     private void cancelNextFrame() {
         handlerRender.removeCallbacks(tspFrame);

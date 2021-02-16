@@ -130,6 +130,7 @@ public class AODControl {
         return lastInSchedule;
     }
     
+    @SuppressWarnings("deprecation")
     private static Date nextAlarmTime(int forSchedule) {
         Date now = new Date(System.currentTimeMillis());
         int nowInt = (now.getHours() * 60) + now.getMinutes();

@@ -18,6 +18,7 @@
 
 package com.android.systemui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
@@ -32,11 +33,13 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 import dalvik.system.DexClassLoader;
 import eu.chainfire.holeylight.misc.Slog;
 
+@SuppressWarnings({ "SameParameterValue", "unused" })
 public class VIDirector {
     private static ClassLoader classLoader = null;
 
@@ -60,7 +63,7 @@ public class VIDirector {
 
     public static VIDirector create(Context context, Boolean flag) {
         try {
-            Class<?> clazz = Class.forName("com.android.keyguard.punchhole.VIDirectorFactory", true, systemUiClassLoader(context));
+            @SuppressLint("PrivateApi") Class<?> clazz = Class.forName("com.android.keyguard.punchhole.VIDirectorFactory", true, systemUiClassLoader(context));
 
             try {
                 // Kotlin-based code found in newer firmwares
@@ -138,6 +141,7 @@ public class VIDirector {
         return ((DisplayManager)context.getSystemService(Context.DISPLAY_SERVICE)).getDisplay(0).getRotation();
     }
     
+    @SuppressWarnings("UnnecessaryLocalVariable")
     public Rect getVIViewLocation(/* int i, boolean flag */) {
         // reflected method crashes, due to disallowed access to mContext.getResources().getConfiguration().windowConfiguration field, adaption from decompile
         Rect rect = new Rect();
@@ -219,7 +223,7 @@ public class VIDirector {
         if (filename == null) return null;
         try {
             InputStream is = context.getPackageManager().getResourcesForApplication("com.android.systemui").getAssets().open(filename);
-            return (new BufferedReader(new InputStreamReader(is, "UTF-8"))).lines().collect(Collectors.joining("\n"));
+            return (new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))).lines().collect(Collectors.joining("\n"));
         } catch (Exception e) {
             Slog.e("VIDirector", "Failed to load json: %s :: %s", filename, e);
             e.printStackTrace();

@@ -38,7 +38,6 @@ import android.os.UserHandle;
 import android.service.notification.StatusBarNotification;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +51,7 @@ import eu.chainfire.holeylight.misc.MotionSensor;
 import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.misc.Slog;
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({ "WeakerAccess", "unused" })
 public class NotificationListenerService extends android.service.notification.NotificationListenerService implements Settings.OnSettingsChangedListener {
     private static NotificationListenerService instance = null;
     public static NotificationListenerService getInstance() {
@@ -66,6 +65,7 @@ public class NotificationListenerService extends android.service.notification.No
 
     private ContentObserver refreshLEDObserver = null;
 
+    @SuppressWarnings("unused")
     public static class ActiveNotification {
         private static final Map<String, Drawable> drawableCache = new HashMap<>();
 
@@ -136,7 +136,8 @@ public class NotificationListenerService extends android.service.notification.No
             try {
                 id = icon.getResId();
                 if (id < 0) id = 0;
-            } catch (Exception e) {
+            } catch (Exception ignored) {
+                // intentionally do nothing
             }
             if (id == 0) return null;
             return getPackageName() + ":" + id;
@@ -173,9 +174,9 @@ public class NotificationListenerService extends android.service.notification.No
     private long stationary_for_ms = 0;
     private boolean connected = false;
     private Handler handler;
-    private List<ActiveNotification> activeNotifications = new ArrayList<>();
+    private final List<ActiveNotification> activeNotifications = new ArrayList<>();
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() == null) return;
@@ -335,7 +336,7 @@ public class NotificationListenerService extends android.service.notification.No
         handleLEDNotifications();
     }
 
-    private Runnable runHandleLEDNotifications = this::handleLEDNotificationsInternal;
+    private final Runnable runHandleLEDNotifications = this::handleLEDNotificationsInternal;
 
     private void handleLEDNotifications() {
         // Prevent update storm caused by updates in rapid succession, and us updating settings ourselves
@@ -478,12 +479,7 @@ public class NotificationListenerService extends android.service.notification.No
                 }
             }
         }
-        visibleNotifications.sort(new Comparator<ActiveNotification>() {
-            @Override
-            public int compare(ActiveNotification o1, ActiveNotification o2) {
-                return Integer.compare(o1.color & 0xFFFFFF, o2.color & 0xFFFFFF);
-            }
-        });
+        visibleNotifications.sort((o1, o2) -> Integer.compare(o1.color & 0xFFFFFF, o2.color & 0xFFFFFF));
 
         boolean changes = (visibleNotifications.size() != currentNotifications.size());
         if (!changes) {
@@ -543,7 +539,7 @@ public class NotificationListenerService extends android.service.notification.No
         return settings.isSeenPickupWhile(settings.getMode(Battery.isCharging(this), isUserPresent), true);
     }
 
-    private MotionSensor.OnMotionStateListener onMotionStateListener = (motionState, for_millis) -> {
+    private final MotionSensor.OnMotionStateListener onMotionStateListener = (motionState, for_millis) -> {
         if (motionState != lastMotionState) {
             log("onMovement --> " + motionState);
             lastMotionState = motionState;

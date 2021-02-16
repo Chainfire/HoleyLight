@@ -41,8 +41,8 @@ import eu.chainfire.holeylight.misc.Slog;
 
 @SuppressWarnings({ "unused", "WeakerAccess" })
 public class NotificationAnimation implements Settings.OnSettingsChangedListener {
-    private static CameraCutout.Cutout OVERRIDE_CUTOUT = null; //CameraCutout.CUTOUT_S10PLUS;
-    private static String OVERRIDE_DEVICE = null; //"beyond2";
+    private static final CameraCutout.Cutout OVERRIDE_CUTOUT = null; //CameraCutout.CUTOUT_S10PLUS;
+    private static final String OVERRIDE_DEVICE = null; //"beyond2";
 
     public interface OnNotificationAnimationListener {
         void onDimensionsApplied(SpritePlayer view);
@@ -83,7 +83,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private volatile boolean hideAOD = false;
     private volatile boolean hideAODFully = false;
     private volatile SpritePlayer.Mode mode = SpritePlayer.Mode.SWIRL;
-    private volatile Rect tspRect = new Rect(0, 0, 0, 0);
+    private final Rect tspRect = new Rect(0, 0, 0, 0);
 
     public NotificationAnimation(Context context, SpritePlayer spritePlayer, OnNotificationAnimationListener onNotificationAnimationListener) {
         this.onNotificationAnimationListener = onNotificationAnimationListener;
@@ -583,7 +583,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
     public void updateTSPRect(Rect rect) {
         boolean apply = !rect.equals(tspRect);
-        Slog.d("AOD_TSP", "Anim " + rect.toString() + " apply:" + String.valueOf(apply));
+        Slog.d("AOD_TSP", "Anim " + rect.toString() + " apply:" + apply);
         if (apply) {
             tspRect.set(rect);
             spritePlayer.setTSPBlank(rect.height() == 0);

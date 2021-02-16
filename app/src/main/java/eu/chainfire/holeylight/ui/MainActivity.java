@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
         super.onDestroy();
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void onSettingsChanged() {
         if (switchMaster != null) {
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
         });
     }
 
-    private Runnable checkPermissionsRunnable = this::checkPermissions;
+    private final Runnable checkPermissionsRunnable = this::checkPermissions;
 
     private boolean inLogcatDump = false;
 
@@ -115,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_TITLE, "holeylight_logcat.txt");
+        //noinspection deprecation
         startActivityForResult(intent, LOGCAT_DUMP_REQUEST_CODE);
     }
 
@@ -168,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
                         .setTitle(getString(R.string.permission_required) + " 1/4")
                         .setMessage(Html.fromHtml(getString(R.string.permission_associate) + getString(R.string.permission_associate_2)))
                         .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                            CompanionDeviceManager companionDeviceManager = (CompanionDeviceManager)getSystemService(COMPANION_DEVICE_SERVICE);
+                            @SuppressLint("WrongConstant") CompanionDeviceManager companionDeviceManager = (CompanionDeviceManager)getSystemService(COMPANION_DEVICE_SERVICE);
                             companionDeviceManager.associate((new AssociationRequest.Builder()).build(), new CompanionDeviceManager.Callback() {
                                 @Override
                                 public void onDeviceFound(IntentSender chooserLauncher) {
@@ -445,6 +447,7 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
         super.finish();
     }
 
+    @SuppressLint("AlwaysShowAction")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         @SuppressLint("InflateParams") View layout = getLayoutInflater().inflate(R.layout.toolbar_switch, null);

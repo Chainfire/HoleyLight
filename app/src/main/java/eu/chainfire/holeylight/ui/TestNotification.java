@@ -18,6 +18,7 @@
 
 package eu.chainfire.holeylight.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -37,7 +38,7 @@ public class TestNotification {
 
     static void show(Context context, int id) {
         NotificationManagerCompat.from(context).deleteNotificationChannel(BuildConfig.APPLICATION_ID + ":test");
-        final NotificationChannel chan = new NotificationChannel(BuildConfig.APPLICATION_ID + ":test", context.getString(R.string.app_name), NotificationManager.IMPORTANCE_LOW);
+        @SuppressLint("WrongConstant") final NotificationChannel chan = new NotificationChannel(BuildConfig.APPLICATION_ID + ":test", context.getString(R.string.app_name), NotificationManager.IMPORTANCE_LOW);
         chan.setDescription(context.getString(R.string.app_name));
         chan.enableLights(true);
         chan.setLightColor(Color.WHITE);

@@ -18,6 +18,7 @@
 
 package eu.chainfire.holeylight.ui;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -110,6 +111,7 @@ public class TuneActivity extends AppCompatActivity implements Settings.OnSettin
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressLint("AlwaysShowAction")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuItem menuItem = menu.add(R.string.reset);

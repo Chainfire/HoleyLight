@@ -29,6 +29,7 @@ public class Display {
 
     private static android.view.Display display = null;
 
+    @SuppressWarnings("DuplicateBranchesInSwitch")
     public static State get(Context context) {
         if (display == null) {
             display = ((DisplayManager)context.getSystemService(DISPLAY_SERVICE)).getDisplay(0);

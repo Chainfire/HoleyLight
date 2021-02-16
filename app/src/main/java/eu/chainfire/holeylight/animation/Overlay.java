@@ -74,7 +74,7 @@ public class Overlay {
         }
     }
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() == null) return;
@@ -377,12 +377,12 @@ public class Overlay {
         return false;
     }
 
-    private Runnable evaluateLoop = () -> evaluate(false);
+    private final Runnable evaluateLoop = () -> evaluate(false);
 
     private boolean evaluateDelayedPosted = false;
-    private Runnable evaluateDelayed = () -> { evaluate(true, true); evaluateDelayedPosted = false; };
+    private final Runnable evaluateDelayed = () -> { evaluate(true, true); evaluateDelayedPosted = false; };
 
-    private Runnable removeTSP = () -> animation.updateTSPRect(new Rect(0, 0, 0, 0));
+    private final Runnable removeTSP = () -> animation.updateTSPRect(new Rect(0, 0, 0, 0));
 
     public void evaluate(boolean refreshAll) {
         evaluate(refreshAll, false);
@@ -501,7 +501,7 @@ public class Overlay {
 
     public void updateTSPRect(Rect rect) {
         boolean apply = Display.isOff(spritePlayer.getContext(), true);
-        Slog.d("AOD_TSP", "Overlay " + rect.toString() + " apply:" + String.valueOf(apply));
+        Slog.d("AOD_TSP", "Overlay " + rect.toString() + " apply:" + apply);
         if (apply) {
             pokeWakeLocks(250);
             animation.updateTSPRect(rect);

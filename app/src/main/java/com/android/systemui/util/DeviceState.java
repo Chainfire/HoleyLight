@@ -21,6 +21,7 @@ package com.android.systemui.util;
 import android.content.Context;
 
 // This class is needed to prevent a crash on N20U when instantiating VIDirector
+@SuppressWarnings({"SameReturnValue", "unused"})
 public class DeviceState {
     public static boolean shouldEnableKeyguardScreenRotation(Context context) {
         return false;

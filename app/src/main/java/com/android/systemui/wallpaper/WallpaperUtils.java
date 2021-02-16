@@ -19,6 +19,7 @@
 package com.android.systemui.wallpaper;
 
 // This class is needed to prevent a crash on S10 when calling getFaceRecognitionVIFileName()
+@SuppressWarnings({"SameReturnValue", "unused"})
 public class WallpaperUtils {
     public static boolean isWhiteKeyguardWallpaper(String s) {
         return false;

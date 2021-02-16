@@ -24,12 +24,14 @@ import android.os.SystemClock;
 import android.service.notification.StatusBarNotification;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import eu.chainfire.holeylight.BuildConfig;
 
 @SuppressWarnings({"WeakerAccess"})
 public class NotificationTracker {
+    @SuppressWarnings("rawtypes")
     public static class Item implements Parcelable {
         private final String key;
         private final long posted;
@@ -121,9 +123,7 @@ public class NotificationTracker {
     private void load(Item[] array) {
         items.clear();
         if (array != null) {
-            for (Item item : array) {
-                items.add(item);
-            }
+            items.addAll(Arrays.asList(array));
         }
     }
 
@@ -155,8 +155,8 @@ public class NotificationTracker {
         Item[] items = save();
         Parcel parcel = Parcel.obtain();
         parcel.writeInt(items.length);
-        for (int i = 0; i < items.length; i++) {
-            items[i].writeToParcel(parcel, 0);
+        for (Item item : items) {
+            item.writeToParcel(parcel, 0);
         }
         byte[] result = parcel.marshall();
         parcel.recycle();
