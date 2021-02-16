@@ -85,6 +85,9 @@ public class SpritePlayer extends RelativeLayout {
     private final float dpToPx;
 
     private volatile int frame = -1;
+    private volatile SpriteSheet spriteSheetSwirlPrevious = null;
+    private volatile SpriteSheet spriteSheetBlinkPrevious = null;
+    private volatile SpriteSheet spriteSheetSinglePrevious = null;
     private volatile SpriteSheet spriteSheetSwirl = null;
     private volatile SpriteSheet spriteSheetBlink = null;
     private volatile SpriteSheet spriteSheetSingle = null;
@@ -478,11 +481,19 @@ public class SpritePlayer extends RelativeLayout {
             ) return;
             if ((lastSpriteSheetRequest.x == width) && (lastSpriteSheetRequest.y == height)) return;
             lastSpriteSheetRequest.set(width, height);
-            if (spriteSheetLoading == 0) {
-                resetSpriteSheet(null);
-            }
             dest.set(0, 0, width, height);
             destDouble.set(dest.centerX() - width, dest.centerY() - height, dest.centerX() + width, dest.centerY() + height);
+            if (
+                (spriteSheetSwirlPrevious != null) && (spriteSheetSwirlPrevious.getWidth() == width) && (spriteSheetSwirlPrevious.getHeight() == height) &&
+                (spriteSheetBlinkPrevious != null) && (spriteSheetBlinkPrevious.getWidth() == width) && (spriteSheetBlinkPrevious.getHeight() == height) &&
+                (spriteSheetSinglePrevious != null) && (spriteSheetSinglePrevious.getWidth() == width) && (spriteSheetSinglePrevious.getHeight() == height)
+            ) {
+                swapSpriteSheet(null);
+                evaluate();
+                return;
+            } else if (spriteSheetLoading == 0) {
+                resetSpriteSheet(null);
+            }
             spriteSheetLoading++;
             spriteSheetLoadingId++;
             final long callbackId = spriteSheetLoadingId;
@@ -536,21 +547,57 @@ public class SpritePlayer extends RelativeLayout {
             if ((mode == null) || (drawMode == mode)) {
                 frame = -1;
             }
-            if ((mode == null) || (mode == Mode.SWIRL)) {
-                SpriteSheet old = spriteSheetSwirl;
+            if (((mode == null) || (mode == Mode.SWIRL)) && spriteSheetSwirl != null) {
+                SpriteSheet recycle = spriteSheetSwirlPrevious;
+                spriteSheetSwirlPrevious = spriteSheetSwirl;
                 spriteSheetSwirl = null;
-                if (old != null) old.recycle();
+                if (recycle != null) recycle.recycle();
             }
-            if ((mode == null) || (mode == Mode.BLINK)) {
-                SpriteSheet old = spriteSheetBlink;
+            if (((mode == null) || (mode == Mode.BLINK)) && spriteSheetBlink != null) {
+                SpriteSheet recycle = spriteSheetBlinkPrevious;
+                spriteSheetBlinkPrevious = spriteSheetBlink;
                 spriteSheetBlink = null;
-                if (old != null) old.recycle();
+                if (recycle != null) recycle.recycle();
             }
-            if ((mode == null) || (mode == Mode.SINGLE)) {
-                SpriteSheet old = spriteSheetSingle;
+            if (((mode == null) || (mode == Mode.SINGLE)) && spriteSheetSingle != null) {
+                SpriteSheet recycle = spriteSheetSinglePrevious;
+                spriteSheetSinglePrevious = spriteSheetSingle;
                 spriteSheetSingle = null;
-                if (old != null) old.recycle();
+                if (recycle != null) recycle.recycle();
             }
+            if ((mode == null) || (drawMode == mode)) {
+                surfaceInvalidated = true;
+                try {
+                    Canvas canvas = surfaceView.getHolder().lockCanvas();
+                    try {
+                        if (!canvas.isHardwareAccelerated()) {
+                            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                        }
+                    } finally {
+                        surfaceView.getHolder().unlockCanvasAndPost(canvas);
+                    }
+                } catch (Throwable t) {
+                    // ...
+                }
+            }
+        }
+    }
+
+    private void swapSpriteSheet(Mode mode) {
+        synchronized (sync) {
+            if ((mode == null) || (drawMode == mode)) {
+                frame = -1;
+            }
+            SpriteSheet tmp;
+            tmp = spriteSheetSwirl;
+            spriteSheetSwirl = spriteSheetSwirlPrevious;
+            spriteSheetSwirlPrevious = tmp;
+            tmp = spriteSheetBlink;
+            spriteSheetBlink = spriteSheetBlinkPrevious;
+            spriteSheetBlinkPrevious = tmp;
+            tmp = spriteSheetSingle;
+            spriteSheetSingle = spriteSheetSinglePrevious;
+            spriteSheetSinglePrevious = tmp;
             if ((mode == null) || (drawMode == mode)) {
                 surfaceInvalidated = true;
                 try {
