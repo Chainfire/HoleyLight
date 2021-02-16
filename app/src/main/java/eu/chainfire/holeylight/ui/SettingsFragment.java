@@ -62,6 +62,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefRespectDND = null;
     private Preference prefTune = null;
     private Preference prefColors = null;
+    private CheckBoxPreference prefBlackFill = null;
     private CheckBoxPreference prefUnholeyIcons = null;
     private CheckBoxPreference prefOverlayLinger = null;
     private CheckBoxPreference prefSeenPickup = null;
@@ -440,6 +441,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             startActivity(new Intent(getActivity(), ColorActivity.class));
             return false;
         });
+        prefBlackFill = check(catAnimation, R.string.settings_animation_black_fill_title, R.string.settings_animation_black_fill_description, Settings.BLACK_FILL, Settings.BLACK_FILL_DEFAULT, true);
         prefUnholeyIcons = check(catAnimation, R.string.settings_animation_unholey_light_icons_title, R.string.settings_animation_unholey_light_icons_description, Settings.UNHOLEY_LIGHT_ICONS, Settings.UNHOLEY_LIGHT_ICONS_DEFAULT, true);
         prefOverlayLinger = check(catAnimation, R.string.settings_animation_overlay_linger_title, 0, null, false, true);
         prefOverlayLinger.setOnPreferenceChangeListener((preference, newValue) -> false);
@@ -662,6 +664,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
             prefTune.setEnabled(settings.isEnabled());
             prefColors.setEnabled(settings.isEnabled());
+            prefBlackFill.setEnabled(settings.isEnabled());
             prefUnholeyIcons.setEnabled(settings.isEnabled());
 
             prefOverlayLinger.setEnabled(settings.isEnabled());

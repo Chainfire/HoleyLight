@@ -231,4 +231,7 @@
     <string name="settings_animation_overlay_linger_description">Delay showing the lockscreen when hiding AOD, may prevent showing AOD on screen shortly</string>
 
     <string name="x_ms">%d milliseconds</string>
+
+    <string name="settings_animation_black_fill_title">Black fill</string>
+    <string name="settings_animation_black_fill_description">Fill area between notification and camera with black</string>
 </resources>

@@ -164,6 +164,7 @@ public class Overlay {
     private boolean lastState = false;
     private int[] lastColors = new int[0];
     private SpritePlayer.Mode lastMode = SpritePlayer.Mode.SWIRL;
+    private boolean lastBlackFill = false;
     private int lastDpAdd = 0;
     private boolean lastDoze = false;
     private boolean added = false;
@@ -444,8 +445,9 @@ public class Overlay {
 
         if (visible && wantedEffective && ((colors.length > 0) || activeHide)) {
             int dpAdd = (doze ? 1 : 0);
-            if (!lastState || colorsChanged() || renderMode != lastMode || (dpAdd != lastDpAdd)) {
-                animation.setMode(renderMode);
+            boolean blackFill = !doze && settings.isBlackFill();
+            if (!lastState || colorsChanged() || renderMode != lastMode || blackFill != lastBlackFill || dpAdd != lastDpAdd) {
+                animation.setMode(renderMode, blackFill);
                 createOverlay();
                 if (settings.isHideAOD() && doze && allowHideAOD) {
                     animation.setHideAOD(true, settings.isHideAODFully());
@@ -458,6 +460,7 @@ public class Overlay {
                 lastColors = colors;
                 lastState = true;
                 lastMode = renderMode;
+                lastBlackFill = blackFill;
                 lastDpAdd = dpAdd;
                 lastDoze = doze;
             }

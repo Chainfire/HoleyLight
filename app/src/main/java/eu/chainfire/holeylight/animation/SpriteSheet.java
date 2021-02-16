@@ -30,8 +30,66 @@ import com.airbnb.lottie.LottieDrawable;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings({ "WeakerAccess", "unused", "UnusedReturnValue" })
+@SuppressWarnings({ "WeakerAccess", "UnusedReturnValue", "FieldCanBeLocal" })
 public class SpriteSheet {
+    private static Bitmap superimposedFrame(LottieComposition lottieComposition) {
+        int frames = (int)lottieComposition.getDurationFrames();
+
+        LottieDrawable lottieDrawable = new LottieDrawable();
+        lottieDrawable.setComposition(lottieComposition);
+
+        Bitmap frame = Bitmap.createBitmap(lottieDrawable.getIntrinsicWidth(), lottieDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+
+        frame.eraseColor(Color.TRANSPARENT);
+
+        for (int i = 0; i < frames; i++) {
+            Canvas frame_canvas = new Canvas(frame);
+            lottieDrawable.setFrame(i);
+            lottieDrawable.draw(frame_canvas);
+        }
+
+        return frame;
+    }
+
+    private static Bitmap blackFrame(Bitmap superimposedFrame) {
+        int[] pixels = new int[superimposedFrame.getWidth() * superimposedFrame.getHeight()];
+        int[] pixelsBlack = new int[superimposedFrame.getWidth() * superimposedFrame.getHeight()];
+
+        Bitmap frame = Bitmap.createBitmap(superimposedFrame.getWidth(), superimposedFrame.getHeight(), Bitmap.Config.ARGB_8888);
+
+        superimposedFrame.getPixels(pixels, 0, superimposedFrame.getWidth(), 0, 0, superimposedFrame.getWidth(), superimposedFrame.getHeight());
+        for (int y = 0; y < superimposedFrame.getHeight(); y++) {
+            int last = 0;
+            boolean inside = false;
+            int start = -1;
+            int end = -1;
+
+            int index = y * superimposedFrame.getWidth();
+            for (int x = 0; x < superimposedFrame.getWidth(); x++) {
+                int p = pixels[index];
+                if ((p == 0) && (last != 0)) {
+                    start = x;
+                    inside = true;
+                } else if (inside && (p != 0) && (last == 0)) {
+                    end = x;
+                    break;
+                }
+                last = p;
+                index++;
+            }
+
+            if ((start >= 0) && (end >= 0) && (end >= start)) {
+                index = y * superimposedFrame.getWidth();
+                for (int x = start; x < end; x++) {
+                    pixelsBlack[index + x] = (int)0xFF000000;
+                }
+            }
+        }
+        frame.setPixels(pixelsBlack, 0, superimposedFrame.getWidth(), 0, 0, superimposedFrame.getWidth(), superimposedFrame.getHeight());
+
+        return frame;
+    }
+
     public static SpriteSheet fromLottieComposition(LottieComposition lottieComposition, int width, int height, SpritePlayer.Mode mode) {
         SpriteSheet ss;
 
@@ -55,43 +113,22 @@ public class SpriteSheet {
 
                 ss.addFrame(frame);
             }
-        } else if (mode == SpritePlayer.Mode.BLINK){
-            int frames = (int)lottieComposition.getDurationFrames();
 
-            ss = new SpriteSheet(width, height, 2, 1);
+            SpriteSheet ss2 = fromLottieComposition(lottieComposition, width, height, SpritePlayer.Mode.SINGLE);
+            ss.setBlackFrame(ss2.getBlackFrame());
+            ss2.setBlackFrame(null);
+        } else if (mode == SpritePlayer.Mode.BLINK || mode == SpritePlayer.Mode.SINGLE) {
+            ss = new SpriteSheet(width, height, mode == SpritePlayer.Mode.BLINK ? 2 : 1, 1);
 
-            LottieDrawable lottieDrawable = new LottieDrawable();
-            lottieDrawable.setComposition(lottieComposition);
+            Bitmap frame = superimposedFrame(lottieComposition);
+            ss.addFrame(frame);
 
-            Bitmap frame = Bitmap.createBitmap(lottieDrawable.getIntrinsicWidth(), lottieDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            ss.setBlackFrame(blackFrame(frame));
 
-            frame.eraseColor(Color.TRANSPARENT);
-            for (int i = 0; i < frames; i++) {
-                Canvas frame_canvas = new Canvas(frame);
-                lottieDrawable.setFrame(i);
-                lottieDrawable.draw(frame_canvas);
+            if (mode == SpritePlayer.Mode.BLINK) {
+                frame.eraseColor(Color.TRANSPARENT);
+                ss.addFrame(frame);
             }
-            ss.addFrame(frame);
-
-            frame.eraseColor(Color.TRANSPARENT);
-            ss.addFrame(frame);
-        } else if (mode == SpritePlayer.Mode.SINGLE) {
-            int frames = (int)lottieComposition.getDurationFrames();
-
-            ss = new SpriteSheet(width, height, 1, 1);
-
-            LottieDrawable lottieDrawable = new LottieDrawable();
-            lottieDrawable.setComposition(lottieComposition);
-
-            Bitmap frame = Bitmap.createBitmap(lottieDrawable.getIntrinsicWidth(), lottieDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-
-            frame.eraseColor(Color.TRANSPARENT);
-            for (int i = 0; i < frames; i++) {
-                Canvas frame_canvas = new Canvas(frame);
-                lottieDrawable.setFrame(i);
-                lottieDrawable.draw(frame_canvas);
-            }
-            ss.addFrame(frame);
         } else {
             return null;
         }
@@ -169,6 +206,8 @@ public class SpriteSheet {
     private final int frames;
     private final int frameRate;
 
+    private Bitmap blackFrame = null;
+
     private SpriteSheet(int width, int height, int frames, int frameRate) {
         this.width = width;
         this.height = height;
@@ -201,6 +240,10 @@ public class SpriteSheet {
         return sprite;
     }
 
+    private void setBlackFrame(Bitmap source) {
+        blackFrame = source;
+    }
+
     public int getWidth() {
         return width;
     }
@@ -224,8 +267,12 @@ public class SpriteSheet {
         return null;
     }
 
+    public Bitmap getBlackFrame() {
+        return blackFrame;
+    }
+
     public boolean isValid() {
-        return (sprites.size() == frames);
+        return (sprites.size() == frames) && (blackFrame != null);
     }
 
     public void recycle() {
@@ -234,6 +281,10 @@ public class SpriteSheet {
             if ((bitmap != null) && !bitmap.isRecycled()) {
                 bitmap.recycle();
             }
+        }
+        if (blackFrame != null) {
+            blackFrame.recycle();
+            blackFrame = null;
         }
     }
 

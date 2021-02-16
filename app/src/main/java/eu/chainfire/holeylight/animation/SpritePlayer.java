@@ -109,6 +109,7 @@ public class SpritePlayer extends RelativeLayout {
     private volatile long modeStart = 0L;
     private volatile boolean surfaceReady = false;
     private volatile boolean tspBlank = false;
+    private volatile boolean blackFill = false;
 
     public SpritePlayer(Context context) {
         super(context);
@@ -306,17 +307,26 @@ public class SpritePlayer extends RelativeLayout {
             paint.setColor(Color.WHITE);
             SpriteSheet.Sprite sprite = spriteSheet.getFrame(frame);
             Bitmap bitmap = sprite.getBitmap();
+            Rect area = sprite.getArea();
+            Bitmap black = spriteSheet.getBlackFrame();
             if ((colors != null) && (colors.length == 1)) {
+                if (blackFill && !Settings.tuning) {
+                    if (!black.isRecycled()) {
+                        paint.setColorFilter(null);
+                        canvas.drawBitmap(black, new Rect(0, 0, black.getWidth(), black.getHeight()), dest, paint);
+                    }
+                }
+
                 // fast single-color mode
                 paint.setColorFilter(new PorterDuffColorFilter(colors[0], PorterDuff.Mode.SRC_ATOP));
                 if (!bitmap.isRecycled()) {
-                    canvas.drawBitmap(sprite.getBitmap(), sprite.getArea(), dest, paint);
+                    canvas.drawBitmap(bitmap, area, dest, paint);
                 }
             } else {
                 // slower multi-colored mode
                 paint.setColorFilter(null);
                 if (!bitmap.isRecycled()) {
-                    canvas.drawBitmap(sprite.getBitmap(), sprite.getArea(), dest, paint);
+                    canvas.drawBitmap(bitmap, area, dest, paint);
                 }
 
                 paint.setXfermode(new PorterDuffXfermode(drawBackground ? PorterDuff.Mode.MULTIPLY : PorterDuff.Mode.SRC_ATOP));
@@ -326,6 +336,14 @@ public class SpritePlayer extends RelativeLayout {
                     // we use double size here because the arc may cut off the larger S10+ animation otherwise
                     paint.setColor(colors[i]);
                     canvas.drawArc(destDouble.left, destDouble.top, destDouble.right, destDouble.bottom, startAngle + 270 + (anglePerColor * i), anglePerColor, true, paint);
+                }
+
+                if (blackFill && !Settings.tuning) {
+                    if (!black.isRecycled()) {
+                        paint.setColorFilter(null);
+                        paint.setXfermode(null);
+                        canvas.drawBitmap(black, new Rect(0, 0, black.getWidth(), black.getHeight()), dest, paint);
+                    }
                 }
             }
         }
@@ -709,8 +727,9 @@ public class SpritePlayer extends RelativeLayout {
         return drawMode;
     }
 
-    public void setMode(Mode mode) {
+    public void setMode(Mode mode, boolean blackFill) {
         synchronized (sync) {
+            boolean redraw = false;
             if (mode != drawMode) {
                 frame = -1;
                 if (mode == Mode.TSP && drawMode == Mode.TSP_HIDE) {
@@ -719,6 +738,13 @@ public class SpritePlayer extends RelativeLayout {
                     modeStart = SystemClock.elapsedRealtime();
                 }
                 drawMode = mode;
+                redraw = true;
+            }
+            if (blackFill != this.blackFill) {
+                this.blackFill = blackFill;
+                redraw = true;
+            }
+            if (redraw) {
                 surfaceInvalidated = true;
                 evaluate();
             }

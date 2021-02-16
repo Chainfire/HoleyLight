@@ -40,6 +40,8 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final boolean DEBUG = BuildConfig.DEBUG;
     public static final boolean DEBUG_OVERLAY = false;
 
+    public static boolean tuning = false;
+
     public interface OnSettingsChangedListener {
         void onSettingsChanged();
     }
@@ -208,6 +210,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     private static final String OVERLAY_LINGER = "overlay_linger";
     private static final int OVERLAY_LINGER_DEFAULT = 125;
+    
+    public static final String BLACK_FILL = "black_fill";
+    public static final boolean BLACK_FILL_DEFAULT = true;
 
     private static Settings instance;
     public static Settings getInstance(Context context) {
@@ -713,6 +718,19 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         edit();
         try {
             editor.putInt(OVERLAY_LINGER, value);
+        } finally {
+            save(true);
+        }
+    }
+
+    public boolean isBlackFill() {
+        return prefs.getBoolean(BLACK_FILL, BLACK_FILL_DEFAULT);
+    }
+    
+    public void setBlackFill(boolean value) {
+        edit();
+        try {
+            editor.putBoolean(BLACK_FILL, value);
         } finally {
             save(true);
         }

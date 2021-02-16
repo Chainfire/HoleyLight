@@ -56,10 +56,12 @@ public class TuneActivity extends AppCompatActivity implements Settings.OnSettin
         TestNotification.show(this, TestNotification.NOTIFICATION_ID_TUNE);
         updateLabels();
         settings.registerOnSettingsChangedListener(this);
+        Settings.tuning = true;
     }
 
     @Override
     protected void onStop() {
+        Settings.tuning = false;
         settings.unregisterOnSettingsChangedListener(this);
         TestNotification.hide(this, TestNotification.NOTIFICATION_ID_TUNE);
         super.onStop();

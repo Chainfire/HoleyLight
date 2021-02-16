@@ -83,6 +83,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private volatile boolean hideAOD = false;
     private volatile boolean hideAODFully = false;
     private volatile SpritePlayer.Mode mode = SpritePlayer.Mode.SWIRL;
+    private volatile boolean blackFill = false;
     private final Rect tspRect = new Rect(0, 0, 0, 0);
 
     public NotificationAnimation(Context context, SpritePlayer spritePlayer, OnNotificationAnimationListener onNotificationAnimationListener) {
@@ -570,14 +571,17 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         }
     }
 
-    public void setMode(SpritePlayer.Mode mode) {
+    public void setMode(SpritePlayer.Mode mode, boolean blackFill) {
         if (mode != this.mode) {
             boolean apply = spritePlayer.isTSPMode(mode) || spritePlayer.isTSPMode(this.mode);
             this.mode = mode;
-            spritePlayer.setMode(mode);
+            spritePlayer.setMode(mode, blackFill);
             if (apply) {
                 applyDimensions();
             }
+        } else if (blackFill != this.blackFill) {
+            this.blackFill = blackFill;
+            spritePlayer.setMode(mode, blackFill);
         }
     }
 
