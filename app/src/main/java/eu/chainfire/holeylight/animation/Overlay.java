@@ -256,7 +256,7 @@ public class Overlay {
                             return false;
                         }
                     }
-                    return true;
+                    return draw;
                 }
 
                 @Override
