@@ -474,9 +474,11 @@ public class Overlay {
                     AODControl.setAOD(spritePlayer.getContext(), false);
                 }
                 if (animation.isPlaying()) {
-                    boolean immediately = !visible || kill;
+                    boolean immediately = !visible || kill || isDelayed;
                     animation.stop(immediately);
                     if (immediately) removeOverlay();
+                } else {
+                    removeOverlay();
                 }
                 lastState = false;
                 lastDoze = doze;
