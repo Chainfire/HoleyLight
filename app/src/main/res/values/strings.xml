@@ -234,4 +234,16 @@
 
     <string name="settings_animation_black_fill_title">Black fill</string>
     <string name="settings_animation_black_fill_description">Fill area between notification and camera with black</string>
+
+    <string name="save">Save</string>
+    <string name="load">Load</string>
+
+    <string name="color_save_error">An error occurred saving color data</string>
+    <string name="color_load_error">An error occurred loading color data</string>
+
+    <string name="color_load_title">Load colors</string>
+    <string name="color_load_options"><![CDATA[Please choose a loading mode<br><br><b>Clear</b>: clear current colors, then load all from file<br><br><b>Add</b>: add colors from file, but keep current color on conflict<br><br><b>Overwrite</b>: add colors from file, overwriting existing colors]]></string>
+    <string name="color_load_option_clear">Clear</string>
+    <string name="color_load_option_add">Add</string>
+    <string name="color_load_option_overwrite">Overwrite</string>
 </resources>

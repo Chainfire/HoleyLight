@@ -19,11 +19,19 @@
 package eu.chainfire.holeylight.misc;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.RectF;
+import android.net.Uri;
 import android.text.Html;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -733,6 +741,97 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
             editor.putBoolean(BLACK_FILL, value);
         } finally {
             save(true);
+        }
+    }
+
+    public boolean saveToUri(ContentResolver resolver, Uri uri) {
+        OutputStream outputStream;
+        try {
+            outputStream = resolver.openOutputStream(uri);
+            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+
+            bufferedWriter.write("eu.chainfire.holeylight 1\r\n");
+
+            Map<String, ?> prefsMap = prefs.getAll();
+            for (String key : prefsMap.keySet()) {
+                Object value = prefsMap.get(key);
+                if (value != null) {
+                    if (key.startsWith(CHANNEL_COLOR)) {
+                        bufferedWriter.write(String.format(Locale.ENGLISH, "i 0x%08X %s\r\n", (Integer)value, key));
+                    } else if (key.startsWith(CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE)) {
+                        bufferedWriter.write(String.format(Locale.ENGLISH, "b %d %s\r\n", (Boolean)value ? 1 : 0, key));
+                    }
+                }
+            }
+
+            bufferedWriter.flush();
+            bufferedWriter.close();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean loadFromUri(ContentResolver resolver, Uri uri, boolean clear, boolean overwrite) {
+        InputStream inputStream;
+        try {
+            inputStream = resolver.openInputStream(uri);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            boolean first = true;
+            while ((line = bufferedReader.readLine()) != null) {
+                if (first) {
+                    if (!line.trim().equals("eu.chainfire.holeylight 1")) {
+                        return false;
+                    }
+                    first = false;
+
+                    if (clear) {
+                        Map<String, ?> prefsMap = prefs.getAll();
+                        List<String> toRemove = new ArrayList<>();
+                        for (String key : prefsMap.keySet()) {
+                            Object value = prefsMap.get(key);
+                            if (value != null) {
+                                if (key.startsWith(CHANNEL_COLOR) || key.startsWith(CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE)) {
+                                    toRemove.add(key);
+                                }
+                            }
+                        }
+                        edit();
+                        try {
+                            for (String key : toRemove) {
+                                editor.remove(key);
+                            }
+                        } finally {
+                            save(true);
+                        }
+                    }
+                } else {
+                    edit();
+                    try {
+                        String[] parts = line.trim().split(" ", 3);
+                        if (parts.length == 3) {
+                            String key = parts[2];
+                            if (!overwrite && prefs.contains(key)) continue;
+                            if (parts[0].equals("i")) {
+                                editor.putInt(key, Long.decode(parts[1]).intValue());
+                            } else if (parts[0].equals("b")) {
+                                editor.putBoolean(key, parts[1].equals("1"));
+                            }
+                        }
+                    } finally {
+                        save(true);
+                    }
+                }
+            }
+
+            bufferedReader.close();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }

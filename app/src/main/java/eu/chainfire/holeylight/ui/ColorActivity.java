@@ -19,11 +19,14 @@
 package eu.chainfire.holeylight.ui;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -43,6 +46,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -60,6 +65,7 @@ public class ColorActivity extends AppCompatActivity {
     private Settings settings = null;
     private AppAdapter apps = null;
     private Integer colorCopy = null;
+    private boolean inSaveLoad = false;
 
     @SuppressWarnings("ConstantConditions")
     @Override
@@ -100,7 +106,9 @@ public class ColorActivity extends AppCompatActivity {
 
     @Override
     protected void onUserLeaveHint() {
-        finish();
+        if (!inSaveLoad) {
+            finish();
+        }
     }
 
     @Override
@@ -484,13 +492,96 @@ public class ColorActivity extends AppCompatActivity {
     @SuppressLint("AlwaysShowAction")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuItem menuItem = menu.add(R.string.refresh);
-        menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        menuItem.setOnMenuItemClickListener(item -> {
+        MenuItem refresh = menu.add(R.string.refresh);
+        refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        refresh.setOnMenuItemClickListener(item -> {
             refresh();
             return true;
         });
+
+        MenuItem save = menu.add(R.string.save);
+        save.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        save.setOnMenuItemClickListener(item -> {
+            save();
+            return true;
+        });
+
+        MenuItem load = menu.add(R.string.load);
+        load.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        load.setOnMenuItemClickListener(item -> {
+            load();
+            return true;
+        });
+
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private final ActivityResultLauncher<Intent> requestSaveFile = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                inSaveLoad = false;
+                if (result != null && result.getResultCode() == Activity.RESULT_OK && result.getData() != null && result.getData().getData() != null) {
+                    if (!settings.saveToUri(getContentResolver(), result.getData().getData())) {
+                        (new AlertDialog.Builder(ColorActivity.this))
+                                .setTitle(getString(R.string.error))
+                                .setMessage(R.string.color_save_error)
+                                .setPositiveButton(android.R.string.ok, null)
+                                .show();
+                    }
+                }
+            }
+    );
+
+    private void save() {
+        inSaveLoad = true;
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TITLE, "holeylight_colors");
+        requestSaveFile.launch(intent);
+    }
+
+    private final ActivityResultLauncher<Intent> requestLoadFile = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                inSaveLoad = false;
+                if (result != null && result.getResultCode() == Activity.RESULT_OK && result.getData() != null && result.getData().getData() != null) {
+                    (new AlertDialog.Builder(ColorActivity.this))
+                            .setTitle(getString(R.string.color_load_title))
+                            .setMessage(Html.fromHtml(getString(R.string.color_load_options)))
+                            .setNeutralButton(R.string.color_load_option_clear, (dialog, which) -> {
+                                loadFromUri(result.getData().getData(), true, true);
+                            })
+                            .setNegativeButton(R.string.color_load_option_add, (dialog, which) -> {
+                                loadFromUri(result.getData().getData(), false, false);
+                            })
+                            .setPositiveButton(R.string.color_load_option_overwrite, (dialog, which) -> {
+                                loadFromUri(result.getData().getData(), false, true);
+                            })
+                            .show();
+                }
+            }
+    );
+
+    private void loadFromUri(Uri uri, boolean clear, boolean overwrite) {
+        if (!settings.loadFromUri(getContentResolver(), uri, clear, overwrite)) {
+            (new AlertDialog.Builder(ColorActivity.this))
+                    .setTitle(getString(R.string.error))
+                    .setMessage(R.string.color_load_error)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+        } else {
+            refresh();
+        }
+    }
+
+    private void load() {
+        inSaveLoad = true;
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TITLE, "holeylight_colors");
+        requestLoadFile.launch(intent);
     }
 }
 
