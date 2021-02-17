@@ -669,7 +669,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
             prefOverlayLinger.setEnabled(settings.isEnabled());
             prefOverlayLinger.setChecked(settings.getOverlayLinger() > 0);
-            prefOverlayLinger.setSummary(getString(R.string.settings_animation_overlay_linger_description) + "\n[ " + (settings.getOverlayLinger() == 0 ? getString(R.string.disabled) : getString(R.string.x_ms, settings.getOverlayLinger())) + " ]");
+            prefOverlayLinger.setSummary(getString(R.string.settings_animation_overlay_linger_description) + (settings.getOverlayLinger() > 0 ? "\n[ " + getString(R.string.x_ms, settings.getOverlayLinger()) + " ]" : ""));
 
             ArrayList<String> seenPickup = new ArrayList<>();
             for (int i = 0; i < Settings.SCREEN_AND_POWER_STATE_DESCRIPTIONS.length; i++) {
@@ -679,7 +679,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             }
             prefSeenPickup.setEnabled(settings.isEnabled());
             prefSeenPickup.setChecked(seenPickup.size() > 0);
-            prefSeenPickup.setSummary(getString(R.string.settings_seen_pickup_description) + "\n[ " + (seenPickup.size() > 0 ? String.join(", ", seenPickup) : getString(R.string.never)) + " ]");
+            prefSeenPickup.setSummary(getString(R.string.settings_seen_pickup_description) + (seenPickup.size() > 0 ? "\n[ " + String.join(", ", seenPickup) + " ]" : ""));
 
             prefSeenOnLockscreen.setEnabled(settings.isEnabledWhileScreenOff());
             prefSeenOnUserPresent.setEnabled(settings.isEnabledWhileScreenOff());
