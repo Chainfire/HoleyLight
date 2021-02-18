@@ -48,6 +48,7 @@ import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.SpritePlayer;
 import eu.chainfire.holeylight.misc.AODControl;
+import eu.chainfire.holeylight.misc.Manufacturer;
 import eu.chainfire.holeylight.misc.Permissions;
 import eu.chainfire.holeylight.misc.Settings;
 
@@ -148,13 +149,26 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
         if (inLogcatDump) return;
         if (setupWizard()) return;
 
+        String device = String.format("%s / %s / %s", Build.BRAND, Build.MANUFACTURER, Build.DEVICE);
+
         switch (Permissions.detect(this)) {
             case DEVICE_SUPPORT:
                 (currentDialog = newAlert(!Settings.DEBUG)
                         .setTitle(R.string.error)
-                        .setMessage(Html.fromHtml(getString(R.string.error_unsupported_device, Build.DEVICE)))
+                        .setMessage(Html.fromHtml(getString(R.string.error_unsupported_device, device)))
                         .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                             if (Settings.DEBUG) logcatDumpRequest();
+                        })
+                        .show()).setCanceledOnTouchOutside(false);
+                break;
+            case DEVICE_OFFICIAL_SUPPORT:
+                (currentDialog = newAlert(!Settings.DEBUG)
+                        .setTitle(R.string.notice_dialog_title)
+                        .setMessage(Html.fromHtml(getString(R.string.notice_not_officially_supported_device, device)))
+                        .setPositiveButton(android.R.string.ok, null)
+                        .setOnDismissListener(dialog -> {
+                            settings.setDeviceOfficialSupportWarningShown(true);
+                            checkPermissions();
                         })
                         .show()).setCanceledOnTouchOutside(false);
                 break;
@@ -249,14 +263,18 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
                 (settings.getAnimationMode(Settings.SCREEN_OFF_BATTERY) == SpritePlayer.Mode.TSP)
         );
         if (aodRequired) {
-            aodRequired = !AODControl.isAODEnabled(this) && !AODControl.haveHelperPackage(this, true);
+            aodRequired = !AODControl.isAODEnabled(this) && !AODControl.usingHelperPackage(this, null);
             if (aodWithImageRequired) {
-                aodWithImageRequired = (AODControl.getAODThemePackage(this) == null);
+                aodWithImageRequired = (Manufacturer.isSamsung() && AODControl.getAODThemePackage(this) == null);
             }
             if (aodRequired) {
                 (currentDialog = newAlert(false)
                         .setTitle(R.string.notice_dialog_title)
-                        .setMessage(Html.fromHtml(getString(R.string.notice_aod_required_message)))
+                        .setMessage(Html.fromHtml(getString(
+                                Manufacturer.isSamsung() ? R.string.notice_aod_required_message :
+                                Manufacturer.isGoogle() ? R.string.notice_aod_required_message_google :
+                                0
+                        )))
                         .setNegativeButton(android.R.string.cancel, null)
                         .setPositiveButton(R.string.open_android_settings, (dialog, which) -> {
                             try {

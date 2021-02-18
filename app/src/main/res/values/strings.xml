@@ -21,7 +21,7 @@
 
     <string name="error">Error</string>
     <string name="error_hide_notch"><![CDATA[<b>Holey Light</b> cannot function while the notch is hidden. Uncheck <b>Settings</b> - <b>Display</b> - <b>Full screen apps</b> - <b>Hide front camera</b>.]]></string>
-    <string name="error_unsupported_device"><![CDATA[<b>Holey Light</b> does not appear support your device. If you are using an <b>Samsung</b> variant please report this code to the XDA thread:<br><br>[ <b>%s</b> ]]]></string>
+    <string name="error_unsupported_device"><![CDATA[<b>Holey Light</b> does not appear support your device. If you are using a <b>Samsung/Google</b> device please report this code to the XDA thread:<br><br>[ <b>%s</b> ]]]></string>
 
 <!-- obsolete --><string name="help_basic_title">Help</string>
 <!-- obsolete --><string name="help_basic_descrption">Some basic advice</string>
@@ -152,8 +152,8 @@
     <string name="settings_hide_aod_description">When the screen is off, hide Always On Display and show only our animation</string>
 
     <string name="notice_dialog_title">Notice</string>
-    <string name="notice_aod_required_message"><![CDATA[The current configuration requires <b>Always On Display</b> to be enabled.<br><br>Please go to <b>Settings -> Lock screen -> Always On Display</b> and set it to <b>Show Always</b> (or <b>Tap to show</b> if so desired).<br><br>Please also make sure its <b>Screen orientation</b> is set to <b>Portrait</b>.<br><br>You may also configure AOD\'s schedule and brightness.]]></string>
-    <string name="notice_aod_with_image_required_message"><![CDATA[The current configuration requires an image to be applied to <b>Always On Display</b>.<br><br>Please go to <b>Themes (AOD section)</b>, <b>Download</b> any (free) theme, and <b>Apply</b> it as <b>Image only</b>.<br><br>If you apply it as both <b>Clock and image</b>, the clock will eventually become visible.]]></string>
+<!-- Samsung --><string name="notice_aod_required_message"><![CDATA[The current configuration requires <b>Always On Display</b> to be enabled.<br><br>Please go to <b>Settings -> Lock screen -> Always On Display</b> and set it to <b>Show Always</b> (or <b>Tap to show</b> if so desired).<br><br>Please also make sure its <b>Screen orientation</b> is set to <b>Portrait</b>.<br><br>You may also configure AOD\'s schedule and brightness.]]></string>
+<!-- Samsung --><string name="notice_aod_with_image_required_message"><![CDATA[The current configuration requires an image to be applied to <b>Always On Display</b>.<br><br>Please go to <b>Themes (AOD section)</b>, <b>Download</b> any (free) theme, and <b>Apply</b> it as <b>Image only</b>.<br><br>If you apply it as both <b>Clock and image</b>, the clock will eventually become visible.]]></string>
     <string name="open_android_settings">Open Android Settings</string>
     <string name="open_theme_store">Open Galaxy Themes</string>
 
@@ -246,4 +246,9 @@
     <string name="color_load_option_clear">Clear</string>
     <string name="color_load_option_add">Add</string>
     <string name="color_load_option_overwrite">Overwrite</string>
+
+<!-- Google --><string name="notice_aod_required_message_google"><![CDATA[The current configuration requires <b>Always On Display</b> to be enabled.<br><br>Please go to <b>Settings -> Display -> Advanced -> Lock screen</b> and enable <b>Always show time and info</b>.]]></string>
+<!-- Google --><string name="settings_schedule_aod_description_unsupported">This device does not support a display schedule</string>
+
+    <string name="notice_not_officially_supported_device"><![CDATA[<b>Holey Light</b> does not <i>officially</i> support this device. If this device has a camera hole inside the display area, it <i>might</i> work. You will probably need to go to the <b>Tune</b> screen to make it look right.<br><br>If the app seems to work well, please report your tuning values and this code to the XDA thread:<br><br>[ <b>%s</b> ]]]></string>
 </resources>

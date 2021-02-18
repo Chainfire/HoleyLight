@@ -39,7 +39,7 @@ public class DetectCutoutActivity extends AppCompatActivity {
         byte[] items = getIntent().getByteArrayExtra(BuildConfig.APPLICATION_ID + "/notifications");
         tracker.loadFromBytes(items);
 
-        animation = new NotificationAnimation(this,null, null);
+        animation = new NotificationAnimation(this, null, 0, null);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.container), (view, insets) -> {
             animation.updateFromInsets(insets);

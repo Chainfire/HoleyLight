@@ -29,7 +29,7 @@
     <string name="enabled">Включить</string>
     <string name="error">Ошибка</string>
     <string name="error_hide_notch">&lt;b>Holey Light&lt;/b> не может работать, пока метка скрыта. Снимите галочку &lt;b>Настройки&lt;/b> - &lt;b>Экран&lt;/b> - &lt;b>Полноэкранные приложения&lt;/b> - &lt;b>Скрыть фронтальную камеру&lt;/b>.</string>
-    <string name="error_unsupported_device">&lt;b>Holey Light&lt;/b> не поддерживает ваше устройство. Если вы используете вариант &lt;b>Samsung&lt;/b> сообщите об этом в форуме на XDA:&lt;br>&lt;br>[ &lt;b>%s&lt;/b> ]</string>
+    <string name="error_unsupported_device">&lt;b>Holey Light&lt;/b> не поддерживает ваше устройство. Если вы используете вариант &lt;b>Samsung/Google&lt;/b> сообщите об этом в форуме на XDA:&lt;br>&lt;br>[ &lt;b>%s&lt;/b> ]</string>
     <string name="help_basic_descrption">Несколько основных советов</string>
     <string name="help_basic_message">"&lt;b>Holey Light&lt;/b> установить на &lt;b>Always On Display (AOD)&lt;/b> (см. Настройки Android) для отображения уведомлений, когда экран выключен,
         поэтому для работы этих режимов необходимо включить AOD.&lt;br>

@@ -46,6 +46,7 @@ import androidx.preference.PreferenceScreen;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.SpritePlayer;
 import eu.chainfire.holeylight.misc.AODControl;
+import eu.chainfire.holeylight.misc.Manufacturer;
 import eu.chainfire.holeylight.misc.Settings;
 
 @SuppressWarnings({"WeakerAccess"})
@@ -303,6 +304,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         }
     }
 
+    private boolean supportsAODSchedule() {
+        return Manufacturer.isSamsung();
+    }
+
     @SuppressWarnings({"ConstantConditions", "deprecation"})
     private PreferenceScreen createPreferenceHierarchy() {
         PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
@@ -334,6 +339,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         Preference setupWizard = pref(null, R.string.setup_wizard_title, R.string.setup_wizard_description, null, true, preference -> {
             settings.setSetupWizardComplete(false);
+            settings.setDeviceOfficialSupportWarningShown(false);
             Activity activity = getActivity();
             if (activity instanceof MainActivity) {
                 ((MainActivity)activity).setupWizard();
@@ -640,24 +646,28 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             }
             prefLockscreenOn.setEnabled(settings.isEnabledWhileScreenOn());
 
-            int[] aodSchedule = AODControl.getAODSchedule(getContext());
-            if (aodSchedule == null) {
-                prefAODSchedule.setSummary(Html.fromHtml(getString(R.string.settings_schedule_aod_description) + "<br>[ " + getString(R.string.settings_schedule_aod_none) + " ]"));
+            if (!supportsAODSchedule()) {
+                prefAODSchedule.setSummary(R.string.settings_schedule_aod_description_unsupported);
             } else {
-                String start;
-                String end;
-                if (DateFormat.is24HourFormat(getContext())) {
-                    start = String.format(Locale.ENGLISH, "%d:%02d", aodSchedule[0] / 60, aodSchedule[0] % 60);
-                    end = String.format(Locale.ENGLISH, "%d:%02d", aodSchedule[1] / 60, aodSchedule[1] % 60);
+                int[] aodSchedule = AODControl.getAODSchedule(getContext());
+                if (aodSchedule == null) {
+                    prefAODSchedule.setSummary(Html.fromHtml(getString(R.string.settings_schedule_aod_description) + "<br>[ " + getString(R.string.settings_schedule_aod_none) + " ]"));
                 } else {
-                    int startHour = (aodSchedule[0] % (12 * 60)) / 60;
-                    if (startHour == 0) startHour = 12;
-                    int endHour = (aodSchedule[1] % (12 * 60)) / 60;
-                    if (endHour == 0) endHour = 12;
-                    start = String.format(Locale.ENGLISH, "%d:%02d %s", startHour, aodSchedule[0] % 60, aodSchedule[0] < 12 * 60 ? "AM" : "PM");
-                    end = String.format(Locale.ENGLISH, "%d:%02d %s", endHour, aodSchedule[1] % 60, aodSchedule[1] < 12 * 60 ? "AM" : "PM");
+                    String start;
+                    String end;
+                    if (DateFormat.is24HourFormat(getContext())) {
+                        start = String.format(Locale.ENGLISH, "%d:%02d", aodSchedule[0] / 60, aodSchedule[0] % 60);
+                        end = String.format(Locale.ENGLISH, "%d:%02d", aodSchedule[1] / 60, aodSchedule[1] % 60);
+                    } else {
+                        int startHour = (aodSchedule[0] % (12 * 60)) / 60;
+                        if (startHour == 0) startHour = 12;
+                        int endHour = (aodSchedule[1] % (12 * 60)) / 60;
+                        if (endHour == 0) endHour = 12;
+                        start = String.format(Locale.ENGLISH, "%d:%02d %s", startHour, aodSchedule[0] % 60, aodSchedule[0] < 12 * 60 ? "AM" : "PM");
+                        end = String.format(Locale.ENGLISH, "%d:%02d %s", endHour, aodSchedule[1] % 60, aodSchedule[1] < 12 * 60 ? "AM" : "PM");
+                    }
+                    prefAODSchedule.setSummary(Html.fromHtml(getString(R.string.settings_schedule_aod_description) + "<br>[ " + start + " - " + end + " ]"));
                 }
-                prefAODSchedule.setSummary(Html.fromHtml(getString(R.string.settings_schedule_aod_description) + "<br>[ " + start + " - " + end + " ]"));
             }
 
             prefRespectDND.setEnabled(settings.isEnabled());

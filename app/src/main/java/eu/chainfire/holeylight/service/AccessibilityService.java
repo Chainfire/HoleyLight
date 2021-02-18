@@ -33,10 +33,10 @@ import java.util.List;
 import java.util.Locale;
 
 import eu.chainfire.holeylight.animation.Overlay;
-import eu.chainfire.holeylight.misc.AODControl;
 import eu.chainfire.holeylight.misc.Display;
 import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.misc.Slog;
+import eu.chainfire.holeylight.service.area.AreaFinder;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class AccessibilityService extends android.accessibilityservice.AccessibilityService {
@@ -44,87 +44,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     private Handler handler = null;
     private Handler handlerMain = null;
     private Display.State lastState = null;
-    private String previousNodeClass = null;
-    private boolean seenXViewPager = false;
-    private boolean haveSeenContainer = false; // if seen, accept no substitute
-
-    private void inspectNode(AccessibilityNodeInfo node, Rect outerBounds, int level, boolean a11, boolean isTapToShow) {
-        if (level == 0 && a11) {
-            previousNodeClass = null;
-            seenXViewPager = false;
-        }
-
-        if (
-                (node == null) ||
-                (node.getClassName() == null) ||
-                (!Settings.DEBUG && (
-                        (!node.getClassName().equals("android.widget.FrameLayout")) &&
-                        (!node.getClassName().equals("com.android.internal.widget.ViewPager"))
-                ))
-        ) {
-            if ((node != null) && (node.getClassName() != null)) {
-                previousNodeClass = node.getClassName().toString();
-                seenXViewPager |= node.getClassName().equals("androidx.viewpager.widget.ViewPager");
-            }
-            return;
-        }
-
-        node.refresh();
-
-        Rect bounds = new Rect();
-        node.getBoundsInScreen(bounds);
-
-        if (Settings.DEBUG) {
-            String l = "";
-            for (int i = 0; i < level; i++) {
-                l += "--";
-            }
-            if (l.length() > 0) l += " ";
-            Slog.d("AOD_TSP", "Node " + l + node.getClassName().toString() + " " + bounds.toString() + " " + node.getViewIdResourceName());
-        }
-
-        if (node.getClassName().equals("com.android.internal.widget.ViewPager") || (
-                a11 &&
-                node.getClassName().equals("android.widget.FrameLayout") && (
-                        (
-                                outerBounds.left == -1 && (
-                                        (
-                                                previousNodeClass != null &&
-                                                previousNodeClass.equals("android.widget.ImageView")
-                                        ) || (
-                                                seenXViewPager &&
-                                                level == 2
-                                        ) || (
-                                                node.getViewIdResourceName() != null &&
-                                                node.getViewIdResourceName().equals("com.samsung.android.app.aodservice:id/common_clock_widget_container")
-                                        )
-                                )
-                        ) || (
-                                outerBounds.left >= 0
-                        )
-                )
-        )) {
-            if (outerBounds.left == -1 && !seenXViewPager && haveSeenContainer && isTapToShow && !(node.getViewIdResourceName() != null && node.getViewIdResourceName().equals("com.samsung.android.app.aodservice:id/common_clock_widget_container"))) {
-                // skip
-            } else {
-                haveSeenContainer |= a11 && node.getViewIdResourceName() != null && node.getViewIdResourceName().equals("com.samsung.android.app.aodservice:id/common_clock_widget_container");
-                if ((bounds.left >= 0) && (bounds.right >= 0) && ((outerBounds.left == -1) || (bounds.left < outerBounds.left))) outerBounds.left = bounds.left;
-                if ((bounds.top >= 0) && (bounds.bottom >= 0) && ((outerBounds.top == -1) || (bounds.top < outerBounds.top))) outerBounds.top = bounds.top;
-                if ((bounds.left >= 0) && (bounds.right >= 0) && ((outerBounds.right == -1) || (bounds.right > outerBounds.right))) outerBounds.right = bounds.right;
-                if ((bounds.top >= 0) && (bounds.bottom >= 0) && ((outerBounds.bottom == -1) || (bounds.bottom > outerBounds.bottom))) outerBounds.bottom = bounds.bottom;
-                Slog.d("AOD_TSP", "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-            }
-        } else if (node.getClassName().equals("android.widget.FrameLayout") || Settings.DEBUG)  {
-            for (int i = 0; i < node.getChildCount(); i++) {
-                inspectNode(node.getChild(i), outerBounds, level + 1, a11, isTapToShow);
-            }
-        }
-
-        if ((node != null) && (node.getClassName() != null)) {
-            previousNodeClass = node.getClassName().toString();
-            seenXViewPager |= node.getClassName().equals("androidx.viewpager.widget.ViewPager");
-        }
-    }
+    private AreaFinder areaFinder = null;
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -163,7 +83,8 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
 
         handler.post(() -> {
             try {
-                boolean isTapToShow = AODControl.isAODTapToShow(this);
+                areaFinder.start(this);
+
                 List<AccessibilityWindowInfo> windows = getWindows();
                 for (AccessibilityWindowInfo window : windows) {
                     AccessibilityNodeInfo root = window.getRoot();
@@ -177,41 +98,10 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
 
                     root.refresh();
 
-                    Rect outerBounds = new Rect(-1, -1, -1, -1);
-
-                    if (Build.VERSION.SDK_INT < 29) { // Android 9
-                        for (int i = 0; i < root.getChildCount(); i++) {
-                            AccessibilityNodeInfo node = root.getChild(i);
-                            if (
-                                    (node == null) ||
-                                    (node.getClassName() == null) ||
-                                    (
-                                        (!node.getClassName().equals("android.support.v4.view.ViewPager")) &&
-                                        (!node.getClassName().equals("android.widget.ImageView"))
-                                    )
-                            ) continue;
-
-                            node.refresh();
-
-                            Rect bounds = new Rect();
-                            node.getBoundsInScreen(bounds);
-
-                            if ((bounds.left >= 0) && ((outerBounds.left == -1) || (bounds.left < outerBounds.left))) outerBounds.left = bounds.left;
-                            if ((bounds.top >= 0) && ((outerBounds.top == -1) || (bounds.top < outerBounds.top))) outerBounds.top = bounds.top;
-                            if ((bounds.right >= 0) && ((outerBounds.right == -1) || (bounds.right > outerBounds.right))) outerBounds.right = bounds.right;
-                            if ((bounds.bottom >= 0) && ((outerBounds.bottom == -1) || (bounds.bottom > outerBounds.bottom))) outerBounds.bottom = bounds.bottom;
-
-                            Slog.d("AOD_TSP", "Node " + node.getClassName().toString() + " " + bounds.toString());
-                        }
-                    } else { // Android 10+
-                        inspectNode(root, outerBounds, 0, false, isTapToShow);
-                        if (outerBounds.left == -1 && Build.VERSION.SDK_INT >= 30) {
-                            // Android 11+
-                            inspectNode(root, outerBounds, 0, true, isTapToShow);
-                        }
-                    }
+                    final Rect outerBounds = areaFinder.find(root);
 
                     if (
+                            (outerBounds != null) &&
                             (outerBounds.left > -1) &&
                             (outerBounds.top > -1) &&
                             (outerBounds.right > -1) &&
@@ -221,15 +111,8 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                     ) {
                         Slog.d("AOD_TSP", "Access " + outerBounds.toString());
                         handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(outerBounds));
-                    } else if (
-                            haveSeenContainer &&
-                            (outerBounds.left == -1) &&
-                            (outerBounds.top == -1) &&
-                            (outerBounds.right == -1) &&
-                            (outerBounds.bottom == -1) &&
-                            isTapToShow
-                    ) {
-                        Slog.d("AOD_TSP", "Access " + outerBounds.toString());
+                    } else if (outerBounds == null) {
+                        Slog.d("AOD_TSP", "Access null");
                         handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(new Rect(0, 0, 0, 0)));
                     }
                 }
@@ -257,20 +140,22 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
 
         boolean done = false;
 
-        // Android 10-
-        try {
-            Class<?> clazz = AccessibilityService.class.getSuperclass();
-            if (clazz != null) {
-                Field token = clazz.getDeclaredField("mWindowToken");
-                token.setAccessible(true);
-                IBinder windowToken = (IBinder)token.get(AccessibilityService.this);
-                if (windowToken != null) {
-                    Overlay.getInstance(AccessibilityService.this, windowToken);
-                    done = true;
+        if (Build.VERSION.SDK_INT < 30) {
+            // Android 10-
+            try {
+                Class<?> clazz = AccessibilityService.class.getSuperclass();
+                if (clazz != null) {
+                    Field token = clazz.getDeclaredField("mWindowToken");
+                    token.setAccessible(true);
+                    IBinder windowToken = (IBinder)token.get(AccessibilityService.this);
+                    if (windowToken != null) {
+                        Overlay.getInstance(AccessibilityService.this, windowToken);
+                        done = true;
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
         // Android 11+
@@ -288,5 +173,6 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
         handlerMain = new Handler(Looper.getMainLooper());
+        areaFinder = AreaFinder.factory();
     }
 }

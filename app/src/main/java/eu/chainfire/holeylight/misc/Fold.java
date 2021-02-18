@@ -34,7 +34,7 @@ import android.os.Build;
 
 public class Fold {
     public static boolean isFold() {
-        return Build.DEVICE.toUpperCase().startsWith("F2");
+        return Manufacturer.isSamsung() && Build.DEVICE.toUpperCase().startsWith("F2");
     }
 
     public static boolean isFolded(int w, int h) {

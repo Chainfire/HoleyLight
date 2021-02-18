@@ -21,7 +21,7 @@
 
     <string name="error">Erro</string>
     <string name="error_hide_notch"><![CDATA[<b>Holey Light</b> não pode funcionar enquanto o notch estiver oculto. Desmarque <b>Configurações</b> - <b>Visor</b> - <b>Aplicativos em tela cheia</b> - <b>Ocultar câmera frontal</b>.]]></string>
-    <string name="error_unsupported_device"><![CDATA[<b>Holey Light</b> não parece suportar o seu dispositivo. Se você estiver usando uma variante do <b>Samsung</b> por favor reporte este código no tópico do XDA:<br><br>[ <b>%s</b> ]]]></string>
+    <string name="error_unsupported_device"><![CDATA[<b>Holey Light</b> não parece suportar o seu dispositivo. Se você estiver usando uma variante do <b>Samsung/Google</b> por favor reporte este código no tópico do XDA:<br><br>[ <b>%s</b> ]]]></string>
 
 <!-- obsolete --><string name="help_basic_title">Ajuda</string>
 <!-- obsolete --><string name="help_basic_descrption">Algumas recomendações básicas</string>

@@ -33,9 +33,13 @@ import com.airbnb.lottie.LottieComposition;
 import com.airbnb.lottie.LottieCompositionFactory;
 import com.android.systemui.VIDirector;
 
+import java.util.Locale;
+
 import androidx.core.view.WindowInsetsCompat;
+import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.misc.CameraCutout;
 import eu.chainfire.holeylight.misc.Fold;
+import eu.chainfire.holeylight.misc.Manufacturer;
 import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.misc.Slog;
 
@@ -55,19 +59,66 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private static final String jsonBeyond0 = "{\"v\":\"5.1.20\",\"fr\":60,\"ip\":0,\"op\":61,\"w\":132,\"h\":132,\"nm\":\"beyond_punch_cut_ani_B0\",\"ddd\":0,\"assets\":[],\"layers\":[{\"ddd\":0,\"ind\":1,\"ty\":1,\"nm\":\"L\",\"td\":1,\"sr\":1,\"ks\":{\"o\":{\"a\":0,\"k\":100,\"ix\":11},\"r\":{\"a\":0,\"k\":45,\"ix\":10},\"p\":{\"a\":1,\"k\":[{\"i\":{\"x\":0.1,\"y\":1},\"o\":{\"x\":0.33,\"y\":0},\"n\":\"0p1_1_0p33_0\",\"t\":0,\"s\":[-41,66.548,0],\"e\":[170,66.548,0],\"to\":[0,0,0],\"ti\":[0,0,0]},{\"t\":60}],\"ix\":2},\"a\":{\"a\":0,\"k\":[24,125,0],\"ix\":1},\"s\":{\"a\":0,\"k\":[100,100,100],\"ix\":6}},\"ao\":0,\"sw\":48,\"sh\":250,\"sc\":\"#ffffff\",\"ip\":0,\"op\":4000,\"st\":0,\"bm\":0},{\"ddd\":0,\"ind\":2,\"ty\":4,\"nm\":\"cue_02\",\"tt\":1,\"sr\":1,\"ks\":{\"o\":{\"a\":0,\"k\":100,\"ix\":11},\"r\":{\"a\":0,\"k\":0,\"ix\":10},\"p\":{\"a\":0,\"k\":[66,66,0],\"ix\":2},\"a\":{\"a\":0,\"k\":[0,0,0],\"ix\":1},\"s\":{\"a\":0,\"k\":[100,100,100],\"ix\":6}},\"ao\":0,\"hasMask\":true,\"masksProperties\":[{\"inv\":false,\"mode\":\"s\",\"pt\":{\"a\":0,\"k\":{\"i\":[[27.614,0],[0,-27.616],[-27.614,0],[0,27.616]],\"o\":[[-27.614,0],[0,27.616],[27.614,0],[0,-27.616]],\"v\":[[0,-50],[-50,0.004],[0,50.008],[50,0.004]],\"c\":true},\"ix\":1},\"o\":{\"a\":0,\"k\":100,\"ix\":3},\"x\":{\"a\":0,\"k\":0,\"ix\":4},\"nm\":\"Mask 1\"}],\"shapes\":[{\"ty\":\"gr\",\"it\":[{\"d\":3,\"ty\":\"el\",\"s\":{\"a\":0,\"k\":[100,100],\"ix\":2},\"p\":{\"a\":0,\"k\":[0,0],\"ix\":3},\"nm\":\"Ellipse Path 1\",\"mn\":\"ADBE Vector Shape - Ellipse\",\"hd\":false},{\"ty\":\"st\",\"c\":{\"a\":0,\"k\":[1,1,1,1],\"ix\":3},\"o\":{\"a\":0,\"k\":100,\"ix\":4},\"w\":{\"a\":1,\"k\":[{\"i\":{\"x\":[0.5],\"y\":[1]},\"o\":{\"x\":[0.33],\"y\":[0]},\"n\":[\"0p5_1_0p33_0\"],\"t\":0,\"s\":[0],\"e\":[14]},{\"i\":{\"x\":[0.833],\"y\":[0.833]},\"o\":{\"x\":[0.1],\"y\":[0]},\"n\":[\"0p833_0p833_0p1_0\"],\"t\":9,\"s\":[14],\"e\":[0]},{\"t\":53,\"s\":[0],\"h\":1}],\"ix\":5},\"lc\":2,\"lj\":1,\"ml\":4,\"nm\":\"Stroke 1\",\"mn\":\"ADBE Vector Graphic - Stroke\",\"hd\":false},{\"ty\":\"tr\",\"p\":{\"a\":0,\"k\":[0,0],\"ix\":2},\"a\":{\"a\":0,\"k\":[0,0],\"ix\":1},\"s\":{\"a\":0,\"k\":[100,100],\"ix\":3},\"r\":{\"a\":0,\"k\":0,\"ix\":6},\"o\":{\"a\":0,\"k\":100,\"ix\":7},\"sk\":{\"a\":0,\"k\":0,\"ix\":4},\"sa\":{\"a\":0,\"k\":0,\"ix\":5},\"nm\":\"Transform\"}],\"nm\":\"Ellipse 1\",\"np\":2,\"cix\":2,\"ix\":1,\"mn\":\"ADBE Vector Group\",\"hd\":false}],\"ip\":0,\"op\":4000,\"st\":0,\"bm\":0},{\"ddd\":0,\"ind\":3,\"ty\":4,\"nm\":\"cue_01\",\"sr\":1,\"ks\":{\"o\":{\"a\":0,\"k\":30,\"ix\":11},\"r\":{\"a\":0,\"k\":0,\"ix\":10},\"p\":{\"a\":0,\"k\":[66,66,0],\"ix\":2},\"a\":{\"a\":0,\"k\":[0,0,0],\"ix\":1},\"s\":{\"a\":0,\"k\":[100,100,100],\"ix\":6}},\"ao\":0,\"hasMask\":true,\"masksProperties\":[{\"inv\":false,\"mode\":\"s\",\"pt\":{\"a\":0,\"k\":{\"i\":[[27.614,0],[0,-27.616],[-27.614,0],[0,27.616]],\"o\":[[-27.614,0],[0,27.616],[27.614,0],[0,-27.616]],\"v\":[[0,-50],[-50,0.004],[0,50.008],[50,0.004]],\"c\":true},\"ix\":1},\"o\":{\"a\":0,\"k\":100,\"ix\":3},\"x\":{\"a\":0,\"k\":0,\"ix\":4},\"nm\":\"Mask 1\"}],\"shapes\":[{\"ty\":\"gr\",\"it\":[{\"d\":3,\"ty\":\"el\",\"s\":{\"a\":0,\"k\":[100,100],\"ix\":2},\"p\":{\"a\":0,\"k\":[0,0],\"ix\":3},\"nm\":\"Ellipse Path 1\",\"mn\":\"ADBE Vector Shape - Ellipse\",\"hd\":false},{\"ty\":\"st\",\"c\":{\"a\":0,\"k\":[1,1,1,1],\"ix\":3},\"o\":{\"a\":0,\"k\":100,\"ix\":4},\"w\":{\"a\":1,\"k\":[{\"i\":{\"x\":[0.5],\"y\":[1]},\"o\":{\"x\":[0.33],\"y\":[0]},\"n\":[\"0p5_1_0p33_0\"],\"t\":0,\"s\":[0],\"e\":[14]},{\"i\":{\"x\":[0.833],\"y\":[0.833]},\"o\":{\"x\":[0.1],\"y\":[0]},\"n\":[\"0p833_0p833_0p1_0\"],\"t\":9,\"s\":[14],\"e\":[0]},{\"t\":53,\"s\":[0],\"h\":1}],\"ix\":5},\"lc\":2,\"lj\":1,\"ml\":4,\"nm\":\"Stroke 1\",\"mn\":\"ADBE Vector Graphic - Stroke\",\"hd\":false},{\"ty\":\"tr\",\"p\":{\"a\":0,\"k\":[0,0],\"ix\":2},\"a\":{\"a\":0,\"k\":[0,0],\"ix\":1},\"s\":{\"a\":0,\"k\":[100,100],\"ix\":3},\"r\":{\"a\":0,\"k\":0,\"ix\":6},\"o\":{\"a\":0,\"k\":100,\"ix\":7},\"sk\":{\"a\":0,\"k\":0,\"ix\":4},\"sa\":{\"a\":0,\"k\":0,\"ix\":5},\"nm\":\"Transform\"}],\"nm\":\"Ellipse 1\",\"np\":2,\"cix\":2,\"ix\":1,\"mn\":\"ADBE Vector Group\",\"hd\":false}],\"ip\":0,\"op\":4000,\"st\":0,\"bm\":0}],\"markers\":[]}";
     private static final String jsonBeyond1 = "{\"v\":\"5.1.20\",\"fr\":60,\"ip\":0,\"op\":61,\"w\":138,\"h\":138,\"nm\":\"beyond_punch_cut_ani_B1\",\"ddd\":0,\"assets\":[],\"layers\":[{\"ddd\":0,\"ind\":1,\"ty\":1,\"nm\":\"L\",\"parent\":2,\"td\":1,\"sr\":1,\"ks\":{\"o\":{\"a\":0,\"k\":100,\"ix\":11},\"r\":{\"a\":0,\"k\":45,\"ix\":10},\"p\":{\"a\":1,\"k\":[{\"i\":{\"x\":0.1,\"y\":1},\"o\":{\"x\":0.33,\"y\":0},\"n\":\"0p1_1_0p33_0\",\"t\":0,\"s\":[-107.5,0.548,0],\"e\":[108,0.548,0],\"to\":[0,0,0],\"ti\":[0,0,0]},{\"t\":60}],\"ix\":2},\"a\":{\"a\":0,\"k\":[24,125,0],\"ix\":1},\"s\":{\"a\":0,\"k\":[100,100,100],\"ix\":6}},\"ao\":0,\"sw\":48,\"sh\":250,\"sc\":\"#ffffff\",\"ip\":0,\"op\":4000,\"st\":0,\"bm\":0},{\"ddd\":0,\"ind\":2,\"ty\":4,\"nm\":\"cue_02\",\"tt\":1,\"sr\":1,\"ks\":{\"o\":{\"a\":0,\"k\":100,\"ix\":11},\"r\":{\"a\":0,\"k\":0,\"ix\":10},\"p\":{\"a\":0,\"k\":[69,69,0],\"ix\":2},\"a\":{\"a\":0,\"k\":[0,0,0],\"ix\":1},\"s\":{\"a\":0,\"k\":[100,100,100],\"ix\":6}},\"ao\":0,\"hasMask\":true,\"masksProperties\":[{\"inv\":false,\"mode\":\"s\",\"pt\":{\"a\":0,\"k\":{\"i\":[[28.719,0],[0,-28.721],[-28.719,0],[0,28.721]],\"o\":[[-28.719,0],[0,28.721],[28.719,0],[0,-28.721]],\"v\":[[0,-52.008],[-52,-0.004],[0,52],[52,-0.004]],\"c\":true},\"ix\":1},\"o\":{\"a\":0,\"k\":100,\"ix\":3},\"x\":{\"a\":0,\"k\":0,\"ix\":4},\"nm\":\"Mask 1\"}],\"shapes\":[{\"ty\":\"gr\",\"it\":[{\"d\":3,\"ty\":\"el\",\"s\":{\"a\":0,\"k\":[104,104],\"ix\":2},\"p\":{\"a\":0,\"k\":[0,0],\"ix\":3},\"nm\":\"Ellipse Path 1\",\"mn\":\"ADBE Vector Shape - Ellipse\",\"hd\":false},{\"ty\":\"st\",\"c\":{\"a\":0,\"k\":[1,1,1,1],\"ix\":3},\"o\":{\"a\":0,\"k\":100,\"ix\":4},\"w\":{\"a\":1,\"k\":[{\"i\":{\"x\":[0.5],\"y\":[1]},\"o\":{\"x\":[0.33],\"y\":[0]},\"n\":[\"0p5_1_0p33_0\"],\"t\":0,\"s\":[0],\"e\":[14]},{\"i\":{\"x\":[0.833],\"y\":[0.833]},\"o\":{\"x\":[0.1],\"y\":[0]},\"n\":[\"0p833_0p833_0p1_0\"],\"t\":9,\"s\":[14],\"e\":[0]},{\"t\":53,\"s\":[0],\"h\":1}],\"ix\":5},\"lc\":2,\"lj\":1,\"ml\":4,\"nm\":\"Stroke 1\",\"mn\":\"ADBE Vector Graphic - Stroke\",\"hd\":false},{\"ty\":\"tr\",\"p\":{\"a\":0,\"k\":[0,0],\"ix\":2},\"a\":{\"a\":0,\"k\":[0,0],\"ix\":1},\"s\":{\"a\":0,\"k\":[100,100],\"ix\":3},\"r\":{\"a\":0,\"k\":0,\"ix\":6},\"o\":{\"a\":0,\"k\":100,\"ix\":7},\"sk\":{\"a\":0,\"k\":0,\"ix\":4},\"sa\":{\"a\":0,\"k\":0,\"ix\":5},\"nm\":\"Transform\"}],\"nm\":\"Ellipse 1\",\"np\":2,\"cix\":2,\"ix\":1,\"mn\":\"ADBE Vector Group\",\"hd\":false}],\"ip\":0,\"op\":4000,\"st\":0,\"bm\":0},{\"ddd\":0,\"ind\":3,\"ty\":4,\"nm\":\"cue_01\",\"sr\":1,\"ks\":{\"o\":{\"a\":0,\"k\":30,\"ix\":11},\"r\":{\"a\":0,\"k\":0,\"ix\":10},\"p\":{\"a\":0,\"k\":[69,69,0],\"ix\":2},\"a\":{\"a\":0,\"k\":[0,0,0],\"ix\":1},\"s\":{\"a\":0,\"k\":[100,100,100],\"ix\":6}},\"ao\":0,\"hasMask\":true,\"masksProperties\":[{\"inv\":false,\"mode\":\"s\",\"pt\":{\"a\":0,\"k\":{\"i\":[[28.719,0],[0,-28.721],[-28.719,0],[0,28.721]],\"o\":[[-28.719,0],[0,28.721],[28.719,0],[0,-28.721]],\"v\":[[0,-52.008],[-52,-0.004],[0,52],[52,-0.004]],\"c\":true},\"ix\":1},\"o\":{\"a\":0,\"k\":100,\"ix\":3},\"x\":{\"a\":0,\"k\":0,\"ix\":4},\"nm\":\"Mask 1\"}],\"shapes\":[{\"ty\":\"gr\",\"it\":[{\"d\":3,\"ty\":\"el\",\"s\":{\"a\":0,\"k\":[104,104],\"ix\":2},\"p\":{\"a\":0,\"k\":[0,0],\"ix\":3},\"nm\":\"Ellipse Path 1\",\"mn\":\"ADBE Vector Shape - Ellipse\",\"hd\":false},{\"ty\":\"st\",\"c\":{\"a\":0,\"k\":[1,1,1,1],\"ix\":3},\"o\":{\"a\":0,\"k\":100,\"ix\":4},\"w\":{\"a\":1,\"k\":[{\"i\":{\"x\":[0.5],\"y\":[1]},\"o\":{\"x\":[0.33],\"y\":[0]},\"n\":[\"0p5_1_0p33_0\"],\"t\":0,\"s\":[0],\"e\":[14]},{\"i\":{\"x\":[0.833],\"y\":[0.833]},\"o\":{\"x\":[0.1],\"y\":[0]},\"n\":[\"0p833_0p833_0p1_0\"],\"t\":9,\"s\":[14],\"e\":[0]},{\"t\":53,\"s\":[0],\"h\":1}],\"ix\":5},\"lc\":2,\"lj\":1,\"ml\":4,\"nm\":\"Stroke 1\",\"mn\":\"ADBE Vector Graphic - Stroke\",\"hd\":false},{\"ty\":\"tr\",\"p\":{\"a\":0,\"k\":[0,0],\"ix\":2},\"a\":{\"a\":0,\"k\":[0,0],\"ix\":1},\"s\":{\"a\":0,\"k\":[100,100],\"ix\":3},\"r\":{\"a\":0,\"k\":0,\"ix\":6},\"o\":{\"a\":0,\"k\":100,\"ix\":7},\"sk\":{\"a\":0,\"k\":0,\"ix\":4},\"sa\":{\"a\":0,\"k\":0,\"ix\":5},\"nm\":\"Transform\"}],\"nm\":\"Ellipse 1\",\"np\":2,\"cix\":2,\"ix\":1,\"mn\":\"ADBE Vector Group\",\"hd\":false}],\"ip\":0,\"op\":4000,\"st\":0,\"bm\":0}],\"markers\":[]}";
     private static final String jsonBeyond2 = "{\"v\":\"5.1.20\",\"fr\":60,\"ip\":0,\"op\":61,\"w\":258,\"h\":132,\"nm\":\"beyond_punch_cut_ani_B2\",\"ddd\":0,\"assets\":[],\"layers\":[{\"ddd\":0,\"ind\":1,\"ty\":1,\"nm\":\"L\",\"td\":1,\"sr\":1,\"ks\":{\"o\":{\"a\":0,\"k\":100,\"ix\":11},\"r\":{\"a\":0,\"k\":45,\"ix\":10},\"p\":{\"a\":1,\"k\":[{\"i\":{\"x\":0.1,\"y\":1},\"o\":{\"x\":0.33,\"y\":0},\"n\":\"0p1_1_0p33_0\",\"t\":0,\"s\":[-40,70.548,0],\"e\":[288,70.548,0],\"to\":[0,0,0],\"ti\":[0,0,0]},{\"t\":60}],\"ix\":2},\"a\":{\"a\":0,\"k\":[24,125,0],\"ix\":1},\"s\":{\"a\":0,\"k\":[100,100,100],\"ix\":6}},\"ao\":0,\"sw\":48,\"sh\":250,\"sc\":\"#ffffff\",\"ip\":0,\"op\":4000,\"st\":0,\"bm\":0},{\"ddd\":0,\"ind\":2,\"ty\":4,\"nm\":\"cue_02\",\"tt\":1,\"sr\":1,\"ks\":{\"o\":{\"a\":0,\"k\":100,\"ix\":11},\"r\":{\"a\":0,\"k\":0,\"ix\":10},\"p\":{\"a\":0,\"k\":[129,66,0],\"ix\":2},\"a\":{\"a\":0,\"k\":[0,0,0],\"ix\":1},\"s\":{\"a\":0,\"k\":[100,100,100],\"ix\":6}},\"ao\":0,\"hasMask\":true,\"masksProperties\":[{\"inv\":false,\"mode\":\"s\",\"pt\":{\"a\":0,\"k\":{\"i\":[[0,-27.062],[27.062,0],[0,0],[0,27.062],[-27.062,0],[0,0]],\"o\":[[0,27.062],[0,0],[-27.062,0],[0,-27.062],[0,0],[27.062,0]],\"v\":[[110,0],[61,49],[-61,49],[-110,0],[-61,-49],[61,-49]],\"c\":true},\"ix\":1},\"o\":{\"a\":0,\"k\":100,\"ix\":3},\"x\":{\"a\":0,\"k\":0,\"ix\":4},\"nm\":\"Mask 1\"}],\"shapes\":[{\"ty\":\"gr\",\"it\":[{\"ty\":\"rc\",\"d\":1,\"s\":{\"a\":0,\"k\":[220,98],\"ix\":2},\"p\":{\"a\":0,\"k\":[0,0],\"ix\":3},\"r\":{\"a\":0,\"k\":54,\"ix\":4},\"nm\":\"Rectangle Path 1\",\"mn\":\"ADBE Vector Shape - Rect\",\"hd\":false},{\"ty\":\"st\",\"c\":{\"a\":0,\"k\":[1,1,1,1],\"ix\":3},\"o\":{\"a\":0,\"k\":100,\"ix\":4},\"w\":{\"a\":1,\"k\":[{\"i\":{\"x\":[0.5],\"y\":[1]},\"o\":{\"x\":[0.33],\"y\":[0]},\"n\":[\"0p5_1_0p33_0\"],\"t\":0,\"s\":[0],\"e\":[14]},{\"i\":{\"x\":[0.833],\"y\":[0.833]},\"o\":{\"x\":[0.1],\"y\":[0]},\"n\":[\"0p833_0p833_0p1_0\"],\"t\":9,\"s\":[14],\"e\":[0]},{\"t\":53,\"s\":[0],\"h\":1}],\"ix\":5},\"lc\":1,\"lj\":1,\"ml\":4,\"nm\":\"Stroke 1\",\"mn\":\"ADBE Vector Graphic - Stroke\",\"hd\":false},{\"ty\":\"tr\",\"p\":{\"a\":0,\"k\":[0,0],\"ix\":2},\"a\":{\"a\":0,\"k\":[0,0],\"ix\":1},\"s\":{\"a\":0,\"k\":[100,100],\"ix\":3},\"r\":{\"a\":0,\"k\":0,\"ix\":6},\"o\":{\"a\":0,\"k\":100,\"ix\":7},\"sk\":{\"a\":0,\"k\":0,\"ix\":4},\"sa\":{\"a\":0,\"k\":0,\"ix\":5},\"nm\":\"Transform\"}],\"nm\":\"Rectangle 1\",\"np\":2,\"cix\":2,\"ix\":1,\"mn\":\"ADBE Vector Group\",\"hd\":false}],\"ip\":0,\"op\":4000,\"st\":0,\"bm\":0},{\"ddd\":0,\"ind\":3,\"ty\":4,\"nm\":\"cue_01\",\"sr\":1,\"ks\":{\"o\":{\"a\":0,\"k\":30,\"ix\":11},\"r\":{\"a\":0,\"k\":0,\"ix\":10},\"p\":{\"a\":0,\"k\":[129,66,0],\"ix\":2},\"a\":{\"a\":0,\"k\":[0,0,0],\"ix\":1},\"s\":{\"a\":0,\"k\":[100,100,100],\"ix\":6}},\"ao\":0,\"hasMask\":true,\"masksProperties\":[{\"inv\":false,\"mode\":\"s\",\"pt\":{\"a\":0,\"k\":{\"i\":[[0,-27.062],[27.062,0],[0,0],[0,27.062],[-27.062,0],[0,0]],\"o\":[[0,27.062],[0,0],[-27.062,0],[0,-27.062],[0,0],[27.062,0]],\"v\":[[110,0],[61,49],[-61,49],[-110,0],[-61,-49],[61,-49]],\"c\":true},\"ix\":1},\"o\":{\"a\":0,\"k\":100,\"ix\":3},\"x\":{\"a\":0,\"k\":0,\"ix\":4},\"nm\":\"Mask 1\"}],\"shapes\":[{\"ty\":\"gr\",\"it\":[{\"ty\":\"rc\",\"d\":1,\"s\":{\"a\":0,\"k\":[220,98],\"ix\":2},\"p\":{\"a\":0,\"k\":[0,0],\"ix\":3},\"r\":{\"a\":0,\"k\":54,\"ix\":4},\"nm\":\"Rectangle Path 1\",\"mn\":\"ADBE Vector Shape - Rect\",\"hd\":false},{\"ty\":\"st\",\"c\":{\"a\":0,\"k\":[1,1,1,1],\"ix\":3},\"o\":{\"a\":0,\"k\":100,\"ix\":4},\"w\":{\"a\":1,\"k\":[{\"i\":{\"x\":[0.5],\"y\":[1]},\"o\":{\"x\":[0.33],\"y\":[0]},\"n\":[\"0p5_1_0p33_0\"],\"t\":0,\"s\":[0],\"e\":[14]},{\"i\":{\"x\":[0.833],\"y\":[0.833]},\"o\":{\"x\":[0.1],\"y\":[0]},\"n\":[\"0p833_0p833_0p1_0\"],\"t\":9,\"s\":[14],\"e\":[0]},{\"t\":53,\"s\":[0],\"h\":1}],\"ix\":5},\"lc\":1,\"lj\":1,\"ml\":4,\"nm\":\"Stroke 1\",\"mn\":\"ADBE Vector Graphic - Stroke\",\"hd\":false},{\"ty\":\"tr\",\"p\":{\"a\":0,\"k\":[0,0],\"ix\":2},\"a\":{\"a\":0,\"k\":[0,0],\"ix\":1},\"s\":{\"a\":0,\"k\":[100,100],\"ix\":3},\"r\":{\"a\":0,\"k\":0,\"ix\":6},\"o\":{\"a\":0,\"k\":100,\"ix\":7},\"sk\":{\"a\":0,\"k\":0,\"ix\":4},\"sa\":{\"a\":0,\"k\":0,\"ix\":5},\"nm\":\"Transform\"}],\"nm\":\"Rectangle 1\",\"np\":2,\"cix\":2,\"ix\":1,\"mn\":\"ADBE Vector Group\",\"hd\":false}],\"ip\":0,\"op\":4000,\"st\":0,\"bm\":0}],\"markers\":[]}";
-    private static final String jsonDefault = jsonBeyond0;
+    private static final String jsonDefault = jsonBeyond1;
+
+    private static class DeviceSpecs {
+        public final String device;
+        public final boolean exact;
+        public String json;
+        public final float dpAddScaleBase;
+        public final float dpAddScaleHorizontal;
+        public final float dpShiftVertical;
+        public final float dpShiftHorizontal;
+        public final boolean supported;
+        public final boolean officiallySupported;
+
+        public DeviceSpecs(String device, boolean exact, String json, float dpAddScaleBase, float dpAddScaleHorizontal, float dpShiftVertical, float dpShiftHorizontal, boolean supported, boolean officiallySupported) {
+            this.device = device.toLowerCase(Locale.ENGLISH);
+            this.exact = exact;
+            this.json = json;
+            this.dpAddScaleBase = dpAddScaleBase;
+            this.dpAddScaleHorizontal = dpAddScaleHorizontal;
+            this.dpShiftVertical = dpShiftVertical;
+            this.dpShiftHorizontal = dpShiftHorizontal;
+            this.supported = supported;
+            this.officiallySupported = officiallySupported;
+        }
+    }
+
+    private static final DeviceSpecs[] deviceSpecs = new DeviceSpecs[] {
+            /* Samsung viDirector */ new DeviceSpecs("_viDirector", true, null, 0, 0, 0, 0, true, true),
+            /* Samsung S10e       */ new DeviceSpecs("beyond0", false, jsonBeyond0, 4, 0, 0, 0, true, true),
+            /* Samsung S10        */ new DeviceSpecs("beyond1", false, jsonBeyond1, 4, 0, 0, 0, true, true),
+            /* Samsung S10+       */ new DeviceSpecs("beyond2", false, jsonBeyond2, 5, 1, 0.25f, -1.75f, true, true),
+            /* Google Pixel 4a    */ new DeviceSpecs("sunfish", true, jsonDefault, -7, 0, 5.5f, 5.5f, true, true),
+//TUNE      /* Google Pixel 4 5G  */ new DeviceSpecs("bramble", true, jsonDefault, -7, 0, 5.5f, 5.5f, true, true),
+            /* Google Pixel 5     */ new DeviceSpecs("redfin", true, jsonDefault, -11.75f, 0, 3.25f, 4.75f, true, true),
+            /* Samsung Generic    */ new DeviceSpecs("_samsung", true, jsonDefault, 0, 0, 0, 0, true, false),
+            /* Google Generic     */ new DeviceSpecs("_google", true, jsonDefault, 0, 0, 0, 0, true, false),
+            /* Unsupported        */ new DeviceSpecs("_unsupported", true, null, 0, 0, 0, 0, false, false)
+    };
+
+    private static DeviceSpecs findDevice(String name) {
+        name = name.toLowerCase(Locale.ENGLISH);
+        for (DeviceSpecs spec : deviceSpecs) {
+            if (
+                    (spec.exact && name.equals(spec.device)) ||
+                    (!spec.exact && name.startsWith(spec.device))
+            ) {
+                return spec;
+            }
+        }
+        return null;
+    }
 
     private final OnNotificationAnimationListener onNotificationAnimationListener;
     private final Settings settings;
     private final CameraCutout cameraCutout;
     private final SpritePlayer spritePlayer;
+    private final float densityMultiplier;
 
-    private final String json;
-    private final float dpAddScaleBase;
-    private final float dpAddScaleHorizontal;
-    private final float dpShiftVertical;
-    private final float dpShiftHorizontal;
     private volatile float dpAdd = 0;
+    private final DeviceSpecs spec;
     private final VIDirector viDirector;
     private final VIDirector viDirector2;
 
@@ -86,16 +137,17 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private volatile boolean blackFill = false;
     private final Rect tspRect = new Rect(0, 0, 0, 0);
 
-    public NotificationAnimation(Context context, SpritePlayer spritePlayer, OnNotificationAnimationListener onNotificationAnimationListener) {
+    public NotificationAnimation(Context context, SpritePlayer spritePlayer, float densityMultiplier, OnNotificationAnimationListener onNotificationAnimationListener) {
         this.onNotificationAnimationListener = onNotificationAnimationListener;
         settings = Settings.getInstance(context);
         cameraCutout = new CameraCutout(context);
         this.spritePlayer = spritePlayer;
+        this.densityMultiplier = densityMultiplier > 0.1f ? densityMultiplier : 1.0f;
 
         String viJson = null;
         VIDirector viDirector = null;
         VIDirector viDirector2 = null;
-        if (OVERRIDE_DEVICE == null) {
+        if (OVERRIDE_DEVICE == null && Manufacturer.isSamsung()) {
             if (Fold.isFold()) {
                 try {
                     viDirector = VIDirector.create(context, true);
@@ -128,11 +180,8 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         if (viJson != null) {
             this.viDirector = viDirector;
             this.viDirector2 = viDirector2;
-            json = viJson;
-            dpAddScaleBase = 0;
-            dpAddScaleHorizontal = 0;
-            dpShiftVertical = 0;
-            dpShiftHorizontal = 0;
+            spec = findDevice("_viDirector");
+            spec.json = viJson;
             settings.setUsingVIDirector(true);
         } else {
             this.viDirector = null;
@@ -140,42 +189,16 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
             settings.setUsingVIDirector(false);
 
             String device = OVERRIDE_DEVICE != null ? OVERRIDE_DEVICE : Build.DEVICE;
-            if (device.startsWith("beyond0")) { //s10e
-                json = jsonBeyond0;
-                dpAddScaleBase = 4;
-                dpAddScaleHorizontal = 0;
-                dpShiftVertical = 0;
-                dpShiftHorizontal = 0;
-            } else if (device.startsWith("beyond1")) { // s10
-                json = jsonBeyond1;
-                dpAddScaleBase = 4;
-                dpAddScaleHorizontal = 0;
-                dpShiftVertical = 0;
-                dpShiftHorizontal = 0;
-            } else if (device.startsWith("beyond2")) { // s10+
-                json = jsonBeyond2;
-                dpAddScaleBase = 5;
-                dpAddScaleHorizontal = 1;
-                dpShiftVertical = 0.25f;
-                dpShiftHorizontal = -1.75f;
-            } else if (device.startsWith("beyondx")) { // s10 x
-                json = jsonBeyond2;
-                dpAddScaleBase = 5;
-                dpAddScaleHorizontal = 1;
-                dpShiftVertical = 0.25f;
-                dpShiftHorizontal = -1.75f;
-            } else {
-                json = null;
-                dpAddScaleBase = 0;
-                dpAddScaleHorizontal = 0;
-                dpShiftVertical = 0;
-                dpShiftHorizontal = 0;
-            }
+            DeviceSpecs spec = findDevice(device);
+            if (spec == null && Manufacturer.isSamsung()) spec = findDevice("_samsung");
+            if (spec == null && Manufacturer.isGoogle()) spec = findDevice("_google");
+            if (spec == null) spec = findDevice("_unsupported");
+            this.spec = spec;
         }
 
         if (!isValid()) return;
 
-        LottieCompositionFactory.fromJsonString(json, null).addListener(result -> {
+        LottieCompositionFactory.fromJsonString(spec.json, null).addListener(result -> {
             lottieComposition = result;
             applyDimensions();
         });
@@ -250,12 +273,16 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean isValid() {
         synchronized (getSynchronizer()) {
-            return (json != null) && (spritePlayer != null);
+            return (isDeviceSupported() && (spec.json != null) && (spritePlayer != null));
         }
     }
 
     public boolean isDeviceSupported() {
-        return (json != null);
+        return spec.supported;
+    }
+
+    public boolean isDeviceOfficiallySupported() {
+        return spec.officiallySupported;
     }
 
     @Override
@@ -349,6 +376,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                         }
 
                         // tuning
+                        realDpToPx *= densityMultiplier;
                         left += getDpShiftHorizontal() * realDpToPx;
                         top += getDpShiftVertical() * realDpToPx;
 
@@ -361,9 +389,14 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                         width = scaledWidth;
                         height = scaledHeight;
                     } else {
-                        // something weird is going on with Lottie's px->dp if current resolution doesn't match native resolution
+                        // something weird is going on with Lottie's px->dp if current resolution doesn't match native resolution on Samsung devices
+                        // if we ever update the used Lottie library, triple check this all still works out
                         float scale = (float) resolution.x / (float) cameraCutout.getNativeResolution().x;
-                        float LottieDpToPx = (1.0f / scale) * realDpToPx;
+                        float lottieDpToPx = (1.0f / scale) * realDpToPx;
+
+                        // on Google (but not Samsung) devices this is needed to stabilize tuning parameters between DPI changes
+                        // we specifically don't have to apply it to lottieDpToPx; implying these two issues are mutually exclusive
+                        realDpToPx *= densityMultiplier;
 
                         if (Build.VERSION.SDK_INT >= 30) {
                             RectF r = cameraCutout.getCutout().getAreaF();
@@ -371,8 +404,8 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
                             r.right = r.left + r.height() * ((float)b.width()/(float)b.height());
 
-                            height = (b.height() / LottieDpToPx);
-                            width = (b.width() / LottieDpToPx);
+                            height = (b.height() / lottieDpToPx);
+                            width = (b.width() / lottieDpToPx);
                             left = r.centerX() - (width / 2.0f) + (getDpShiftHorizontal() * realDpToPx);
                             top = r.centerY() - (height / 2.0f) + (getDpShiftVertical() * realDpToPx);
 
@@ -395,8 +428,8 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                             Rect r = cameraCutout.getCutout().getArea();
                             Rect b = lottieComposition.getBounds();
 
-                            height = (b.height() / LottieDpToPx);
-                            width = (b.width() / LottieDpToPx);
+                            height = (b.height() / lottieDpToPx);
+                            width = (b.width() / lottieDpToPx);
                             left = r.exactCenterX() - (width / 2.0f) + (getDpShiftHorizontal() * realDpToPx);
                             top = r.exactCenterY() - (height / 2.0f) + (getDpShiftVertical() * realDpToPx);
 
@@ -521,19 +554,19 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     }
 
     public float getDpAddScaleBase() {
-        return settings.getDpAddScaleBase(dpAddScaleBase);
+        return settings.getDpAddScaleBase(spec.dpAddScaleBase);
     }
 
     public float getDpAddScaleHorizontal() {
-        return settings.getDpAddScaleHorizontal(dpAddScaleHorizontal);
+        return settings.getDpAddScaleHorizontal(spec.dpAddScaleHorizontal);
     }
 
     public float getDpShiftVertical() {
-        return settings.getDpShiftVertical(dpShiftVertical);
+        return settings.getDpShiftVertical(spec.dpShiftVertical);
     }
 
     public float getDpShiftHorizontal() {
-        return settings.getDpShiftHorizontal(dpShiftHorizontal);
+        return settings.getDpShiftHorizontal(spec.dpShiftHorizontal);
     }
 
     public float getSpeedFactor() {

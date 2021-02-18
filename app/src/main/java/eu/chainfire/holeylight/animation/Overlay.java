@@ -42,10 +42,13 @@ import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.WindowManager;
 
+import java.lang.reflect.Method;
+
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.misc.AODControl;
 import eu.chainfire.holeylight.misc.Battery;
 import eu.chainfire.holeylight.misc.Display;
+import eu.chainfire.holeylight.misc.Manufacturer;
 import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.misc.Slog;
 import eu.chainfire.holeylight.service.AccessibilityService;
@@ -84,11 +87,15 @@ public class Overlay {
             switch (intent.getAction()) {
                 case Intent.ACTION_CONFIGURATION_CHANGED:
                     Point resolutionNow = getResolution();
-                    if (
+                    int densityNow = getDensity();
+                    float densityMult = getDensityMultiplier();
+                    if ((
                             ((resolutionNow.x != resolution.x) || (resolutionNow.y != resolution.y)) &&
                             ((resolutionNow.x != resolution.y) || (resolutionNow.y != resolution.x))
-                    ) {
-                        Slog.d("Broadcast", "Resolution: %dx%d --> %dx%d", resolution.x, resolution.y, resolutionNow.x, resolutionNow.y);
+                    ) || (
+                            densityNow != density
+                    )) {
+                        Slog.d("Broadcast", "Resolution: %dx%d --> %dx%d, Density: %d --> %d [%.5f]", resolution.x, resolution.y, resolutionNow.x, resolutionNow.y, density, densityNow, densityMult);
 
                         // Resolution changed
                         // This is an extremely ugly hack, don't try this at home
@@ -96,6 +103,7 @@ public class Overlay {
                         // oddities with Lottie's renderer. We just hard exit and let Android
                         // restart us.
                         resolution = resolutionNow;
+                        density = densityNow;
                         Intent start = new Intent(context, DetectCutoutActivity.class);
                         start.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(start);
@@ -169,6 +177,8 @@ public class Overlay {
     private boolean lastDoze = false;
     private boolean added = false;
     private Point resolution;
+    private int density;
+    private float densityMultiplier;
     private IBinder windowToken;
     private long lastVisibleTime;
 
@@ -180,6 +190,8 @@ public class Overlay {
         handler = new Handler(Looper.getMainLooper());
         settings = Settings.getInstance(context);
         resolution = getResolution();
+        density = getDensity();
+        densityMultiplier = getDensityMultiplier();
     }
 
     @SuppressWarnings("all")
@@ -205,6 +217,31 @@ public class Overlay {
         return new Point(metrics.widthPixels, metrics.heightPixels);
     }
 
+    private int getDensity() {
+        DisplayMetrics metrics = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getRealMetrics(metrics);
+        return metrics.densityDpi;
+    }
+
+    private float getDensityMultiplier() {
+        float ret = 1.0f;
+        if (Manufacturer.isGoogle()) {
+            // things work differently on Samsung
+            try {
+                @SuppressLint("PrivateApi") Class<?> c = Class.forName("android.os.SystemProperties");
+                Method get = c.getMethod("get", String.class);
+                String d = (String)get.invoke(null, "ro.sf.lcd_density");
+                if (d != null) {
+                    int i = Integer.parseInt(d);
+                    ret = (float)i / (float)density;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
     private void initActualOverlay(Context context, IBinder windowToken) {
         synchronized (this) {
             if (this.windowToken == null && windowToken != null) this.windowToken = windowToken;
@@ -213,7 +250,7 @@ public class Overlay {
             spritePlayer = new SpritePlayer(context);
 
             initParams();
-            animation = new NotificationAnimation(context, spritePlayer, new NotificationAnimation.OnNotificationAnimationListener() {
+            animation = new NotificationAnimation(context, spritePlayer, densityMultiplier, new NotificationAnimation.OnNotificationAnimationListener() {
                 private int skips = 0;
 
                 @Override

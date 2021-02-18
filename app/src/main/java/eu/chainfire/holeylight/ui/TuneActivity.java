@@ -41,7 +41,7 @@ public class TuneActivity extends AppCompatActivity implements Settings.OnSettin
         setContentView(R.layout.activity_tune);
 
         settings = Settings.getInstance(this);
-        animation = new NotificationAnimation(this,null, null);
+        animation = new NotificationAnimation(this, null, 0, null);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

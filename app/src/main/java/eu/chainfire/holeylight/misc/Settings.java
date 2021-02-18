@@ -217,10 +217,12 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     private static final boolean SEEN_TIMEOUT_TRACK_SEPARATELY_DEFAULT = false;
 
     private static final String OVERLAY_LINGER = "overlay_linger";
-    private static final int OVERLAY_LINGER_DEFAULT = 125;
+    private static final int OVERLAY_LINGER_DEFAULT = Manufacturer.isSamsung() ? 125 : 0;
     
     public static final String BLACK_FILL = "black_fill";
     public static final boolean BLACK_FILL_DEFAULT = true;
+
+    private static final String DEVICE_OFFICIAL_SUPPORT_WARNING_SHOWN = "devuce_official_support_warning_shown";
 
     private static Settings instance;
     public static Settings getInstance(Context context) {
@@ -739,6 +741,19 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         edit();
         try {
             editor.putBoolean(BLACK_FILL, value);
+        } finally {
+            save(true);
+        }
+    }
+
+    public boolean isDeviceOfficialSupportWarningShown() {
+        return prefs.getBoolean(DEVICE_OFFICIAL_SUPPORT_WARNING_SHOWN, false);
+    }
+
+    public void setDeviceOfficialSupportWarningShown(boolean value) {
+        edit();
+        try {
+            editor.putBoolean(DEVICE_OFFICIAL_SUPPORT_WARNING_SHOWN, value);
         } finally {
             save(true);
         }
