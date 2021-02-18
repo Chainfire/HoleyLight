@@ -222,7 +222,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final String BLACK_FILL = "black_fill";
     public static final boolean BLACK_FILL_DEFAULT = true;
 
-    private static final String DEVICE_OFFICIAL_SUPPORT_WARNING_SHOWN = "devuce_official_support_warning_shown";
+    private static final String DEVICE_OFFICIAL_SUPPORT_WARNING_SHOWN = "device_official_support_warning_shown";
 
     private static Settings instance;
     public static Settings getInstance(Context context) {
@@ -305,6 +305,42 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         editor = null;
     }
 
+    private void put(String key, float value, boolean saveImmediately) {
+        edit();
+        try {
+            editor.putFloat(key, value);
+        } finally {
+            save(saveImmediately);
+        }
+    }
+
+    private void put(String key, int value, boolean saveImmediately) {
+        edit();
+        try {
+            editor.putInt(key, value);
+        } finally {
+            save(saveImmediately);
+        }
+    }
+
+    private void put(String key, boolean value, boolean saveImmediately) {
+        edit();
+        try {
+            editor.putBoolean(key, value);
+        } finally {
+            save(saveImmediately);
+        }
+    }
+
+    private void put(String key, String value, boolean saveImmediately) {
+        edit();
+        try {
+            editor.putString(key, value);
+        } finally {
+            save(saveImmediately);
+        }
+    }
+
     public RectF getCutoutAreaRect() {
         return new RectF(
             prefs.getFloat(CUTOUT_AREA_LEFT, -1f),
@@ -332,12 +368,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void setDpAddScaleBase(float value) {
-        edit();
-        try {
-            editor.putFloat(DP_ADD_SCALE_BASE, value);
-        } finally {
-            save(true);
-        }
+        put(DP_ADD_SCALE_BASE, value, true);
     }
 
     public float getDpAddScaleHorizontal(float defaultValue) {
@@ -345,12 +376,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void setDpAddScaleHorizontal(float value) {
-        edit();
-        try {
-            editor.putFloat(DP_ADD_SCALE_HORIZONTAL, value);
-        } finally {
-            save(true);
-        }
+        put(DP_ADD_SCALE_HORIZONTAL, value, true);
     }
 
     public float getDpShiftVertical(float defaultValue) {
@@ -358,12 +384,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void setDpShiftVertical(float value) {
-        edit();
-        try {
-            editor.putFloat(DP_SHIFT_VERTICAL, value);
-        } finally {
-            save(true);
-        }
+        put(DP_SHIFT_VERTICAL, value, true);
     }
 
     public float getDpShiftHorizontal(float defaultValue) {
@@ -371,12 +392,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void setDpShiftHorizontal(float value) {
-        edit();
-        try {
-            editor.putFloat(DP_SHIFT_HORIZONTAL, value);
-        } finally {
-            save(true);
-        }
+        put(DP_SHIFT_HORIZONTAL, value, true);
     }
 
     public float getSpeedFactor() {
@@ -386,12 +402,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public void setSpeedFactor(float value) {
         value = Math.min(Math.max(value, 0.5f), 2.0f);
 
-        edit();
-        try {
-            editor.putFloat(SPEED_FACTOR, value);
-        } finally {
-            save(true);
-        }
+        put(SPEED_FACTOR, value, true);
     }
 
     public boolean isEnabled() {
@@ -399,12 +410,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void setEnabled(boolean enabled) {
-        edit();
-        try {
-            editor.putBoolean(ENABLED_MASTER, enabled);
-        } finally {
-            save(true);
-        }
+        put(ENABLED_MASTER, enabled, true);
     }
 
     public String getEnabledWhileKey(int mode) {
@@ -412,12 +418,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void setEnabledWhile(int mode, boolean enabled) {
-        edit();
-        try {
-            editor.putBoolean(getEnabledWhileKey(mode), enabled);
-        } finally {
-            save(true);
-        }
+        put(getEnabledWhileKey(mode), enabled, true);
     }
 
     public boolean isEnabledWhile(int mode) {
@@ -467,12 +468,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         if (channelName == null) channelName = CHANNEL_NAME_DEFAULT;
         String key = String.format(Locale.ENGLISH, CHANNEL_COLOR_FMT, packageName, channelName);
         if (!prefs.contains(key) || (prefs.getInt(key, -1) != color)) {
-            edit();
-            try {
-                editor.putInt(key, color);
-            } finally {
-                save(!fromListener);
-            }
+            put(key, color, fromListener);
         }
     }
 
@@ -514,12 +510,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
     
     public void setRespectNotificationColorStateForPackageAndChannel(String packageName, String channelName, boolean value) {
-        edit();
-        try {
-            editor.putBoolean(String.format(CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE_FMT, packageName, channelName), value);
-        } finally {
-            save(true);
-        }
+        put(String.format(CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE_FMT, packageName, channelName), value, true);
     }
 
     public String getSeenPickupWhileKey(int mode) {
@@ -527,12 +518,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
     
     public void setSeenPickupWhile(int mode, boolean seenPickup) {
-        edit();
-        try {
-            editor.putBoolean(getSeenPickupWhileKey(mode), seenPickup);
-        } finally {
-            save(true);
-        }
+        put(getSeenPickupWhileKey(mode), seenPickup, true);
     }
 
     public boolean isSeenPickupWhile(int mode, boolean effective) {
@@ -564,12 +550,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public void setAnimationMode(int mode, SpritePlayer.Mode animationMode) {
         AnimationStyle as = getAnimationStyle(animationMode);
         if (as != null) {
-            edit();
-            try {
-                editor.putString(getAnimationModeKey(mode), as.name);
-            } finally {
-                save(true);
-            }
+            put(getAnimationModeKey(mode), as.name, true);
         }
     }
 
@@ -601,12 +582,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void setHideAOD(boolean hide) {
-        edit();
-        try {
-            editor.putBoolean(HIDE_AOD, hide);
-        } finally {
-            save(true);
-        }
+        put(HIDE_AOD, hide, true);
     }
     
     public void setHideAOD(boolean hide, boolean fully) {
@@ -624,12 +600,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void setHideAODFully(boolean fully) {
-        edit();
-        try {
-            editor.putBoolean(HIDE_AOD_FULLY, fully);
-        } finally {
-            save(true);
-        }
+        put(HIDE_AOD_FULLY, fully, true);
     }
 
     public boolean isSetupWizardComplete() {
@@ -637,12 +608,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void setSetupWizardComplete(boolean complete) {
-        edit();
-        try {
-            editor.putBoolean(SETUP_WIZARD_COMPLETE, complete);
-        } finally {
-            save(true);
-        }
+        put(SETUP_WIZARD_COMPLETE, complete, true);
     }
 
     public boolean isRespectDoNotDisturb() {
@@ -666,12 +632,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void setSeenTimeout(int mode, int value) {
-        edit();
-        try {
-            editor.putInt(getSeenTimeoutKey(mode), value);
-        } finally {
-            save(true);
-        }
+        put(getSeenTimeoutKey(mode), value, true);
     }
 
     public boolean isUnholeyLightIcons() {
@@ -683,12 +644,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void incAccessibilityServiceCounter() {
-        edit();
-        try {
-            editor.putInt(ACCESSIBILITY_SERVICE_COUNTER, (getAccessibilityServiceCounter() + 1) % 1000);
-        } finally {
-            save(true);
-        }
+        put(ACCESSIBILITY_SERVICE_COUNTER, (getAccessibilityServiceCounter() + 1) % 1000, true);
     }
 
     public boolean isUsingVIDirector() {
@@ -698,13 +654,8 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public void setUsingVIDirector(boolean value) {
         if (value == isUsingVIDirector()) return;
 
-        edit();
-        try {
-            editor.putBoolean(USING_VI_DIRECTOR, value);
-            resetTuning();
-        } finally {
-            save(true);
-        }
+        put(USING_VI_DIRECTOR, value, true);
+        resetTuning();
     }
 
     public boolean isSeenTimeoutTrackSeparately() {
@@ -712,12 +663,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void setSeenTimeoutTrackSeparately(boolean value) {
-        edit();
-        try {
-            editor.putBoolean(SEEN_TIMEOUT_TRACK_SEPARATELY, value);
-        } finally {
-            save(true);
-        }
+        put(SEEN_TIMEOUT_TRACK_SEPARATELY, value, true);
     }
 
     public int getOverlayLinger() {
@@ -725,12 +671,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void setOverlayLinger(int value) {
-        edit();
-        try {
-            editor.putInt(OVERLAY_LINGER, value);
-        } finally {
-            save(true);
-        }
+        put(OVERLAY_LINGER, value, true);
     }
 
     public boolean isBlackFill() {
@@ -738,12 +679,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
     
     public void setBlackFill(boolean value) {
-        edit();
-        try {
-            editor.putBoolean(BLACK_FILL, value);
-        } finally {
-            save(true);
-        }
+        put(BLACK_FILL, value, true);
     }
 
     public boolean isDeviceOfficialSupportWarningShown() {
@@ -751,12 +687,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void setDeviceOfficialSupportWarningShown(boolean value) {
-        edit();
-        try {
-            editor.putBoolean(DEVICE_OFFICIAL_SUPPORT_WARNING_SHOWN, value);
-        } finally {
-            save(true);
-        }
+        put(DEVICE_OFFICIAL_SUPPORT_WARNING_SHOWN, value, true);
     }
 
     public boolean saveToUri(ContentResolver resolver, Uri uri) {
