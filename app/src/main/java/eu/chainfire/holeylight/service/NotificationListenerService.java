@@ -374,7 +374,8 @@ public class NotificationListenerService extends android.service.notification.No
                     getActiveNotifications(),
                     !Display.isOn(this, false) || !settings.isSeenIfScreenOn(true),
                     timeout,
-                    !settings.isSeenTimeoutTrackSeparately() ? null : screenOn
+                    !settings.isSeenTimeoutTrackSeparately() ? null : screenOn,
+                    Display.isOn(this, false) // slightly different from screenOn
             );
             for (StatusBarNotification sbn : sbns) {
                 Notification not = sbn.getNotification();

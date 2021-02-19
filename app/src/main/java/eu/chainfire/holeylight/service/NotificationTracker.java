@@ -163,7 +163,7 @@ public class NotificationTracker {
         return result;
     }
 
-    public StatusBarNotification[] prune(StatusBarNotification[] active, boolean addNewNotifications, int timeout, Boolean screenOn) {
+    public StatusBarNotification[] prune(StatusBarNotification[] active, boolean addNewNotifications, int timeout, Boolean screenOnForTracking, boolean screenOn) {
         long now = SystemClock.elapsedRealtime();
 
         // remove notifications from our own list that are no longer active
@@ -186,15 +186,20 @@ public class NotificationTracker {
         // find all active notifications that are not marked as seen in our own list
         List<StatusBarNotification> sbns = new ArrayList<>();
         for (StatusBarNotification sbn : active) {
+            boolean isSelf = BuildConfig.APPLICATION_ID.equals(sbn.getPackageName());
+            boolean blockSelf = isSelf && !screenOn;
+
             boolean found = false;
             for (Item item : items) {
                 if (item.match(sbn)) {
-                    if (!item.getSeen(screenOn) || sbn.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
+                    if (!item.getSeen(screenOnForTracking) || sbn.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
                         if ((timeout > 0) && (now - item.firstSeen > timeout) && (item.shown > 0) && !sbn.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
-                            item.setSeen(screenOn);
+                            item.setSeen(screenOnForTracking);
                         } else {
                             item.shown++;
-                            sbns.add(sbn);
+                            if (!blockSelf) {
+                                sbns.add(sbn);
+                            }
                         }
                     }
                     found = true;
@@ -203,10 +208,12 @@ public class NotificationTracker {
             }
             if (!found) {
                 Item item = new Item(sbn);
-                if (addNewNotifications || BuildConfig.APPLICATION_ID.equals(sbn.getPackageName())) {
-                    sbns.add(sbn);
+                if (addNewNotifications || isSelf) {
+                    if (!blockSelf) {
+                        sbns.add(sbn);
+                    }
                 } else {
-                    item.setSeen(screenOn);
+                    item.setSeen(screenOnForTracking);
                 }
                 items.add(item);
             }
