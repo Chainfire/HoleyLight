@@ -280,4 +280,6 @@
     <string name="settings_category_customization">Customization</string>
     <string name="settings_customization_locale_title">Language</string>
     <string name="settings_customization_locale_default">Default</string>
+
+    <string name="manufacturer_detection_error">MANUFACTURER DETECTION ERROR</string>
 </resources>

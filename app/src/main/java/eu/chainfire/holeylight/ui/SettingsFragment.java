@@ -547,7 +547,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         PreferenceCategory catAnimation = category(root, R.string.settings_category_animation_title, 0);
         Preference prefAODBrightness = pref(catAnimation, R.string.settings_animation_brightness_title, 0, null, true, null);
-        prefAODBrightness.setSummary(Html.fromHtml(getString(Manufacturer.isSamsung() ? R.string.settings_animation_brightness_description : Manufacturer.isGoogle() ? R.string.settings_animation_brightness_description_google : 0)));
+        prefAODBrightness.setSummary(Html.fromHtml(getString(Manufacturer.isSamsung() ? R.string.settings_animation_brightness_description : Manufacturer.isGoogle() ? R.string.settings_animation_brightness_description_google : R.string.manufacturer_detection_error)));
         prefTune = pref(catAnimation, R.string.settings_animation_tune_title, R.string.settings_animation_tune_description, null, true, preference -> {
             startActivity(new Intent(getActivity(), TuneActivity.class));
             return false;
@@ -681,7 +681,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         if (Manufacturer.isSamsung()) {
             prefAODHelperControl = check(catAODHelper, R.string.settings_aod_helper_control_title, 0, Settings.AOD_HELPER_CONTROL, Settings.AOD_HELPER_CONTROL_DEFAULT, true);
-            prefAODHelperControl.setSummary(Html.fromHtml(getString(Manufacturer.isSamsung() ? R.string.settings_aod_helper_control_description_samsung : Manufacturer.isGoogle() ? R.string.settings_aod_helper_control_description_google : 0)));
+            prefAODHelperControl.setSummary(Html.fromHtml(getString(Manufacturer.isSamsung() ? R.string.settings_aod_helper_control_description_samsung : Manufacturer.isGoogle() ? R.string.settings_aod_helper_control_description_google : R.string.manufacturer_detection_error)));
         }
 
         if (Manufacturer.isGoogle()) {
@@ -863,7 +863,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 prefAODHelper.setVisible(true);
             } else if (aodHelperState == AODControl.AODHelperState.NOT_INSTALLED) {
                 prefAODHelper.setTitle(R.string.settings_aod_helper_install_title);
-                prefAODHelper.setSummary(Html.fromHtml(getString(Manufacturer.isSamsung() ? R.string.settings_aod_helper_install_description_samsung : Manufacturer.isGoogle() ? R.string.settings_aod_helper_install_description_google : 0)));
+                prefAODHelper.setSummary(Html.fromHtml(getString(Manufacturer.isSamsung() ? R.string.settings_aod_helper_install_description_samsung : Manufacturer.isGoogle() ? R.string.settings_aod_helper_install_description_google : R.string.manufacturer_detection_error)));
                 prefAODHelper.setOnPreferenceClickListener(aodHelperInstructions);
                 prefAODHelper.setVisible(true);
             } else {
