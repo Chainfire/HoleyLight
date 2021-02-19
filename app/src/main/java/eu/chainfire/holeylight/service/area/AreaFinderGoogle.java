@@ -85,4 +85,10 @@ public class AreaFinderGoogle extends AreaFinder {
 
         return outerBounds;
     }
+
+    @Override
+    public Integer findOverlayBottom(AccessibilityNodeInfo root) {
+        // already included in the rectangle returned by find()
+        return null;
+    }
 }

@@ -13,4 +13,9 @@ public class AreaFinderDummy extends AreaFinder {
     public Rect find(AccessibilityNodeInfo root) {
         return new Rect(-1, -1, -1, -1);
     }
+
+    @Override
+    public Integer findOverlayBottom(AccessibilityNodeInfo root) {
+        return null;
+    }
 }

@@ -113,6 +113,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                     root.refresh();
 
                     final Rect outerBounds = areaFinder.find(root);
+                    final Integer overlayBottom = areaFinder.findOverlayBottom(root);
 
                     if (
                             (outerBounds != null) &&
@@ -123,11 +124,11 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                             (outerBounds.width() > 0) &&
                             (outerBounds.height() > 0)
                     ) {
-                        Slog.d("AOD_TSP", "Access " + outerBounds.toString());
-                        handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(outerBounds));
+                        Slog.d("AOD_TSP", "Access " + outerBounds.toString() + " bottom:" + overlayBottom);
+                        handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(outerBounds, overlayBottom != null ? overlayBottom : 0));
                     } else if (outerBounds == null) {
                         Slog.d("AOD_TSP", "Access null");
-                        handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(new Rect(0, 0, 0, 0)));
+                        handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(new Rect(0, 0, 0, 0), 0));
                     }
                 }
             } catch (Exception e) {

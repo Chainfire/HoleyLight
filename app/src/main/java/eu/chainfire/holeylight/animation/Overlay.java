@@ -419,7 +419,7 @@ public class Overlay {
     private boolean evaluateDelayedPosted = false;
     private final Runnable evaluateDelayed = () -> { evaluate(true, true); evaluateDelayedPosted = false; };
 
-    private final Runnable removeTSP = () -> animation.updateTSPRect(new Rect(0, 0, 0, 0));
+    private final Runnable removeTSP = () -> animation.updateTSPRect(new Rect(0, 0, 0, 0), 0);
 
     public void evaluate(boolean refreshAll) {
         evaluate(refreshAll, false);
@@ -538,12 +538,12 @@ public class Overlay {
         evaluate(true);
     }
 
-    public void updateTSPRect(Rect rect) {
+    public void updateTSPRect(Rect rect, int overlayBottom) {
         boolean apply = Display.isOff(spritePlayer.getContext(), true);
-        Slog.d("AOD_TSP", "Overlay " + rect.toString() + " apply:" + apply);
+        Slog.d("AOD_TSP", "Overlay " + rect.toString() + " bottom:" + overlayBottom + " apply:" + apply);
         if (apply) {
             pokeWakeLocks(250);
-            animation.updateTSPRect(rect);
+            animation.updateTSPRect(rect, overlayBottom);
         }
     }
 }

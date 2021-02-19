@@ -142,6 +142,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private volatile SpritePlayer.Mode mode = SpritePlayer.Mode.SWIRL;
     private volatile boolean blackFill = false;
     private final Rect tspRect = new Rect(0, 0, 0, 0);
+    private volatile int tspOverlayBottom = 0;
 
     public NotificationAnimation(Context context, SpritePlayer spritePlayer, float densityMultiplier, OnNotificationAnimationListener onNotificationAnimationListener) {
         this.onNotificationAnimationListener = onNotificationAnimationListener;
@@ -480,8 +481,12 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                     int bottom = resolution.y;
                     if (!hideAODFully) {
                         bottom = (int)(resolution.y * 0.75f);
-                        if (Build.VERSION.SDK_INT >= 30 && tspRect.bottom > 0) {
-                            bottom = tspRect.bottom;
+                        if (Build.VERSION.SDK_INT >= 30) {
+                            if (tspOverlayBottom > 0) {
+                                bottom = tspOverlayBottom;
+                            } else if (tspRect.bottom > 0) {
+                                bottom = tspRect.bottom;
+                            }
                         }
                     }
                     update.set(0, 0, resolution.x, bottom);
@@ -628,11 +633,12 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         }
     }
 
-    public void updateTSPRect(Rect rect) {
+    public void updateTSPRect(Rect rect, int overlayBottom) {
         boolean apply = !rect.equals(tspRect);
-        Slog.d("AOD_TSP", "Anim " + rect.toString() + " apply:" + apply);
+        Slog.d("AOD_TSP", "Anim " + rect.toString() + " bottom:" + overlayBottom + " apply:" + apply);
         if (apply) {
             tspRect.set(rect);
+            tspOverlayBottom = overlayBottom;
             spritePlayer.setTSPBlank(rect.height() == 0);
             applyDimensions();
         }

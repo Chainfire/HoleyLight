@@ -14,6 +14,7 @@ public class AreaFinderSamsung extends AreaFinder {
     private boolean seenXViewPager = false;
     private boolean haveSeenContainer = false; // if seen, accept no substitute
     private boolean isTapToShow = false;
+    private Integer overlayBottom = null;
 
     private void inspectNode(AccessibilityNodeInfo node, Rect outerBounds, int level, boolean a11, boolean isTapToShow) {
         if (level == 0 && a11) {
@@ -26,7 +27,8 @@ public class AreaFinderSamsung extends AreaFinder {
                 (node.getClassName() == null) ||
                 (!Settings.DEBUG && (
                         (!node.getClassName().equals("android.widget.FrameLayout")) &&
-                        (!node.getClassName().equals("com.android.internal.widget.ViewPager"))
+                        (!node.getClassName().equals("com.android.internal.widget.ViewPager")) &&
+                        (!"com.samsung.android.app.aodservice:id/common_battery_text".equals(node.getViewIdResourceName()))
                 ))
         ) {
             if ((node != null) && (node.getClassName() != null)) {
@@ -50,7 +52,10 @@ public class AreaFinderSamsung extends AreaFinder {
             Slog.d(TAG, "Node " + l + node.getClassName().toString() + " " + bounds.toString() + " " + node.getViewIdResourceName());
         }
 
-        if (node.getClassName().equals("com.android.internal.widget.ViewPager") || (
+        if ("com.samsung.android.app.aodservice:id/common_battery_text".equals(node.getViewIdResourceName())) {
+            overlayBottom = bounds.top - 1;
+            Slog.d(TAG, "|||||||||||||||||||||||||||||||||||||||||||||||||||");
+        } else if (node.getClassName().equals("com.android.internal.widget.ViewPager") || (
                 a11 &&
                 node.getClassName().equals("android.widget.FrameLayout") && (
                         (
@@ -96,6 +101,7 @@ public class AreaFinderSamsung extends AreaFinder {
     @Override
     public void start(Context context) {
         isTapToShow = AODControl.isAODTapToShow(context);
+        overlayBottom = null;
     }
 
     @Override
@@ -147,5 +153,10 @@ public class AreaFinderSamsung extends AreaFinder {
         }
 
         return outerBounds;
+    }
+
+    @Override
+    public Integer findOverlayBottom(AccessibilityNodeInfo root) {
+        return overlayBottom;
     }
 }
