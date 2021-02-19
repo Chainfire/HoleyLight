@@ -484,14 +484,10 @@ public class Overlay {
             if (!lastState || colorsChanged() || renderMode != lastMode || blackFill != lastBlackFill || doze != lastDoze) {
                 animation.setMode(renderMode, blackFill);
                 createOverlay();
-                if (settings.isHideAOD() && doze && allowHideAOD) {
-                    animation.setHideAOD(true, settings.isHideAODFully());
-                    AODControl.setAODEnabled(spritePlayer.getContext(), true, null);
-                } else {
-                    animation.setHideAOD(spritePlayer.isTSPMode(renderMode), settings.isHideAODFully());
-                }
+                animation.setHideAOD(spritePlayer.isTSPMode(renderMode) || (settings.isHideAOD() && doze && allowHideAOD), settings.isHideAODFully());
                 animation.setDoze(doze);
                 animation.play(activeHide ? new int[] { Color.BLACK } : colors, settings.isUnholeyLightIcons() ? icons : new Drawable[0], false, (renderMode != lastMode));
+                if (colors.length > 0) AODControl.setAODEnabled(spritePlayer.getContext(), true, null);
                 lastColors = colors;
                 lastState = true;
                 lastMode = renderMode;
@@ -500,22 +496,35 @@ public class Overlay {
             }
         } else {
             if (lastState) {
-                if (spritePlayer.isTSPMode(lastMode)) {
-                    animation.setHideAOD(false);
-                }
-                if (settings.isHideAOD()) {
-                    animation.setHideAOD(false);
+                final boolean fVisible = visible;
+                final boolean fDoze = doze;
+                Runnable goAway = () -> {
+                    if (lastState) {
+                        if (spritePlayer.isTSPMode(lastMode)) {
+                            animation.setHideAOD(false);
+                        }
+                        if (settings.isHideAOD()) {
+                            animation.setHideAOD(false);
+                        }
+                        if (animation.isPlaying()) {
+                            boolean immediately = !fVisible || kill || isDelayed || settings.isAODHelperControl();
+                            animation.stop(immediately);
+                            if (immediately) removeOverlay();
+                        } else {
+                            removeOverlay();
+                        }
+                        lastState = false;
+                        lastDoze = fDoze;
+                    }
+                };
+                if (doze && settings.isAODHelperControl()) {
+                    animation.setHideAOD(true, settings.isHideAODFully());
                     AODControl.setAODEnabled(spritePlayer.getContext(), false, null);
-                }
-                if (animation.isPlaying()) {
-                    boolean immediately = !visible || kill || isDelayed;
-                    animation.stop(immediately);
-                    if (immediately) removeOverlay();
+                    pokeWakeLocks(500);
+                    handler.postDelayed(goAway, 250);
                 } else {
-                    removeOverlay();
+                    goAway.run();
                 }
-                lastState = false;
-                lastDoze = doze;
             }
         }
 
