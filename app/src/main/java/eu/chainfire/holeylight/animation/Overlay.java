@@ -173,7 +173,6 @@ public class Overlay {
     private int[] lastColors = new int[0];
     private SpritePlayer.Mode lastMode = SpritePlayer.Mode.SWIRL;
     private boolean lastBlackFill = false;
-    private int lastDpAdd = 0;
     private boolean lastDoze = false;
     private boolean added = false;
     private Point resolution;
@@ -481,9 +480,8 @@ public class Overlay {
         boolean wantedEffective = (wanted || activeHide) && settings.isEnabledWhile(mode) && lockscreenOk;
 
         if (visible && wantedEffective && ((colors.length > 0) || activeHide)) {
-            int dpAdd = (doze ? 1 : 0);
             boolean blackFill = !doze && settings.isBlackFill();
-            if (!lastState || colorsChanged() || renderMode != lastMode || blackFill != lastBlackFill || dpAdd != lastDpAdd) {
+            if (!lastState || colorsChanged() || renderMode != lastMode || blackFill != lastBlackFill || doze != lastDoze) {
                 animation.setMode(renderMode, blackFill);
                 createOverlay();
                 if (settings.isHideAOD() && doze && allowHideAOD) {
@@ -492,13 +490,12 @@ public class Overlay {
                 } else {
                     animation.setHideAOD(spritePlayer.isTSPMode(renderMode), settings.isHideAODFully());
                 }
-                animation.setDpAdd(dpAdd);
+                animation.setDoze(doze);
                 animation.play(activeHide ? new int[] { Color.BLACK } : colors, settings.isUnholeyLightIcons() ? icons : new Drawable[0], false, (renderMode != lastMode));
                 lastColors = colors;
                 lastState = true;
                 lastMode = renderMode;
                 lastBlackFill = blackFill;
-                lastDpAdd = dpAdd;
                 lastDoze = doze;
             }
         } else {

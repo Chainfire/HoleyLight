@@ -69,10 +69,11 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         public final float dpAddScaleHorizontal;
         public final float dpShiftVertical;
         public final float dpShiftHorizontal;
+        public final float dpAddDoze;
         public final boolean supported;
         public final boolean officiallySupported;
 
-        public DeviceSpecs(String device, boolean exact, String json, float dpAddScaleBase, float dpAddScaleHorizontal, float dpShiftVertical, float dpShiftHorizontal, boolean supported, boolean officiallySupported) {
+        public DeviceSpecs(String device, boolean exact, String json, float dpAddScaleBase, float dpAddScaleHorizontal, float dpShiftVertical, float dpShiftHorizontal, float dpAddDoze, boolean supported, boolean officiallySupported) {
             this.device = device.toLowerCase(Locale.ENGLISH);
             this.exact = exact;
             this.json = json;
@@ -80,22 +81,27 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
             this.dpAddScaleHorizontal = dpAddScaleHorizontal;
             this.dpShiftVertical = dpShiftVertical;
             this.dpShiftHorizontal = dpShiftHorizontal;
+            this.dpAddDoze = dpAddDoze;
             this.supported = supported;
             this.officiallySupported = officiallySupported;
         }
     }
 
     private static final DeviceSpecs[] deviceSpecs = new DeviceSpecs[] {
-            /* Samsung viDirector */ new DeviceSpecs("_viDirector", true, null, 0, 0, 0, 0, true, true),
-            /* Samsung S10e       */ new DeviceSpecs("beyond0", false, jsonBeyond0, 4, 0, 0, 0, true, true),
-            /* Samsung S10        */ new DeviceSpecs("beyond1", false, jsonBeyond1, 4, 0, 0, 0, true, true),
-            /* Samsung S10+       */ new DeviceSpecs("beyond2", false, jsonBeyond2, 5, 1, 0.25f, -1.75f, true, true),
-            /* Google Pixel 4a    */ new DeviceSpecs("sunfish", true, jsonDefault, -7, 0, 5.5f, 5.5f, true, true),
-//TUNE      /* Google Pixel 4 5G  */ new DeviceSpecs("bramble", true, jsonDefault, -7, 0, 5.5f, 5.5f, true, true),
-            /* Google Pixel 5     */ new DeviceSpecs("redfin", true, jsonDefault, -11.75f, 0, 3.25f, 4.75f, true, true),
-            /* Samsung Generic    */ new DeviceSpecs("_samsung", true, jsonDefault, 0, 0, 0, 0, true, false),
-            /* Google Generic     */ new DeviceSpecs("_google", true, jsonDefault, 0, 0, 0, 0, true, false),
-            /* Unsupported        */ new DeviceSpecs("_unsupported", true, null, 0, 0, 0, 0, false, false)
+            /* Samsung viDirector */ new DeviceSpecs("_viDirector", true, null, 0, 0, 0, 0, 1f, true, true),
+
+            /* Samsung S10e       */ new DeviceSpecs("beyond0", false, jsonBeyond0, 4, 0, 0, 0, 1f, true, true),
+            /* Samsung S10        */ new DeviceSpecs("beyond1", false, jsonBeyond1, 4, 0, 0, 0, 1f, true, true),
+            /* Samsung S10+       */ new DeviceSpecs("beyond2", false, jsonBeyond2, 5, 1, 0.25f, -1.75f, 1f, true, true),
+
+            /* Google Pixel 4a    */ new DeviceSpecs("sunfish", true, jsonDefault, -7, 0, 5.5f, 5.5f, 3f, true, true),
+//TUNE      /* Google Pixel 4 5G  */ new DeviceSpecs("bramble", true, jsonDefault, -7, 0, 5.5f, 5.5f, 3f, true, true),
+            /* Google Pixel 5     */ new DeviceSpecs("redfin", true, jsonDefault, -11.75f, 0, 3.25f, 4.75f, 3f, true, true),
+
+            /* Samsung Generic    */ new DeviceSpecs("_samsung", true, jsonDefault, 0, 0, 0, 0, 1f, true, false),
+            /* Google Generic     */ new DeviceSpecs("_google", true, jsonDefault, 0, 0, 0, 0, 3f, true, false),
+
+            /* Unsupported        */ new DeviceSpecs("_unsupported", true, null, 0, 0, 0, 0, 3f, false, false)
     };
 
     private static DeviceSpecs findDevice(String name) {
@@ -117,7 +123,6 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private final SpritePlayer spritePlayer;
     private final float densityMultiplier;
 
-    private volatile float dpAdd = 0;
     private final DeviceSpecs spec;
     private final VIDirector viDirector;
     private final VIDirector viDirector2;
@@ -131,6 +136,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private volatile int[] colorsNext = null;
     private volatile boolean playNext = false;
 
+    private volatile boolean inDoze = false;
     private volatile boolean hideAOD = false;
     private volatile boolean hideAODFully = false;
     private volatile SpritePlayer.Mode mode = SpritePlayer.Mode.SWIRL;
@@ -380,7 +386,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                         left += getDpShiftHorizontal() * realDpToPx;
                         top += getDpShiftVertical() * realDpToPx;
 
-                        float addVertical = (getDpAddScaleBase() + dpAdd) * realDpToPx;
+                        float addVertical = (getDpAddScaleBase() + getDpAdd()) * realDpToPx;
                         float addHorizontal = (addVertical * ((float)b.width() / (float)b.height())) + (getDpAddScaleHorizontal() * realDpToPx);
                         float scaledWidth = width + addHorizontal;
                         float scaledHeight = height + addVertical;
@@ -409,7 +415,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                             left = r.centerX() - (width / 2.0f) + (getDpShiftHorizontal() * realDpToPx);
                             top = r.centerY() - (height / 2.0f) + (getDpShiftVertical() * realDpToPx);
 
-                            float addVertical = (getDpAddScaleBase() + dpAdd) * realDpToPx;
+                            float addVertical = (getDpAddScaleBase() + getDpAdd()) * realDpToPx;
                             float addHorizontal = (addVertical * ((float)b.width() / (float)b.height())) + (getDpAddScaleHorizontal() * realDpToPx);
                             float scaledWidth = width + addHorizontal;
                             float scaledHeight = height + addVertical;
@@ -435,7 +441,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
                             // you'd assume as these animations come straight from Samsung's ROMs that
                             // they'd work perfectly out of the box, but oh no...
-                            float addVertical = (getDpAddScaleBase() + dpAdd) * realDpToPx;
+                            float addVertical = (getDpAddScaleBase() + getDpAdd()) * realDpToPx;
                             float addHorizontal = (addVertical * ((float)b.width() / (float)b.height())) + (getDpAddScaleHorizontal() * realDpToPx);
                             float scaledWidth = width + addHorizontal;
                             float scaledHeight = height + addVertical;
@@ -573,17 +579,21 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         return settings.getSpeedFactor();
     }
 
-    public float getDpAdd() {
-        return dpAdd;
+    public boolean getDoze() {
+        return inDoze;
     }
 
-    public void setDpAdd(float dpAdd) {
+    public void setDoze(boolean doze) {
         synchronized (getSynchronizer()) {
-            if (this.dpAdd != dpAdd) {
-                this.dpAdd = dpAdd;
+            if (this.inDoze != doze) {
+                this.inDoze = doze;
                 applyDimensions();
             }
         }
+    }
+
+    public float getDpAdd() {
+        return inDoze ? spec.dpAddDoze : 0;
     }
 
     public boolean getHideAOD() {
