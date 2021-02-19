@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS"
                      tools:ignore="ProtectedPermissions"/>
 
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"
+                     tools:ignore="ProtectedPermissions"/>
+
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher_jh"
@@ -14,7 +17,9 @@
         <receiver android:name=".AODReceiver" android:exported="true"
                   tools:ignore="ExportedReceiver">
             <intent-filter>
-                <action android:name="eu.chainfire.holeylightaodhelper.SET_AOD"/>
+                <action android:name="eu.chainfire.holeylightaodhelper.FIX_PERMISSIONS" />
+                <action android:name="eu.chainfire.holeylightaodhelper.SET_BRIGHTNESS" />
+                <action android:name="eu.chainfire.holeylightaodhelper.SET_AOD" />
             </intent-filter>
         </receiver>
     </application>

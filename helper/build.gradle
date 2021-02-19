@@ -6,8 +6,8 @@ android {
         applicationId "eu.chainfire.holeylight.aodhelper"
         minSdkVersion 22
         targetSdkVersion 22
-        versionCode 51
-        versionName "0.51"
+        versionCode 54
+        versionName "0.54"
     }
     buildTypes {
         release {

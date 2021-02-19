@@ -30,7 +30,10 @@ import static android.content.Context.POWER_SERVICE;
 public class Permissions {
     private static final int NOTIFICATION_ID_PERMISSIONS = 2001;
 
-    public enum Needed { DEVICE_SUPPORT, DEVICE_OFFICIAL_SUPPORT, UNHIDE_NOTCH, COMPANION_DEVICE, NOTIFICATION_SERVICE, ACCESSIBILITY_SERVICE, BATTERY_OPTIMIZATION_EXEMPTION, NONE }
+    public enum Needed { DEVICE_SUPPORT, DEVICE_OFFICIAL_SUPPORT, UNHIDE_NOTCH, COMPANION_DEVICE, NOTIFICATION_SERVICE, ACCESSIBILITY_SERVICE, BATTERY_OPTIMIZATION_EXEMPTION, AOD_HELPER_UPDATE, AOD_HELPER_PERMISSIONS, NONE }
+
+    public static boolean allowAODHelperUpdateNeeded = true;
+    public static boolean allowAODHelperPermissionsNeeded = true;
 
     private static boolean haveAccessibilityService(Context context) {
         AccessibilityManager accessibilityManager = ((AccessibilityManager)context.getSystemService(ACCESSIBILITY_SERVICE));
@@ -63,7 +66,7 @@ public class Permissions {
     }
 
     @SuppressLint("WrongConstant")
-    public static Needed detect(Context context) {
+    public static Needed detect(Context context, boolean aodHelper) {
         NotificationAnimation animation = new NotificationAnimation(context, null, 0, null);
         if (!animation.isDeviceSupported()) {
             return Needed.DEVICE_SUPPORT;
@@ -80,6 +83,19 @@ public class Permissions {
         } else if (!((PowerManager)context.getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)) {
             return Needed.BATTERY_OPTIMIZATION_EXEMPTION;
         } else {
+            if (aodHelper) {
+                AODControl.AODHelperState state;
+                if (allowAODHelperUpdateNeeded || allowAODHelperPermissionsNeeded) {
+                    state = AODControl.getAODHelperState(context);
+                } else {
+                    state = AODControl.AODHelperState.NOT_INSTALLED;
+                }
+                if (allowAODHelperUpdateNeeded && state == AODControl.AODHelperState.NEEDS_UPDATE) {
+                    return Needed.AOD_HELPER_UPDATE;
+                } else if (allowAODHelperPermissionsNeeded && state == AODControl.AODHelperState.NEEDS_PERMISSIONS) {
+                    return Needed.AOD_HELPER_PERMISSIONS;
+                }
+            }
             return Needed.NONE;
         }
     }
@@ -89,7 +105,7 @@ public class Permissions {
     }
 
     public static void notify(Context context) {
-        if (isNotificationWorthy(detect(context))) {
+        if (isNotificationWorthy(detect(context, true))) {
             NotificationManagerCompat.from(context).deleteNotificationChannel(BuildConfig.APPLICATION_ID + ":permission");
             @SuppressLint("WrongConstant") final NotificationChannel chan = new NotificationChannel(BuildConfig.APPLICATION_ID + ":permission", context.getString(R.string.app_name), NotificationManager.IMPORTANCE_HIGH);
             chan.setDescription(context.getString(R.string.app_name));

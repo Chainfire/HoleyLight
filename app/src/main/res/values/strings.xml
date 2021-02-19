@@ -251,4 +251,28 @@
 <!-- Google --><string name="settings_schedule_aod_description_unsupported">This device does not support a display schedule</string>
 
     <string name="notice_not_officially_supported_device"><![CDATA[<b>Holey Light</b> does not <i>officially</i> support this device. If this device has a camera hole inside the display area, it <i>might</i> work. You will probably need to go to the <b>Tune</b> screen to make it look right.<br><br>If the app seems to work well, please report your tuning values and this code to the XDA thread:<br><br>[ <b>%s</b> ]]]></string>
+
+    <string name="instructions">Instructions</string>
+    <string name="ignore">Ignore</string>
+    <string name="root">Root</string>
+
+    <string name="aod_helper">AOD Helper</string>
+    <string name="aod_helper_update"><![CDATA[The <b>AOD Helper</b> package needs to be updated. All options using it have been disabled and need to be manually re-enabled after updating. Do you want instructions on how to update?]]></string>
+    <string name="aod_helper_permissions"><![CDATA[The <b>AOD Helper</b> package needs additional permissions. All options using it have been disabled and need to be manually re-enabled after granting permissions. Do you want instructions on how to update?<br><br>If your device is rooted, the problem <i>may</i> be solved for you if choose the <b>Root</b> option. You will get this popup again if it doesn\'t work.]]></string>
+
+    <string name="settings_category_aod_helper_title">@string/aod_helper</string>
+    <string name="settings_category_aod_helper_description">Power users only, experimental</string>
+
+    <string name="settings_aod_helper_install_title">Install</string>
+<!-- Samsung --><string name="settings_aod_helper_install_description_samsung"><![CDATA[<b>AOD Helper</b> is not currently installed. Tap for instructions.]]></string>
+<!-- Google --><string name="settings_aod_helper_install_description_google"><![CDATA[<b>AOD Helper</b> is not currently installed. <b>Root</b> or <b>adb shell</b> is required. Tap for instructions.]]></string>
+    <string name="settings_aod_helper_update_title">Update</string>
+    <string name="settings_aod_helper_update_description_normal"><![CDATA[<b>AOD Helper</b> is installed but outdated. It needs to updated to be used again. Tap for instructions.]]></string>
+    <string name="settings_aod_helper_update_description_permissions"><![CDATA[<b>AOD Helper</b> is installed but does not have the required permissions. Tap for instructions.]]></string>
+    <string name="settings_aod_helper_control_title">Automatic AOD control</string>
+<!-- Samsung --><string name="settings_aod_helper_control_description_samsung"><![CDATA[Enable and disable AOD automatically based on notification status. Reduces power usage when no notifications are active. <b>Not</b> compatible with AOD in <b>Tap to show</b> mode!]]></string>
+<!-- Google --><string name="settings_aod_helper_control_description_google">Enabled and disable AOD automatically based on notification status. Reduces power usage when no notifications are active.</string>
+<!-- Google --><string name="settings_aod_helper_increase_brightness_title_google">Maximize AOD brightness</string>
+<!-- Google --><string name="settings_aod_helper_increase_brightness_description_google">While still limited to automatic brightness settings, this option usually does increase AOD brightness significantly.</string>
+
 </resources>

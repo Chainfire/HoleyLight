@@ -208,7 +208,6 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final Boolean UNHOLEY_LIGHT_ICONS_DEFAULT = true;
 
     public static final String ACCESSIBILITY_SERVICE_COUNTER = "accessibility_service_counter";
-    public static final int ACCESSIBILITY_SERVICE_COUNTER_DEFAULT = 0;
 
     public static final String USING_VI_DIRECTOR = "using_vidirector";
     public static final boolean USING_VI_DIRECTOR_DEFAULT = false;
@@ -223,6 +222,12 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final boolean BLACK_FILL_DEFAULT = true;
 
     private static final String DEVICE_OFFICIAL_SUPPORT_WARNING_SHOWN = "device_official_support_warning_shown";
+
+    public static final String AOD_HELPER_CONTROL = "aod_helper_control";
+    public static final boolean AOD_HELPER_CONTROL_DEFAULT = false;
+
+    public static final String AOD_HELPER_BRIGHTNESS = "aod_helper_brightness";
+    public static final boolean AOD_HELPER_BRIGHTNESS_DEFAULT = false;
 
     private static Settings instance;
     public static Settings getInstance(Context context) {
@@ -640,7 +645,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public int getAccessibilityServiceCounter() {
-        return prefs.getInt(ACCESSIBILITY_SERVICE_COUNTER, ACCESSIBILITY_SERVICE_COUNTER_DEFAULT);
+        return prefs.getInt(ACCESSIBILITY_SERVICE_COUNTER, 0);
     }
 
     public void incAccessibilityServiceCounter() {
@@ -688,6 +693,22 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public void setDeviceOfficialSupportWarningShown(boolean value) {
         put(DEVICE_OFFICIAL_SUPPORT_WARNING_SHOWN, value, true);
+    }
+    
+    public boolean isAODHelperControl() {
+        return prefs.getBoolean(AOD_HELPER_CONTROL, AOD_HELPER_CONTROL_DEFAULT);
+    }
+    
+    public void setAODHelperControl(boolean value) {
+        put(AOD_HELPER_CONTROL, value, true);
+    }
+
+    public boolean isAODHelperBrightness() {
+        return prefs.getBoolean(AOD_HELPER_BRIGHTNESS, AOD_HELPER_BRIGHTNESS_DEFAULT);
+    }
+    
+    public void setAODHelperBrightness(boolean value) {
+        put(AOD_HELPER_BRIGHTNESS, value, true);
     }
 
     public boolean saveToUri(ContentResolver resolver, Uri uri) {

@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
 
         String device = String.format("%s / %s / %s", Build.BRAND, Build.MANUFACTURER, Build.DEVICE);
 
-        switch (Permissions.detect(this)) {
+        switch (Permissions.detect(this, true)) {
             case DEVICE_SUPPORT:
                 (currentDialog = newAlert(!Settings.DEBUG)
                         .setTitle(R.string.error)
@@ -242,16 +242,49 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
                         })
                         .show()).setCanceledOnTouchOutside(false);
                 break;
+            case AOD_HELPER_UPDATE:
+                (currentDialog = newAlert(false)
+                        .setTitle(R.string.aod_helper)
+                        .setMessage(Html.fromHtml(getString(R.string.aod_helper_update)))
+                        .setPositiveButton(R.string.instructions, (dialog, which) -> {
+                            checkPermissionsOnResume = true;
+                            aodHelperInstructions();
+                        })
+                        .setNegativeButton(R.string.ignore, (dialog, which) -> {
+                            Permissions.allowAODHelperUpdateNeeded = false;
+                            checkPermissions();
+                        })
+                        .show()).setCanceledOnTouchOutside(false);
+                break;
+            case AOD_HELPER_PERMISSIONS:
+                (currentDialog = newAlert(false)
+                        .setTitle(R.string.aod_helper)
+                        .setMessage(Html.fromHtml(getString(R.string.aod_helper_permissions)))
+                        .setNeutralButton(R.string.root, (dialog, which) -> {
+                            AODControl.fixHelperPermissions(MainActivity.this, result -> {
+                                checkPermissions();
+                            });
+                        })
+                        .setPositiveButton(R.string.instructions, (dialog, which) -> {
+                            checkPermissionsOnResume = true;
+                            aodHelperInstructions();
+                        })
+                        .setNegativeButton(R.string.ignore, (dialog, which) -> {
+                            Permissions.allowAODHelperPermissionsNeeded = false;
+                            checkPermissions();
+                        })
+                        .show()).setCanceledOnTouchOutside(false);
+                break;
             case NONE:
                 newAlert(false); // dismiss leftovers
-                validateSettings();
+                validateSettings(true);
         }
     }
 
     @SuppressWarnings({ "deprecation", "UnusedReturnValue" })
-    public boolean validateSettings() {
+    public boolean validateSettings(boolean aodHelper) {
         if (!Settings.getInstance(this).isSetupWizardComplete()) return false;
-        if (Permissions.detect(this) != Permissions.Needed.NONE) return false;
+        if (Permissions.detect(this, aodHelper) != Permissions.Needed.NONE) return false;
 
         boolean aodRequired = settings.isEnabled() && (
                 settings.isEnabledWhile(Settings.SCREEN_OFF_CHARGING, true) ||
@@ -263,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
                 (settings.getAnimationMode(Settings.SCREEN_OFF_BATTERY) == SpritePlayer.Mode.TSP)
         );
         if (aodRequired) {
-            aodRequired = !AODControl.isAODEnabled(this) && !AODControl.usingHelperPackage(this, null);
+            aodRequired = !AODControl.isAODEnabled(this) && !settings.isAODHelperControl();
             if (aodWithImageRequired) {
                 aodWithImageRequired = (Manufacturer.isSamsung() && AODControl.getAODThemePackage(this) == null);
             }
@@ -477,5 +510,15 @@ public class MainActivity extends AppCompatActivity implements Settings.OnSettin
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         item.setActionView(layout);
         return true;
+    }
+
+    public void aodHelperInstructions() {
+        try {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse("https://github.com/Chainfire/HoleyLight/blob/master/apks/AODHelper.md"));
+            startActivity(i);
+        } catch (Exception e) {
+            //  no action
+        }
     }
 }

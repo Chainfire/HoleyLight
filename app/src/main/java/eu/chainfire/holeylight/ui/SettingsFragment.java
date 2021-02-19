@@ -72,6 +72,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefSeenIfScreenOn = null;
     private CheckBoxPreference prefSeenOnTimeout = null;
     private CheckBoxPreference prefHideAOD = null;
+    private Preference prefAODHelper = null;
+    private CheckBoxPreference prefAODHelperControl = null;
+    private CheckBoxPreference prefAODHelperBrightness = null;
+
+    private AODControl.AODHelperState aodHelperState = AODControl.AODHelperState.NOT_INSTALLED;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -567,6 +572,31 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return false;
         });
 
+        PreferenceCategory catAODHelper = category(root, R.string.settings_category_aod_helper_title, R.string.settings_category_aod_helper_description);
+        prefAODHelper = pref(catAODHelper, 0, 0, null, true, null);
+
+        if (Manufacturer.isSamsung()) {
+            prefAODHelperControl = check(catAODHelper, R.string.settings_aod_helper_control_title, 0, Settings.AOD_HELPER_CONTROL, Settings.AOD_HELPER_CONTROL_DEFAULT, true);
+            prefAODHelperControl.setSummary(Html.fromHtml(getString(Manufacturer.isSamsung() ? R.string.settings_aod_helper_control_description_samsung : Manufacturer.isGoogle() ? R.string.settings_aod_helper_control_description_google : 0)));
+        }
+
+        if (Manufacturer.isGoogle()) {
+            prefAODHelperBrightness = check(catAODHelper, R.string.settings_aod_helper_increase_brightness_title_google, 0, Settings.AOD_HELPER_BRIGHTNESS, Settings.AOD_HELPER_BRIGHTNESS_DEFAULT, true);
+            prefAODHelperBrightness.setSummary(Html.fromHtml(getString(R.string.settings_aod_helper_increase_brightness_description_google)));
+            prefAODHelperBrightness.setOnPreferenceClickListener(preference -> {
+                if (settings.isAODHelperBrightness()) {
+                    AODControl.setAODBrightness(getContext(), true, result -> {});
+                }
+                return true;
+            });
+            prefAODHelperBrightness.setOnPreferenceChangeListener((preference, newValue) -> {
+                if (!((Boolean)newValue)) {
+                    AODControl.setAODBrightness(getContext(), false, result -> {});
+                }
+                return true;
+            });
+        }
+
         PreferenceCategory catChainfire = category(root, R.string.settings_category_chainfire_title, 0);
         pref(catChainfire, R.string.settings_playstore_title, R.string.settings_playstore_description, null, true, preference -> {
             try {
@@ -600,7 +630,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             });
         }
 
-        updatePrefs(null);
+        updatePrefs(null, true);
         prefs.registerOnSharedPreferenceChangeListener(this);
         return root;
     }
@@ -608,13 +638,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @Override
     public void onStart() {
         super.onStart();
-        updatePrefs(null);
+        updatePrefs(null, true);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         try {
-            updatePrefs(key);
+            updatePrefs(key, false);
         } catch (Throwable t) {
             // no action
         }
@@ -629,8 +659,18 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         return "\n[ ? ]";
     }
 
+    private final Preference.OnPreferenceClickListener aodHelperInstructions = preference -> {
+        Activity activity = getActivity();
+        if (activity instanceof MainActivity) {
+            ((MainActivity)activity).aodHelperInstructions();
+        }
+        return false;
+    };
+
+    private final Preference.OnPreferenceClickListener aodHelperNone = preference -> false;
+
     @SuppressWarnings({ "unused", "ConstantConditions", "deprecation" })
-    private void updatePrefs(String key) {
+    private void updatePrefs(String key, boolean evaluateHelper) {
         if (prefScreenOnCharging != null) {
             for (CheckBoxPreference pref : new CheckBoxPreference[] { prefScreenOnCharging, prefScreenOffCharging, prefScreenOnBattery, prefScreenOffBattery }) {
                 int mode = getModeFromPreference(pref);
@@ -701,10 +741,40 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             prefHideAOD.setChecked(settings.isHideAOD());
             prefHideAOD.setSummary(getString(R.string.settings_hide_aod_description) + (settings.isHideAOD() ? "\n[ " + getString(settings.isHideAODFully() ? R.string.hide_aod_full_title : R.string.hide_aod_partial_title) + " ]" : ""));
 
+            aodHelperState = AODControl.getAODHelperState(getContext());
+
+            prefAODHelper.setEnabled(settings.isEnabled());
+            if (aodHelperState == AODControl.AODHelperState.NEEDS_UPDATE) {
+                prefAODHelper.setTitle(R.string.settings_aod_helper_update_title);
+                prefAODHelper.setSummary(Html.fromHtml(getString(R.string.settings_aod_helper_update_description_normal)));
+                prefAODHelper.setOnPreferenceClickListener(aodHelperInstructions);
+                prefAODHelper.setVisible(true);
+            } else if (aodHelperState == AODControl.AODHelperState.NEEDS_PERMISSIONS) {
+                prefAODHelper.setTitle(R.string.settings_aod_helper_update_title);
+                prefAODHelper.setSummary(Html.fromHtml(getString(R.string.settings_aod_helper_update_description_permissions)));
+                prefAODHelper.setOnPreferenceClickListener(aodHelperInstructions);
+                prefAODHelper.setVisible(true);
+            } else if (aodHelperState == AODControl.AODHelperState.NOT_INSTALLED) {
+                prefAODHelper.setTitle(R.string.settings_aod_helper_install_title);
+                prefAODHelper.setSummary(Html.fromHtml(getString(Manufacturer.isSamsung() ? R.string.settings_aod_helper_install_description_samsung : Manufacturer.isGoogle() ? R.string.settings_aod_helper_install_description_google : 0)));
+                prefAODHelper.setOnPreferenceClickListener(aodHelperInstructions);
+                prefAODHelper.setVisible(true);
+            } else {
+                prefAODHelper.setOnPreferenceClickListener(aodHelperNone);
+                prefAODHelper.setVisible(false);
+            }
+
+            if (prefAODHelperControl != null) {
+                prefAODHelperControl.setEnabled(settings.isEnabled() && aodHelperState == AODControl.AODHelperState.OK);
+            }
+            if (prefAODHelperBrightness != null) {
+                prefAODHelperBrightness.setEnabled(settings.isEnabled() && aodHelperState == AODControl.AODHelperState.OK);
+            }
+
             if (key != null) {
                 Activity activity = getActivity();
                 if (activity instanceof MainActivity) {
-                    ((MainActivity)activity).validateSettings();
+                    ((MainActivity)activity).validateSettings(evaluateHelper);
                 }
             }
         }

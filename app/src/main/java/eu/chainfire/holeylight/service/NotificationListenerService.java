@@ -278,6 +278,7 @@ public class NotificationListenerService extends android.service.notification.No
         startMotionSensor();
         getContentResolver().registerContentObserver(android.provider.Settings.Global.getUriFor("zen_mode"), false, refreshLEDObserver);
         getContentResolver().registerContentObserver(android.provider.Settings.Global.getUriFor("aod_show_state"), false, refreshLEDObserver);
+        AODControl.setAODBrightness(this, true, result -> {});
     }
 
     @Override
