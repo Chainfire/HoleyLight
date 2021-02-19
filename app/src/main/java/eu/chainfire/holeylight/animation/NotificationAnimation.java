@@ -351,7 +351,13 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
                     // Apply
                     left = tspRect.centerX() - (squareSize / 2f);
-                    top = tspRect.centerY() - (squareSize / 2f);
+                    if (Manufacturer.isSamsung()) {
+                        // Samsung: small screen area, stay at the top in case size changes when tapped, looks better
+                        top = tspRect.top;
+                    } else {
+                        // Google: stay in center of found area
+                        top = tspRect.centerY() - (squareSize / 2f);
+                    }
                     width = squareSize;
                     height = squareSize;
                 } else {
