@@ -485,7 +485,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                         }
                     }
                     update.set(0, 0, resolution.x, bottom);
-                    spritePlayer.setBackgroundColor(Color.BLACK);
+                    spritePlayer.setBackgroundColor(Settings.DEBUG_OVERLAY ? 0x40FF0000 : Color.BLACK);
                 } else {
                     update.set((int)left, (int)top, (int)(left + width), (int)(top + height));
                     spritePlayer.setBackgroundColor(Color.TRANSPARENT);
