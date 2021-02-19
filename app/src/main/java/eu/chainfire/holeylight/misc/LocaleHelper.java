@@ -25,7 +25,7 @@ import java.util.Locale;
 
 public class LocaleHelper {
     public static Locale getLocale(Context context) {
-        Locale locale = context.getResources().getConfiguration().getLocales().get(0);
+        Locale locale = null;
         try {
             Configuration config = context.getResources().getConfiguration();
 
@@ -36,12 +36,16 @@ public class LocaleHelper {
                 } else {
                     locale = new Locale(lang);
                 }
-                if ((locale != null) && !Locale.getDefault().equals(locale)) {
-                    Locale.setDefault(locale);
-                    config.setLocale(locale);
-                    context.getResources().updateConfiguration(config, null);
+                if (locale != null) {
+                    if (!Locale.getDefault().getLanguage().equals(locale.getLanguage())) Locale.setDefault(locale);
+                    if (!config.getLocales().get(0).getLanguage().equals(locale.getLanguage())) {
+                        config.setLocale(locale);
+                        context.getResources().updateConfiguration(config, null);
+                    }
                 }
             }
+
+            if (locale == null) locale = context.getResources().getConfiguration().getLocales().get(0);
         } catch (Exception ignored) {
             // occasional NullPointerException for reasons unknown
         }
@@ -49,20 +53,47 @@ public class LocaleHelper {
     }
 
     public static Configuration getConfiguration(Context context) {
+        return getConfiguration(context, null);
+    }
+
+    public static Configuration getConfiguration(Context context, Configuration existingConfiguration) {
+        if (existingConfiguration == null) existingConfiguration = context.getResources().getConfiguration();
+
+        Locale locale = getLocale(context);
+        if (locale == null || existingConfiguration.getLocales().get(0).getLanguage().equals(locale.getLanguage())) {
+            return existingConfiguration;
+        }
+
         Configuration configuration = context.getResources().getConfiguration();
         configuration.setLocale(getLocale(context));
         configuration.setLayoutDirection(configuration.getLocales().get(0));
+        configuration.uiMode = existingConfiguration.uiMode;
         return configuration;
     }
 
     public static Context getContext(Context context) {
-        Context ret = context.createConfigurationContext(getConfiguration(context));
+        Configuration existingConfiguration = context.getResources().getConfiguration();
+        Configuration newConfiguration = LocaleHelper.getConfiguration(context, existingConfiguration);
+
+        if (existingConfiguration == newConfiguration) return context;
+
+        Context ret = context.createConfigurationContext(newConfiguration);
         updateResources(ret);
         updateResources(context);
         return ret;
     }
 
     public static void updateResources(Context context) {
-        context.getResources().updateConfiguration(LocaleHelper.getConfiguration(context), null);
+        updateResources(context, null);
+    }
+
+    public static void updateResources(Context context, Configuration existingConfiguration) {
+        if (existingConfiguration == null) existingConfiguration = context.getResources().getConfiguration();
+
+        Configuration newConfiguration = LocaleHelper.getConfiguration(context, existingConfiguration);
+
+        if (existingConfiguration != newConfiguration) {
+            context.getResources().updateConfiguration(newConfiguration, null);
+        }
     }
 }

@@ -60,7 +60,7 @@ import top.defaults.colorpicker.ColorPickerPopup;
 
 import static android.content.res.Configuration.UI_MODE_NIGHT_YES;
 
-public class ColorActivity extends LocaleActivity {
+public class ColorActivity extends BaseActivity {
     private Settings settings = null;
     private AppAdapter apps = null;
     private Integer colorCopy = null;

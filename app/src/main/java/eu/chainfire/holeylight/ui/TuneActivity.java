@@ -30,7 +30,7 @@ import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.NotificationAnimation;
 import eu.chainfire.holeylight.misc.Settings;
 
-public class TuneActivity extends LocaleActivity implements Settings.OnSettingsChangedListener {
+public class TuneActivity extends BaseActivity implements Settings.OnSettingsChangedListener {
     private Settings settings = null;
     private NotificationAnimation animation = null;
 

@@ -27,7 +27,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import eu.chainfire.holeylight.misc.LocaleHelper;
 
 /* Sheer insanity */
-public class LocaleActivity extends AppCompatActivity {
+public class BaseActivity extends AppCompatActivity {
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(LocaleHelper.getContext(newBase));
@@ -41,24 +41,27 @@ public class LocaleActivity extends AppCompatActivity {
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        LocaleHelper.updateResources(this);
+        LocaleHelper.updateResources(this, newConfig);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         LocaleHelper.updateResources(this);
         super.onCreate(savedInstanceState);
+        getDelegate().applyDayNight();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         LocaleHelper.updateResources(this);
+        getDelegate().applyDayNight();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         LocaleHelper.updateResources(this);
+        getDelegate().applyDayNight();
     }
 }

@@ -26,7 +26,7 @@ import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.NotificationAnimation;
 import eu.chainfire.holeylight.service.NotificationTracker;
 
-public class DetectCutoutActivity extends LocaleActivity {
+public class DetectCutoutActivity extends BaseActivity {
     private NotificationAnimation animation;
 
     @Override
