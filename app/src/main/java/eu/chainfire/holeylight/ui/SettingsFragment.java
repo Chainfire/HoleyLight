@@ -443,7 +443,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         PreferenceCategory catAnimation = category(root, R.string.settings_category_animation_title, 0);
         Preference prefAODBrightness = pref(catAnimation, R.string.settings_animation_brightness_title, 0, null, true, null);
-        prefAODBrightness.setSummary(Html.fromHtml(getString(R.string.settings_animation_brightness_description)));
+        prefAODBrightness.setSummary(Html.fromHtml(getString(Manufacturer.isSamsung() ? R.string.settings_animation_brightness_description : Manufacturer.isGoogle() ? R.string.settings_animation_brightness_description_google : 0)));
         prefTune = pref(catAnimation, R.string.settings_animation_tune_title, R.string.settings_animation_tune_description, null, true, preference -> {
             startActivity(new Intent(getActivity(), TuneActivity.class));
             return false;

@@ -225,7 +225,7 @@
     <string name="settings_seen_on_timeout_track_separately">Track separately</string>
 
     <string name="settings_animation_brightness_title">Brightness: Screen off</string>
-    <string name="settings_animation_brightness_description"><![CDATA[The display brightness (for when the screen is off) is controlled by AOD, <b>Settings -> Lock screen -> Always On Display -> Auto brightness</b>.]]></string>
+<!-- Samsung --><string name="settings_animation_brightness_description"><![CDATA[The display brightness (for when the screen is off) is controlled by AOD, <b>Settings -> Lock screen -> Always On Display -> Auto brightness</b>.]]></string>
 
     <string name="settings_animation_overlay_linger_title">Hide AOD: Overlay linger time</string>
     <string name="settings_animation_overlay_linger_description">Delay showing the lockscreen when hiding AOD, may prevent showing AOD on screen shortly</string>
@@ -275,4 +275,5 @@
 <!-- Google --><string name="settings_aod_helper_increase_brightness_title_google">Maximize AOD brightness</string>
 <!-- Google --><string name="settings_aod_helper_increase_brightness_description_google">While still limited to automatic brightness settings, this option usually does increase AOD brightness significantly.</string>
 
+<!-- Google --><string name="settings_animation_brightness_description_google"><![CDATA[There is no display brightness (for when the screen is off) control in Android Settings on this device]]></string>
 </resources>
