@@ -47,6 +47,7 @@ import eu.chainfire.holeylight.animation.Overlay;
 import eu.chainfire.holeylight.misc.AODControl;
 import eu.chainfire.holeylight.misc.Battery;
 import eu.chainfire.holeylight.misc.Display;
+import eu.chainfire.holeylight.misc.LocaleHelper;
 import eu.chainfire.holeylight.misc.MotionSensor;
 import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.misc.Slog;
@@ -203,6 +204,11 @@ public class NotificationListenerService extends android.service.notification.No
 
     private void log(String fmt, Object... args) {
         Slog.d("Listener", fmt, args);
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(LocaleHelper.getContext(base));
     }
 
     @Override

@@ -50,7 +50,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -61,7 +60,7 @@ import top.defaults.colorpicker.ColorPickerPopup;
 
 import static android.content.res.Configuration.UI_MODE_NIGHT_YES;
 
-public class ColorActivity extends AppCompatActivity {
+public class ColorActivity extends LocaleActivity {
     private Settings settings = null;
     private AppAdapter apps = null;
     private Integer colorCopy = null;

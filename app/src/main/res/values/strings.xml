@@ -276,4 +276,8 @@
 <!-- Google --><string name="settings_aod_helper_increase_brightness_description_google">While still limited to automatic brightness settings, this option usually does increase AOD brightness significantly.</string>
 
 <!-- Google --><string name="settings_animation_brightness_description_google"><![CDATA[There is no display brightness (for when the screen is off) control in Android Settings on this device]]></string>
+
+    <string name="settings_category_customization">Customization</string>
+    <string name="settings_customization_locale_title">Language</string>
+    <string name="settings_customization_locale_default">Default</string>
 </resources>

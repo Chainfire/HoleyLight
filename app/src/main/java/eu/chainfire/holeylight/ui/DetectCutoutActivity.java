@@ -20,14 +20,13 @@ package eu.chainfire.holeylight.ui;
 
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.NotificationAnimation;
 import eu.chainfire.holeylight.service.NotificationTracker;
 
-public class DetectCutoutActivity extends AppCompatActivity {
+public class DetectCutoutActivity extends LocaleActivity {
     private NotificationAnimation animation;
 
     @Override

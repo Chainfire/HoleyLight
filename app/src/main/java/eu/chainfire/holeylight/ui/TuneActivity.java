@@ -26,12 +26,11 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.NotificationAnimation;
 import eu.chainfire.holeylight.misc.Settings;
 
-public class TuneActivity extends AppCompatActivity implements Settings.OnSettingsChangedListener {
+public class TuneActivity extends LocaleActivity implements Settings.OnSettingsChangedListener {
     private Settings settings = null;
     private NotificationAnimation animation = null;
 

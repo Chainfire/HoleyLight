@@ -46,3 +46,21 @@ dependencies {
     implementation 'com.airbnb.android:lottie:3.0.0'
     implementation 'com.github.duanhong169:colorpicker:1.1.6'
 }
+
+task buildTranslationArray << {
+    def foundLocales = new StringBuilder()
+    foundLocales.append("new String[]{")
+
+    fileTree("src/main/res").visit { FileVisitDetails details ->
+        if(details.file.path.endsWith("strings.xml")){
+            def languageCode = details.file.parent.tokenize('/').last().tokenize('\\').last().replaceAll('values-','').replaceAll('-r','-')
+            languageCode = (languageCode == "values") ? "en" : languageCode;
+            foundLocales.append("\"").append(languageCode).append("\"").append(",")
+        }
+    }
+
+    foundLocales.append("}")
+    def foundLocalesString = foundLocales.toString().replaceAll(',}','}')
+    android.defaultConfig.buildConfigField "String[]", "TRANSLATION_ARRAY", foundLocalesString
+}
+preBuild.dependsOn buildTranslationArray

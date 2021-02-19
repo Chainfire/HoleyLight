@@ -42,7 +42,6 @@ import java.io.OutputStreamWriter;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
@@ -52,7 +51,7 @@ import eu.chainfire.holeylight.misc.Manufacturer;
 import eu.chainfire.holeylight.misc.Permissions;
 import eu.chainfire.holeylight.misc.Settings;
 
-public class MainActivity extends AppCompatActivity implements Settings.OnSettingsChangedListener {
+public class MainActivity extends LocaleActivity implements Settings.OnSettingsChangedListener {
     private static final int LOGCAT_DUMP_REQUEST_CODE = 12345;
 
     private Handler handler = null;

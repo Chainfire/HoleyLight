@@ -18,6 +18,8 @@
 
 package eu.chainfire.holeylight.service;
 
+import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Handler;
@@ -34,6 +36,7 @@ import java.util.Locale;
 
 import eu.chainfire.holeylight.animation.Overlay;
 import eu.chainfire.holeylight.misc.Display;
+import eu.chainfire.holeylight.misc.LocaleHelper;
 import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.misc.Slog;
 import eu.chainfire.holeylight.service.area.AreaFinder;
@@ -45,6 +48,17 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     private Handler handlerMain = null;
     private Display.State lastState = null;
     private AreaFinder areaFinder = null;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.getContext(newBase));
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        LocaleHelper.updateResources(this);
+    }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {

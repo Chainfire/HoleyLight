@@ -18,11 +18,13 @@
 
 package eu.chainfire.holeylight.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
@@ -38,11 +40,13 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import androidx.preference.CheckBoxPreference;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
+import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.SpritePlayer;
 import eu.chainfire.holeylight.misc.AODControl;
@@ -75,6 +79,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private Preference prefAODHelper = null;
     private CheckBoxPreference prefAODHelperControl = null;
     private CheckBoxPreference prefAODHelperBrightness = null;
+    private ListPreference prefLocale = null;
 
     private AODControl.AODHelperState aodHelperState = AODControl.AODHelperState.NOT_INSTALLED;
 
@@ -130,6 +135,22 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         retval.setEnabled(enabled);
         retval.setKey(key);
         retval.setDefaultValue(defaultValue);
+        retval.setIconSpaceReserved(false);
+        if (category != null) category.addPreference(retval);
+        return retval;
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public ListPreference list(PreferenceCategory category, int caption, int summary, int dialogCaption, String key, Object defaultValue, CharSequence[] entries, CharSequence[] entryValues, boolean enabled) {
+        ListPreference retval = new ListPreference(getContext());
+        if (caption > 0) retval.setTitle(caption);
+        if (summary > 0) retval.setSummary(summary);
+        retval.setEnabled(enabled);
+        if (key != null) retval.setKey(key);
+        retval.setDefaultValue(defaultValue);
+        retval.setDialogTitle(dialogCaption);
+        retval.setEntries(entries);
+        retval.setEntryValues(entryValues);
         retval.setIconSpaceReserved(false);
         if (category != null) category.addPreference(retval);
         return retval;
@@ -311,6 +332,89 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     private boolean supportsAODSchedule() {
         return Manufacturer.isSamsung();
+    }
+
+    @SuppressLint("SoonBlockedPrivateApi")
+    private ListPreference getLocalesPreference(PreferenceCategory category) {
+        ArrayList<String> locales = new ArrayList<>();
+
+        AssetManager assetManager = getActivity().getAssets();
+        String[] assetLocales = assetManager.getLocales();
+        for (String s : assetLocales) {
+            String lang = s.replace("-", "_");
+
+            boolean found = BuildConfig.TRANSLATION_ARRAY.length == 0;
+            for (String match : BuildConfig.TRANSLATION_ARRAY) {
+                found = match.replace("-", "_").equals(lang);
+                if (found) break;
+            }
+
+            if (found) locales.add(lang);
+        }
+        locales.sort((lhs, rhs) -> {
+            if ((lhs != null) && (rhs != null)) {
+                String left_lang = lhs;
+                String left_country = null;
+
+                String right_lang = rhs;
+                String right_country = null;
+
+                Locale left_locale;
+                Locale right_locale;
+
+                if (left_lang.contains("_") && !left_lang.endsWith("_")) {
+                    left_country = left_lang.substring(left_lang.indexOf("_") + 1);
+                    left_lang = left_lang.substring(0, left_lang.indexOf("_"));
+                }
+
+                if (right_lang.contains("_") && !right_lang.endsWith("_")) {
+                    right_country = right_lang.substring(right_lang.indexOf("_") + 1);
+                    right_lang = right_lang.substring(0, right_lang.indexOf("_"));
+                }
+
+                if (left_country != null) {
+                    left_locale = new Locale(left_lang, left_country);
+                } else {
+                    left_locale = new Locale(left_lang);
+                }
+
+                if (right_country != null) {
+                    right_locale = new Locale(right_lang, right_country);
+                } else {
+                    right_locale = new Locale(right_lang);
+                }
+
+                if ((left_locale != null) && (right_locale != null)) {
+                    return left_locale.getDisplayName().compareTo(right_locale.getDisplayName());
+                } else {
+                    return 0;
+                }
+            } else {
+                return 0;
+            }
+        });
+
+        CharSequence[] lang_entries = new CharSequence[locales.size() + 1];
+        CharSequence[] lang_values = new CharSequence[locales.size() + 1];
+
+        lang_entries[0] = getString(R.string.settings_customization_locale_default);
+        lang_values[0] = "";
+
+        for (int i = 0; i < locales.size(); i++) {
+            String lang = locales.get(i);
+
+            Locale loc;
+            if (lang.contains("_") && !lang.endsWith("_")) {
+                loc = new Locale(lang.substring(0, lang.indexOf("_")), lang.substring(lang.indexOf("_") + 1));
+            } else {
+                loc = new Locale(lang);
+            }
+
+            lang_entries[i + 1] = loc.getDisplayName();
+            lang_values[i + 1] = lang;
+        }
+
+        return list(category, R.string.settings_customization_locale_title, 0, R.string.settings_customization_locale_title, Settings.LOCALE, "", lang_entries, lang_values, true);
     }
 
     @SuppressWarnings({"ConstantConditions", "deprecation"})
@@ -619,6 +723,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return false;
         });
 
+        PreferenceCategory catCustomizations = category(root, R.string.settings_category_customization, 0);
+        prefLocale = getLocalesPreference(catCustomizations);
+
         if (Settings.DEBUG) {
             PreferenceCategory catDebug = category(root, R.string.settings_category_debug, 0);
             pref(catDebug, R.string.logcat_dump_title, R.string.logcat_dump_description, null, true, preference -> {
@@ -769,6 +876,31 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             }
             if (prefAODHelperBrightness != null) {
                 prefAODHelperBrightness.setEnabled(settings.isEnabled() && aodHelperState == AODControl.AODHelperState.OK);
+            }
+
+            if ((key == null) || (key.equals(Settings.LOCALE))) {
+                String lang = settings.getLocale();
+                if ("".equals(lang)) {
+                    prefLocale.setSummary(String.format(Locale.ENGLISH, "[ %s ]", getString(R.string.settings_customization_locale_default)));
+                } else {
+                    Locale loc;
+                    if (lang.contains("_")) {
+                        loc = new Locale(lang.substring(0, lang.indexOf("_")), lang.substring(lang.indexOf("_") + 1));
+                    } else {
+                        loc = new Locale(lang);
+                    }
+                    prefLocale.setSummary(String.format(Locale.ENGLISH, "[ %s ]", loc.getDisplayName()));
+                }
+
+                if (key != null) {
+                    getActivity().finish();
+                    Intent i = new Intent(getActivity(), getActivity().getClass());
+                    i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    getActivity().startActivity(i);
+                    getActivity().overridePendingTransition(0, 0);
+                    settings.setLocale(settings.getLocale()); // force save before exit
+                    System.exit(0);
+                }
             }
 
             if (key != null) {

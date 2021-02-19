@@ -229,6 +229,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final String AOD_HELPER_BRIGHTNESS = "aod_helper_brightness";
     public static final boolean AOD_HELPER_BRIGHTNESS_DEFAULT = false;
 
+    public static final String LOCALE = "locale";
+    private static final String LOCALE_DEFAULT = "";
+
     private static Settings instance;
     public static Settings getInstance(Context context) {
         synchronized (Settings.class) {
@@ -709,6 +712,14 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     
     public void setAODHelperBrightness(boolean value) {
         put(AOD_HELPER_BRIGHTNESS, value, true);
+    }
+
+    public String getLocale() {
+        return prefs.getString(LOCALE, LOCALE_DEFAULT);
+    }
+
+    public void setLocale(String locale) {
+        put(LOCALE, locale != null ? locale : LOCALE_DEFAULT, true);
     }
 
     public boolean saveToUri(ContentResolver resolver, Uri uri) {
