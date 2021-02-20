@@ -261,6 +261,7 @@ public class MainActivity extends BaseActivity implements Settings.OnSettingsCha
                         .setMessage(Html.fromHtml(getString(R.string.aod_helper_permissions)))
                         .setNeutralButton(R.string.root, (dialog, which) -> {
                             AODControl.fixHelperPermissions(MainActivity.this, result -> {
+                                settings.incAccessibilityServiceCounter();
                                 checkPermissions();
                             });
                         })
@@ -461,6 +462,7 @@ public class MainActivity extends BaseActivity implements Settings.OnSettingsCha
     protected void onResume() {
         super.onResume();
         if (checkPermissionsOnResume) {
+            settings.incAccessibilityServiceCounter();
             checkPermissionsOnResume = false;
             handler.removeCallbacks(checkPermissionsRunnable);
             handler.postDelayed(checkPermissionsRunnable, 1000);
