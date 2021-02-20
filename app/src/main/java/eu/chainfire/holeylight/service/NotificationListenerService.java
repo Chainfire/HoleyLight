@@ -263,7 +263,7 @@ public class NotificationListenerService extends android.service.notification.No
             settingsKey = newKey;
             apply();
         }
-        int counter = settings.getAccessibilityServiceCounter();
+        int counter = settings.getUpdateCounter();
         if (counter != accessibilityServiceCounter) {
             apply();
         }

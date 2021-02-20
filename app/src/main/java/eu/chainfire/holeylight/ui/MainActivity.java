@@ -34,12 +34,26 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.android.billingclient.api.AcknowledgePurchaseParams;
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingFlowParams;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsParams;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
@@ -50,6 +64,7 @@ import eu.chainfire.holeylight.misc.AODControl;
 import eu.chainfire.holeylight.misc.Manufacturer;
 import eu.chainfire.holeylight.misc.Permissions;
 import eu.chainfire.holeylight.misc.Settings;
+import eu.chainfire.holeylight.misc.Slog;
 
 public class MainActivity extends BaseActivity implements Settings.OnSettingsChangedListener {
     private static final int LOGCAT_DUMP_REQUEST_CODE = 12345;
@@ -261,7 +276,7 @@ public class MainActivity extends BaseActivity implements Settings.OnSettingsCha
                         .setMessage(Html.fromHtml(getString(R.string.aod_helper_permissions)))
                         .setNeutralButton(R.string.root, (dialog, which) -> {
                             AODControl.fixHelperPermissions(MainActivity.this, result -> {
-                                settings.incAccessibilityServiceCounter();
+                                settings.incUpdateCounter();
                                 checkPermissions();
                             });
                         })
@@ -455,6 +470,8 @@ public class MainActivity extends BaseActivity implements Settings.OnSettingsCha
         Permissions.unnotify(this);
         handler.removeCallbacks(checkPermissionsRunnable);
         handler.postDelayed(checkPermissionsRunnable, 1000);
+        handler.removeCallbacks(billingConnectorRunnable);
+        handler.post(billingConnectorRunnable);
         TestNotification.show(this, TestNotification.NOTIFICATION_ID_MAIN);
     }
 
@@ -462,7 +479,7 @@ public class MainActivity extends BaseActivity implements Settings.OnSettingsCha
     protected void onResume() {
         super.onResume();
         if (checkPermissionsOnResume) {
-            settings.incAccessibilityServiceCounter();
+            settings.incUpdateCounter();
             checkPermissionsOnResume = false;
             handler.removeCallbacks(checkPermissionsRunnable);
             handler.postDelayed(checkPermissionsRunnable, 1000);
@@ -472,6 +489,7 @@ public class MainActivity extends BaseActivity implements Settings.OnSettingsCha
     @Override
     protected void onStop() {
         handler.removeCallbacks(checkPermissionsRunnable);
+        handler.removeCallbacks(billingConnectorRunnable);
         TestNotification.hide(this, TestNotification.NOTIFICATION_ID_MAIN);
         super.onStop();
     }
@@ -521,5 +539,145 @@ public class MainActivity extends BaseActivity implements Settings.OnSettingsCha
         } catch (Exception e) {
             //  no action
         }
+    }
+
+    // In-App Purchases
+
+    private final String[] skus = new String[] { "donate.1", "donate.2", "donate.3", "donate.4", "donate.5" };
+    private final int[] skusDescriptions = new int[] { R.string.donate_sku_donate_1, R.string.donate_sku_donate_2, R.string.donate_sku_donate_3, R.string.donate_sku_donate_4, R.string.donate_sku_donate_5 };
+
+    public final List<SkuDetails> skusAvailable = new ArrayList<>();
+    public boolean iapAvailable = false;
+
+    private boolean billingClientConnected = false;
+
+    private final Runnable billingConnectorRunnable = new Runnable() {
+        @Override
+        public void run() {
+            createBillingClientConnection();
+            handler.postDelayed(billingConnectorRunnable, 2500);
+        }
+    };
+
+    private final PurchasesUpdatedListener purchasesUpdatedListener = (billingResult, purchases) -> {
+        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+            if (purchases != null) {
+                for (Purchase purchase : purchases) {
+                    Slog.d("IAP", "purchaseUpdate: %s", purchase.getSku());
+                    handlePurchase(purchase);
+                }
+            }
+        } // else we could show an error but the app really doesn't care about purchases for functionality
+    };
+
+    private BillingClient billingClient = null;
+
+    private void createBillingClientConnection() {
+        if (billingClientConnected) return;
+        try {
+            if (billingClient == null) {
+                billingClient = BillingClient.newBuilder(this)
+                        .setListener(purchasesUpdatedListener)
+                        .enablePendingPurchases()
+                        .build();
+            }
+            billingClient.startConnection(new BillingClientStateListener() {
+                @Override
+                public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
+                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                        billingClientConnected = true;
+                        iapAvailable = true;
+
+                        List<String> skuList = new ArrayList<>(Arrays.asList(skus));
+                        SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
+                        params.setSkusList(skuList).setType(BillingClient.SkuType.INAPP);
+                        billingClient.querySkuDetailsAsync(params.build(), (billingResult1, skuDetailsList) -> {
+                            if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                                skusAvailable.clear();
+                                if (skuDetailsList != null) {
+                                    for (SkuDetails details : skuDetailsList) {
+                                        Slog.d("IAP", "querySkuDetails: %s: %s", details.getSku(), details.getPrice());
+                                        skusAvailable.add(details);
+                                    }
+                                }
+                            }
+                        });
+                        Purchase.PurchasesResult purchasesResult = billingClient.queryPurchases(BillingClient.SkuType.INAPP);
+                        if (purchasesResult.getBillingResult() != null && purchasesResult.getBillingResult().getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                            List<Purchase> purchases = purchasesResult.getPurchasesList();
+                            if (purchases != null) {
+                                for (Purchase purchase : purchases) {
+                                    Slog.d("IAP", "queryPurchases: %s", purchase.getSku());
+                                    handlePurchase(purchase);
+                                }
+                            }
+                        }
+                        settings.incUpdateCounter();
+                    }
+                }
+                @Override
+                public void onBillingServiceDisconnected() {
+                    billingClientConnected = false;
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handlePurchase(Purchase purchase) {
+        try {
+            if (!billingClientConnected) return;
+            if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
+                if (!purchase.isAcknowledged()) {
+                    AcknowledgePurchaseParams acknowledgePurchaseParams =
+                        AcknowledgePurchaseParams.newBuilder()
+                            .setPurchaseToken(purchase.getPurchaseToken())
+                            .build();
+                    Slog.d("IAP", "acknowledging: %s", purchase.getSku());
+                    final String sku = purchase.getSku();
+                    billingClient.acknowledgePurchase(acknowledgePurchaseParams, billingResult -> {
+                        Slog.d("IAP", "acknowledged: %s", sku);
+                        settings.setPurchased(purchase.getSku());
+                    });
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void startPurchase() {
+        if (skusAvailable.size() == 0) return;
+
+        List<CharSequence> itemList = new ArrayList<>();
+        final List<SkuDetails> skuList = new ArrayList<>();
+        for (int i = 0; i < skus.length; i++) {
+            SkuDetails details = null;
+            for (int j = 0; j < skusAvailable.size(); j++) {
+                if (skus[i].equals(skusAvailable.get(j).getSku())) {
+                    details = skusAvailable.get(j);
+                    break;
+                }
+            }
+            if (details != null) {
+                String already_purchased = settings.isPurchased(skus[i]) ? " - " + getString(R.string.donate_sku_already_purchased) : "";
+                itemList.add(Html.fromHtml("<b>" + getString(skusDescriptions[i]) + "</b><br><small>" + details.getPrice() + already_purchased + "</small>"));
+                skuList.add(details);
+            }
+        }
+
+        (currentDialog = newAlert(false)
+                .setTitle(R.string.donate_title)
+                .setItems(itemList.toArray(new CharSequence[0]), (dialog, which) -> {
+                    BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
+                            .setSkuDetails(skuList.get(which))
+                            .build();
+                    if (billingClient.launchBillingFlow(MainActivity.this, billingFlowParams).getResponseCode() != BillingClient.BillingResponseCode.OK) {
+                        Slog.e("IAP", "error launching billing flow");
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()).setCanceledOnTouchOutside(false);
     }
 }

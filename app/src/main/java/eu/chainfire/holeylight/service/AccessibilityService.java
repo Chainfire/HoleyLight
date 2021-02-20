@@ -178,7 +178,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             Overlay.getInstance(AccessibilityService.this);
         }
 
-        Settings.getInstance(this).incAccessibilityServiceCounter();
+        Settings.getInstance(this).incUpdateCounter();
     }
 
     @Override

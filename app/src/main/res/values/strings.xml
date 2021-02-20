@@ -282,4 +282,14 @@
     <string name="settings_customization_locale_default">Default</string>
 
     <string name="manufacturer_detection_error">MANUFACTURER DETECTION ERROR</string>
+
+    <string name="donate_title">Donate</string>
+    <string name="donate_description_iap">Support my efforts, buy me a drink. Completely optional, does not unlock additional features.</string>
+    <string name="donate_sku_donate.1">Soda</string>
+    <string name="donate_sku_donate.2">Coffee</string>
+    <string name="donate_sku_donate.3">Beer</string>
+    <string name="donate_sku_donate.4">Wine</string>
+    <string name="donate_sku_donate.5">Scotch</string>
+    <string name="donate_sku_already_purchased">Already purchased</string>
+    <string name="donate_description_paypal">PayPal: chainfire@chainfire.eu</string>
 </resources>

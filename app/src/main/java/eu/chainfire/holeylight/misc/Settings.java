@@ -207,7 +207,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final String UNHOLEY_LIGHT_ICONS = "unholey_icons";
     public static final Boolean UNHOLEY_LIGHT_ICONS_DEFAULT = true;
 
-    public static final String ACCESSIBILITY_SERVICE_COUNTER = "accessibility_service_counter";
+    public static final String UPDATE_COUNTER = "update_counter";
 
     public static final String USING_VI_DIRECTOR = "using_vidirector";
     public static final boolean USING_VI_DIRECTOR_DEFAULT = false;
@@ -231,6 +231,8 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public static final String LOCALE = "locale";
     private static final String LOCALE_DEFAULT = "";
+
+    private static final String PURCHASES = "purchases";
 
     private static Settings instance;
     public static Settings getInstance(Context context) {
@@ -647,12 +649,12 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         return prefs.getBoolean(UNHOLEY_LIGHT_ICONS, UNHOLEY_LIGHT_ICONS_DEFAULT);
     }
 
-    public int getAccessibilityServiceCounter() {
-        return prefs.getInt(ACCESSIBILITY_SERVICE_COUNTER, 0);
+    public int getUpdateCounter() {
+        return prefs.getInt(UPDATE_COUNTER, 0);
     }
 
-    public void incAccessibilityServiceCounter() {
-        put(ACCESSIBILITY_SERVICE_COUNTER, (getAccessibilityServiceCounter() + 1) % 1000, true);
+    public void incUpdateCounter() {
+        put(UPDATE_COUNTER, (getUpdateCounter() + 1) % 1000, true);
     }
 
     public boolean isUsingVIDirector() {
@@ -720,6 +722,36 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public void setLocale(String locale) {
         put(LOCALE, locale != null ? locale : LOCALE_DEFAULT, true);
+    }
+
+    public String[] getPurchased() {
+        String[] ret = prefs.getString(PURCHASES, "").split(",");
+        if (ret.length == 1 && (ret[0] == null || ret[0].equals(""))) return new String[0];
+        return ret;
+    }
+
+    public boolean isPurchased(String sku) {
+        String[] purchased = getPurchased();
+        boolean found = false;
+        for (String purchase : purchased) {
+            if (sku.equals(purchase)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void setPurchased(String sku) {
+        if (!isPurchased(sku)) {
+            String[] purchased = getPurchased();
+            StringBuilder sb = new StringBuilder();
+            for (String s : purchased) {
+                sb.append(s);
+                sb.append(",");
+            }
+            sb.append(sku);
+            put(PURCHASES, sb.toString(), true);
+        }
     }
 
     public boolean saveToUri(ContentResolver resolver, Uri uri) {

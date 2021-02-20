@@ -81,6 +81,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefAODHelperBrightness = null;
     private ListPreference prefLocale = null;
 
+    private Preference prefDonateTop = null;
+    private Preference prefDonateBottom = null;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
@@ -444,6 +447,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         copyright.setSummary(details);
         root.addPreference(copyright);
 
+        prefDonateTop = pref(null, R.string.donate_title, 0, null, true, donateClickListener);
+        prefDonateTop.setVisible(false);
+        root.addPreference(prefDonateTop);
+
         Preference setupWizard = pref(null, R.string.setup_wizard_title, R.string.setup_wizard_description, null, true, preference -> {
             settings.setSetupWizardComplete(false);
             settings.setDeviceOfficialSupportWarningShown(false);
@@ -700,6 +707,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         }
 
         PreferenceCategory catChainfire = category(root, R.string.settings_category_chainfire_title, 0);
+
+        prefDonateBottom = pref(catChainfire, R.string.donate_title, 0, null, true, donateClickListener);
+        prefDonateBottom.setVisible(false);
+
         pref(catChainfire, R.string.settings_playstore_title, R.string.settings_playstore_description, null, true, preference -> {
             try {
                 Intent i = new Intent(Intent.ACTION_VIEW);
@@ -777,6 +788,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @SuppressWarnings({ "unused", "ConstantConditions", "deprecation" })
     private void updatePrefs(String key, boolean evaluateHelper) {
         if (prefScreenOnCharging != null) {
+            MainActivity activity = null;
+            {
+                Activity act = getActivity();
+                if (act instanceof MainActivity) {
+                    activity = (MainActivity)act;
+                }
+            }
+
             for (CheckBoxPreference pref : new CheckBoxPreference[] { prefScreenOnCharging, prefScreenOffCharging, prefScreenOnBattery, prefScreenOffBattery }) {
                 int mode = getModeFromPreference(pref);
                 pref.setEnabled(settings.isEnabled());
@@ -901,12 +920,34 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 }
             }
 
-            if (key != null) {
-                Activity activity = getActivity();
-                if (activity instanceof MainActivity) {
-                    ((MainActivity)activity).validateSettings(evaluateHelper);
-                }
+            if (activity != null) {
+                boolean donateAtTop = activity.iapAvailable && settings.getPurchased().length == 0;
+                int summary = activity.iapAvailable ? R.string.donate_description_iap : R.string.donate_description_paypal;
+                boolean enabled = activity.iapAvailable;
+                
+                prefDonateTop.setSummary(summary);
+                prefDonateTop.setEnabled(enabled);
+                prefDonateTop.setVisible(donateAtTop);
+
+                prefDonateBottom.setSummary(summary);
+                prefDonateBottom.setEnabled(enabled);
+                prefDonateBottom.setVisible(!donateAtTop);
+            }
+
+            if (key != null && activity != null) {
+                activity.validateSettings(evaluateHelper);
             }
         }
     }
+
+    private final Preference.OnPreferenceClickListener donateClickListener = new Preference.OnPreferenceClickListener() {
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+            Activity activity = getActivity();
+            if (activity instanceof MainActivity) {
+                ((MainActivity)activity).startPurchase();
+            }
+            return true;
+        }
+    };
 }
