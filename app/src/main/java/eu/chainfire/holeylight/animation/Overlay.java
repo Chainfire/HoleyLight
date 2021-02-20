@@ -487,7 +487,7 @@ public class Overlay {
                 animation.setHideAOD(spritePlayer.isTSPMode(renderMode) || (settings.isHideAOD() && doze && allowHideAOD), settings.isHideAODFully());
                 animation.setDoze(doze);
                 animation.play(activeHide ? new int[] { Color.BLACK } : colors, settings.isUnholeyLightIcons() ? icons : new Drawable[0], false, (renderMode != lastMode));
-                if (colors.length > 0) AODControl.setAODEnabled(spritePlayer.getContext(), true, null);
+                AODControl.setAODEnabled(spritePlayer.getContext(), (colors.length > 0), null);
                 lastColors = colors;
                 lastState = true;
                 lastMode = renderMode;
@@ -524,6 +524,7 @@ public class Overlay {
                     handler.postDelayed(goAway, 250);
                 } else {
                     goAway.run();
+                    AODControl.setAODEnabled(spritePlayer.getContext(), false, result -> {});
                 }
             }
         }
