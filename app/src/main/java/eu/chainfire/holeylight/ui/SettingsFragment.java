@@ -940,14 +940,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         }
     }
 
-    private final Preference.OnPreferenceClickListener donateClickListener = new Preference.OnPreferenceClickListener() {
-        @Override
-        public boolean onPreferenceClick(Preference preference) {
-            Activity activity = getActivity();
-            if (activity instanceof MainActivity) {
-                ((MainActivity)activity).startPurchase();
-            }
-            return true;
+    private final Preference.OnPreferenceClickListener donateClickListener = preference -> {
+        Activity activity = getActivity();
+        if (activity instanceof MainActivity) {
+            ((MainActivity)activity).startPurchase();
         }
+        return true;
     };
 }
