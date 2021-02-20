@@ -81,8 +81,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefAODHelperBrightness = null;
     private ListPreference prefLocale = null;
 
-    private AODControl.AODHelperState aodHelperState = AODControl.AODHelperState.NOT_INSTALLED;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
@@ -848,7 +846,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             prefHideAOD.setChecked(settings.isHideAOD());
             prefHideAOD.setSummary(getString(R.string.settings_hide_aod_description) + (settings.isHideAOD() ? "\n[ " + getString(settings.isHideAODFully() ? R.string.hide_aod_full_title : R.string.hide_aod_partial_title) + " ]" : ""));
 
-            aodHelperState = AODControl.getAODHelperState(getContext());
+            AODControl.AODHelperState aodHelperState = AODControl.getAODHelperState(getContext());
 
             prefAODHelper.setEnabled(settings.isEnabled());
             if (aodHelperState == AODControl.AODHelperState.NEEDS_UPDATE) {
