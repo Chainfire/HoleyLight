@@ -152,6 +152,10 @@ public class AreaFinderSamsung extends AreaFinder {
             return null;
         }
 
+        if ((outerBounds.bottom > -1) && (overlayBottom == null || outerBounds.bottom > overlayBottom)) {
+            overlayBottom = outerBounds.bottom;
+        }
+
         return outerBounds;
     }
 
