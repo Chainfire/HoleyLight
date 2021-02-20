@@ -467,6 +467,7 @@ public class Overlay {
             handler.removeCallbacks(removeTSP);
             if (!isDelayed && (spritePlayer.isTSPMode(lastMode) || (lastDoze && settings.isHideAOD())) && !(spritePlayer.isTSPMode(renderMode) || doze)) {
                 Slog.d("Overlay", "Linger: %d ms", linger);
+                animation.setHideAOD(true, true);
                 handler.removeCallbacks(evaluateLoop);
                 if (!evaluateDelayedPosted) {
                     handler.postDelayed(evaluateDelayed, linger);
