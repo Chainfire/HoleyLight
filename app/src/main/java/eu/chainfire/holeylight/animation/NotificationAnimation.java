@@ -489,7 +489,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                         bottom = (int)(resolution.y * 0.75f);
                         if (Build.VERSION.SDK_INT >= 30) {
                             if (tspOverlayBottom > 0) {
-                                bottom = tspOverlayBottom;
+                                bottom = Math.max(tspRect.bottom, tspOverlayBottom);
                             } else if (tspRect.bottom > 0) {
                                 bottom = tspRect.bottom;
                             }
