@@ -43,6 +43,7 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0-alpha2'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'com.android.billingclient:billing:3.0.2'
     implementation 'com.airbnb.android:lottie:3.0.0'
     implementation 'com.github.duanhong169:colorpicker:1.1.6'
 }
