@@ -88,6 +88,12 @@ public class TuneActivity extends BaseActivity implements Settings.OnSettingsCha
             settings.setDpShiftHorizontal(animation.getDpShiftHorizontal() - 0.25f);
         } else if (view == findViewById(R.id.btnShiftHorizontalPlus)) {
             settings.setDpShiftHorizontal(animation.getDpShiftHorizontal() + 0.25f);
+        } else if (view == findViewById(R.id.btnAddThicknessMinus)) {
+            settings.setDpAddThickness(animation.getDpAddThickness() - 0.25f);
+            settings.setDpAddScaleBase(animation.getDpAddScaleBase() - 0.25f);
+        } else if (view == findViewById(R.id.btnAddThicknessPlus)) {
+            settings.setDpAddThickness(animation.getDpAddThickness() + 0.25f);
+            settings.setDpAddScaleBase(animation.getDpAddScaleBase() + 0.25f);
         } else if (view == findViewById(R.id.btnSpeedMinus)) {
             settings.setSpeedFactor(animation.getSpeedFactor() - 0.1f);
         } else if (view == findViewById(R.id.btnSpeedPlus)) {
@@ -100,6 +106,7 @@ public class TuneActivity extends BaseActivity implements Settings.OnSettingsCha
         ((TextView)findViewById(R.id.tvAddScaleHorizontal)).setText(getString(R.string.tune_scale_horizontal, animation.getDpAddScaleHorizontal()));
         ((TextView)findViewById(R.id.tvShiftVertical)).setText(getString(R.string.tune_shift_vertical, animation.getDpShiftVertical()));
         ((TextView)findViewById(R.id.tvShiftHorizontal)).setText(getString(R.string.tune_shift_horizontal, animation.getDpShiftHorizontal()));
+        ((TextView)findViewById(R.id.tvAddThickness)).setText(getString(R.string.tune_thickness, animation.getDpAddThickness()));
         ((TextView)findViewById(R.id.tvSpeed)).setText(getString(R.string.tune_speed, animation.getSpeedFactor()));
     }
 

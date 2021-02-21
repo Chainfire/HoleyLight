@@ -143,6 +143,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private volatile boolean blackFill = false;
     private final Rect tspRect = new Rect(0, 0, 0, 0);
     private volatile int tspOverlayBottom = 0;
+    private volatile float currentDpAddThickness = 0;
 
     public NotificationAnimation(Context context, SpritePlayer spritePlayer, float densityMultiplier, OnNotificationAnimationListener onNotificationAnimationListener) {
         this.onNotificationAnimationListener = onNotificationAnimationListener;
@@ -205,10 +206,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
         if (!isValid()) return;
 
-        LottieCompositionFactory.fromJsonString(spec.json, null).addListener(result -> {
-            lottieComposition = result;
-            applyDimensions();
-        });
+        loadJson();
 
         spritePlayer.setOnAnimationListener(new SpritePlayer.OnAnimationListener() {
             @Override
@@ -266,6 +264,18 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         settings.registerOnSettingsChangedListener(this);
     }
 
+    private void loadJson() {
+        // not adjusted for density but shouldn't be important here
+        float dpToPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, spritePlayer.getContext().getResources().getDisplayMetrics());
+
+        currentDpAddThickness = getDpAddThickness();
+        LottieCompositionFactory.fromJsonString(JSONAnimationManipulator.modify(spec.json, currentDpAddThickness * dpToPx), null).addListener(result -> {
+            lottieComposition = result;
+            spritePlayer.forceReload();
+            applyDimensions();
+        });
+    }
+
     @Override
     protected void finalize() throws Throwable {
         settings.unregisterOnSettingsChangedListener(this);
@@ -294,7 +304,11 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
     @Override
     public void onSettingsChanged() {
-        applyDimensions();
+        if (getDpAddThickness() != currentDpAddThickness) {
+            loadJson();
+        } else {
+            applyDimensions();
+        }
     }
 
     private void setColor(int color) {
@@ -584,6 +598,10 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
     public float getDpShiftHorizontal() {
         return settings.getDpShiftHorizontal(spec.dpShiftHorizontal);
+    }
+
+    public float getDpAddThickness() {
+        return settings.getDpAddThickness(0);
     }
 
     public float getSpeedFactor() {

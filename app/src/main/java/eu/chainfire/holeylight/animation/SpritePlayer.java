@@ -94,6 +94,7 @@ public class SpritePlayer extends RelativeLayout {
     private volatile int spriteSheetLoading = 0;
     private volatile long spriteSheetLoadingId = 0;
     private final Point lastSpriteSheetRequest = new Point(0, 0);
+    private volatile boolean forceSpriteSheetReload = false;
     private final Rect dest = new Rect();
     private final Rect destDouble = new Rect();
     private volatile boolean surfaceInvalidated = true;
@@ -114,6 +115,7 @@ public class SpritePlayer extends RelativeLayout {
     public SpritePlayer(Context context) {
         super(context);
 
+        // not adjusted for density but shouldn't be important here
         dpToPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getContext().getResources().getDisplayMetrics());
 
         handlerThreadRender = new HandlerThread("SpritePlayer#Render");
@@ -485,6 +487,7 @@ public class SpritePlayer extends RelativeLayout {
     }
 
     private void callOnSpriteSheetNeeded(int width, int height) {
+        if (width == -1 || height == -1) return;
         synchronized (sync) {
             if (isTSPMode()) {
                 surfaceInvalidated = true;
@@ -493,15 +496,17 @@ public class SpritePlayer extends RelativeLayout {
             }
             if (onSpriteSheetNeededListener == null) return;
             if (
+                !forceSpriteSheetReload &&
                 (spriteSheetSwirl != null) && (spriteSheetSwirl.getWidth() == width) && (spriteSheetSwirl.getHeight() == height) &&
                 (spriteSheetBlink != null) && (spriteSheetBlink.getWidth() == width) && (spriteSheetBlink.getHeight() == height) &&
                 (spriteSheetSingle != null) && (spriteSheetSingle.getWidth() == width) && (spriteSheetSingle.getHeight() == height)
             ) return;
-            if ((lastSpriteSheetRequest.x == width) && (lastSpriteSheetRequest.y == height)) return;
+            if (!forceSpriteSheetReload && (lastSpriteSheetRequest.x == width) && (lastSpriteSheetRequest.y == height)) return;
             lastSpriteSheetRequest.set(width, height);
             dest.set(0, 0, width, height);
             destDouble.set(dest.centerX() - width, dest.centerY() - height, dest.centerX() + width, dest.centerY() + height);
             if (
+                !forceSpriteSheetReload &&
                 (spriteSheetSwirlPrevious != null) && (spriteSheetSwirlPrevious.getWidth() == width) && (spriteSheetSwirlPrevious.getHeight() == height) &&
                 (spriteSheetBlinkPrevious != null) && (spriteSheetBlinkPrevious.getWidth() == width) && (spriteSheetBlinkPrevious.getHeight() == height) &&
                 (spriteSheetSinglePrevious != null) && (spriteSheetSinglePrevious.getWidth() == width) && (spriteSheetSinglePrevious.getHeight() == height)
@@ -515,12 +520,29 @@ public class SpritePlayer extends RelativeLayout {
             spriteSheetLoading++;
             spriteSheetLoadingId++;
             final long callbackId = spriteSheetLoadingId;
+            final boolean handleForceReload = forceSpriteSheetReload;
             handlerLoader.post(() -> {
                 OnSpriteSheetNeededListener listener;
                 synchronized (sync) {
                     listener = onSpriteSheetNeededListener;
                 }
                 if ((listener != null) && (callbackId == spriteSheetLoadingId)) {
+                    if (handleForceReload) {
+                        if (spriteSheetSwirlPrevious != null) {
+                            spriteSheetSwirlPrevious.recycle();
+                            spriteSheetSwirlPrevious = null;
+                        }
+                        if (spriteSheetBlinkPrevious != null) {
+                            spriteSheetBlinkPrevious.recycle();
+                            spriteSheetBlinkPrevious = null;
+                        }
+                        if (spriteSheetSinglePrevious != null) {
+                            spriteSheetSinglePrevious.recycle();
+                            spriteSheetSinglePrevious = null;
+                        }
+                        forceSpriteSheetReload = false;
+                    }
+
                     SpriteSheet spriteSheetSwirl = listener.onSpriteSheetNeeded(width, height, Mode.SWIRL);
                     SpriteSheet spriteSheetBlink = listener.onSpriteSheetNeeded(width, height, Mode.BLINK);
                     SpriteSheet spriteSheetSingle = listener.onSpriteSheetNeeded(width, height, Mode.SINGLE);
@@ -546,13 +568,7 @@ public class SpritePlayer extends RelativeLayout {
             if (this.onSpriteSheetNeededListener == onSpriteSheetNeededListener) return;
 
             this.onSpriteSheetNeededListener = onSpriteSheetNeededListener;
-            if (
-                    (width != -1) && (height != -1) &&
-                    !((spriteSheetSwirl != null) && (spriteSheetSwirl.getWidth() == width) && spriteSheetSwirl.getHeight() == height) &&
-                    !((spriteSheetBlink != null) && (spriteSheetBlink.getWidth() == width) && spriteSheetBlink.getHeight() == height)
-            ) {
-                callOnSpriteSheetNeeded(width, height);
-            }
+            callOnSpriteSheetNeeded(width, height);
         }
     }
 
@@ -829,5 +845,9 @@ public class SpritePlayer extends RelativeLayout {
     public void setTSPBlank(boolean value) {
         Slog.d("SpritePlayer", "tspBlank --> %s", value ? "TRUE" : "FALSE");
         tspBlank = value;
+    }
+
+    public void forceReload() {
+        forceSpriteSheetReload = true;
     }
 }

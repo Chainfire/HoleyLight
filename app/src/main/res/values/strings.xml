@@ -292,4 +292,6 @@
     <string name="donate_sku_donate.5">Scotch</string>
     <string name="donate_sku_already_purchased">Already purchased</string>
     <string name="donate_description_paypal">PayPal: chainfire@chainfire.eu</string>
+
+    <string name="tune_thickness">Add thickness: %.2fdp</string>
 </resources>

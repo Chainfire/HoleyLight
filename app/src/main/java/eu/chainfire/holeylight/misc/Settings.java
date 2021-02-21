@@ -177,6 +177,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     private static final String DP_ADD_SCALE_HORIZONTAL = "dp_add_scale_horizontal_float";
     private static final String DP_SHIFT_VERTICAL = "dp_shift_vertical_float";
     private static final String DP_SHIFT_HORIZONTAL = "dp_shift_horizontal_float";
+    private static final String DP_ADD_THICKNESS = "dp_add_thickness";
 
     private static final String SPEED_FACTOR = "speed_factor";
 
@@ -405,6 +406,16 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         put(DP_SHIFT_HORIZONTAL, value, true);
     }
 
+    public float getDpAddThickness(float defaultValue) {
+        return prefs.getFloat(DP_ADD_THICKNESS, defaultValue);
+    }
+
+    public void setDpAddThickness(float value) {
+        value = Math.min(Math.max(value, 0.0f), 7.5f);
+
+        put(DP_ADD_THICKNESS, value, true);
+    }
+
     public float getSpeedFactor() {
         return prefs.getFloat(SPEED_FACTOR, 1.0f);
     }
@@ -576,6 +587,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
                     DP_ADD_SCALE_HORIZONTAL,
                     DP_SHIFT_VERTICAL,
                     DP_SHIFT_HORIZONTAL,
+                    DP_ADD_THICKNESS,
                     SPEED_FACTOR
             }) {
                 if (prefs.contains(key)) {
