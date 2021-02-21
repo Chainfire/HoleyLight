@@ -138,7 +138,7 @@ Tap to visit XDA thread"</string>
     <string name="setup_wizard_choose_notification_style" formatted="false">请选择息屏时的动画效果.&lt;br>&lt;br>&lt;b>漩涡&lt;/b> 会在相机孔周边环绕显示提示灯, 每小时最多消耗 &lt;b>5.5%&lt;/b> 的电量.&lt;br>&lt;br>&lt;b>闪烁&lt;/b> 会在相机孔周边闪烁显示提示灯, 每小时最多消耗 &lt;b>3.5%&lt;/b> 的电量.&lt;br>&lt;br>&lt;b>中心环形&lt;/b> 会在屏幕中央显示一个环形提示灯(没有动画). 但每小时电量消耗不到 &lt;b>1%&lt;/b>. 此选项将 &lt;i>始终&lt;/i> &lt;b>隐藏息屏提醒&lt;/b>,这对于其它两个是 &lt;i>可选的&lt;/i>.</string>
     <string name="setup_wizard_complete">初始设置已完成. 接下来我们需要再进行一些设置以保证软件正常运行.&lt;br>&lt;br></string>
     <string name="setup_wizard_description">帮助您设置本软件</string>
-    <string name="setup_wizard_hide_aod">&lt;b>息屏提醒&lt;/b> 是三星手机自带的功能, 可实现在屏幕关闭时显示各种信息, 每小时仅消耗不到 1% 的电量. &lt;br>&lt;br>我们可以 &lt;b>显示息屏提醒&lt;/b> 的同时显示信息提示灯, 或者 &lt;b>隐藏息屏提醒&lt;/b> 只显示本软件自带的黑屏和信息提示灯.</string>
+    <string name="setup_wizard_hide_aod">&lt;b>息屏提醒&lt;/b> 是手机自带的功能, 可实现在屏幕关闭时显示各种信息, 每小时仅消耗不到 1% 的电量. &lt;br>&lt;br>我们可以 &lt;b>显示息屏提醒&lt;/b> 的同时显示信息提示灯, 或者 &lt;b>隐藏息屏提醒&lt;/b> 只显示本软件自带的黑屏和信息提示灯.</string>
     <string name="setup_wizard_option_hide_aod">隐藏息屏提醒</string>
     <string name="setup_wizard_option_show_aod">显示息屏提醒</string>
     <string name="setup_wizard_run_while_screen_off" formatted="false">本软件可实现屏幕关闭时显示信息提示灯, 但这将消耗每 &lt;b>小时&lt;/b> &lt;b>1%&lt;/b> 到 &lt;b>5.5%&lt;/b> 的电量, 具体电量消耗取决于您的设置.&lt;br>&lt;br>此功能还需激活 &lt;b>息屏提醒&lt;/b> 才能生效. 若您不喜欢 &lt;b>息屏提醒&lt;/b>, 也可通过设置将其隐藏!&lt;br>&lt;br>那么您是否需要在屏幕关闭时显示信息提示灯呢?</string>
