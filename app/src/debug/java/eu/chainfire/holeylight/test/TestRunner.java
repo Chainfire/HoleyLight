@@ -51,7 +51,10 @@ import eu.chainfire.holeylight.ui.TestNotification;
 
     - kill, restart, and reconfigure HoleyLight; preferably restart device
 
-    AOD Helper required. Samsung only.
+    AOD Helper required. Samsung only. Disable Do-Not-Disturb on device.
+
+    //TODO add tests for AOD schedule... unfortunately Samsung seems to *set* Settings.System("aod_mode_start/end_time") but not read? Makes automating more difficult
+
  */
 
 public class TestRunner {
