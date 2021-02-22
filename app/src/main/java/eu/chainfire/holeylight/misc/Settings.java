@@ -772,7 +772,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
             outputStream = resolver.openOutputStream(uri);
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
 
-            bufferedWriter.write("eu.chainfire.holeylight 1\r\n");
+            bufferedWriter.write(BuildConfig.APPLICATION_ID + " 1\r\n");
 
             Map<String, ?> prefsMap = prefs.getAll();
             for (String key : prefsMap.keySet()) {
@@ -805,7 +805,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
             boolean first = true;
             while ((line = bufferedReader.readLine()) != null) {
                 if (first) {
-                    if (!line.trim().equals("eu.chainfire.holeylight 1")) {
+                    if (!line.trim().equals(BuildConfig.APPLICATION_ID + " 1")) {
                         return false;
                     }
                     first = false;

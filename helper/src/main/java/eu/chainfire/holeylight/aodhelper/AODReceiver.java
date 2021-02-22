@@ -35,13 +35,13 @@ public class AODReceiver extends BroadcastReceiver {
 
         boolean isSamsung = false;
         boolean isGoogle = false;
-        if (intent.hasExtra("eu.chainfire.holeylight.aodhelper.MANUFACTURER")) {
-            String manufacturer = intent.getStringExtra("eu.chainfire.holeylight.aodhelper.MANUFACTURER");
+        if (intent.hasExtra(BuildConfig.APPLICATION_ID + ".MANUFACTURER")) {
+            String manufacturer = intent.getStringExtra(BuildConfig.APPLICATION_ID + ".MANUFACTURER");
             isSamsung = "samsung".equals(manufacturer);
             isGoogle = "google".equals(manufacturer);
         }
 
-        if ("eu.chainfire.holeylight.aodhelper.FIX_PERMISSIONS".equals(intent.getAction())) {
+        if ((BuildConfig.APPLICATION_ID + ".FIX_PERMISSIONS").equals(intent.getAction())) {
             if (!isSamsung && context.checkCallingOrSelfPermission("android.permission.WRITE_SECURE_SETTINGS") != PackageManager.PERMISSION_GRANTED) {
                 try {
                     Process process = Runtime.getRuntime().exec("su -c pm grant eu.chainfire.holeylight.aodhelper android.permission.WRITE_SECURE_SETTINGS");
@@ -59,9 +59,9 @@ public class AODReceiver extends BroadcastReceiver {
             }
         }
 
-        if ("eu.chainfire.holeylight.aodhelper.SET_BRIGHTNESS".equals(intent.getAction())) {
-            if (intent.hasExtra("eu.chainfire.holeylight.aodhelper.SET_BRIGHTNESS.enable")) {
-                boolean enabled = intent.getBooleanExtra("eu.chainfire.holeylight.aodhelper.SET_BRIGHTNESS.enable", false);
+        if ((BuildConfig.APPLICATION_ID + ".SET_BRIGHTNESS").equals(intent.getAction())) {
+            if (intent.hasExtra(BuildConfig.APPLICATION_ID + ".SET_BRIGHTNESS.enable")) {
+                boolean enabled = intent.getBooleanExtra(BuildConfig.APPLICATION_ID + ".SET_BRIGHTNESS.enable", false);
                 try {
                     ContentResolver resolver = context.getContentResolver();
                     if (isSamsung) {
@@ -86,9 +86,9 @@ public class AODReceiver extends BroadcastReceiver {
             }
         }
 
-        if ("eu.chainfire.holeylight.aodhelper.SET_AOD".equals(intent.getAction())) {
-            if (intent.hasExtra("eu.chainfire.holeylight.aodhelper.SET_AOD.enable")) {
-                boolean enabled = intent.getBooleanExtra("eu.chainfire.holeylight.aodhelper.SET_AOD.enable", false);
+        if ((BuildConfig.APPLICATION_ID + ".SET_AOD").equals(intent.getAction())) {
+            if (intent.hasExtra(BuildConfig.APPLICATION_ID + ".SET_AOD.enable")) {
+                boolean enabled = intent.getBooleanExtra(BuildConfig.APPLICATION_ID + ".SET_AOD.enable", false);
                 try {
                     ContentResolver resolver = context.getContentResolver();
                     if (isSamsung) {

@@ -54,12 +54,13 @@ public class AODControl {
     private static HandlerThread handlerThread = null;
 
     private static Intent getIntent(String action, Boolean enabled) {
-        Intent intent = new Intent("eu.chainfire.holeylight.aodhelper." + action);
-        intent.setClassName("eu.chainfire.holeylight.aodhelper", "eu.chainfire.holeylight.aodhelper.AODReceiver");
+        String APPLICATION_ID_AOD_HELPER = BuildConfig.APPLICATION_ID + ".aodhelper";
+        Intent intent = new Intent(APPLICATION_ID_AOD_HELPER + "." + action);
+        intent.setClassName(APPLICATION_ID_AOD_HELPER, "eu.chainfire.holeylight.aodhelper.AODReceiver");
         intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
-        intent.putExtra("eu.chainfire.holeylight.aodhelper.MANUFACTURER", Manufacturer.isSamsung() ? "samsung" : Manufacturer.isGoogle() ? "google" : "unknown");
+        intent.putExtra(APPLICATION_ID_AOD_HELPER + ".MANUFACTURER", Manufacturer.isSamsung() ? "samsung" : Manufacturer.isGoogle() ? "google" : "unknown");
         if (enabled != null) {
-            intent.putExtra("eu.chainfire.holeylight.aodhelper." + action + ".enable", enabled);
+            intent.putExtra(APPLICATION_ID_AOD_HELPER + "." + action + ".enable", enabled);
         }
         return intent;
     }
@@ -165,7 +166,7 @@ public class AODControl {
         boolean helperPermissions = false;
         {
             try {
-                PackageInfo packageInfo = context.getPackageManager().getPackageInfo("eu.chainfire.holeylight.aodhelper", PackageManager.GET_PERMISSIONS);
+                PackageInfo packageInfo = context.getPackageManager().getPackageInfo(BuildConfig.APPLICATION_ID + ".aodhelper", PackageManager.GET_PERMISSIONS);
                 if (packageInfo != null) {
                     //noinspection deprecation
                     helperVersion = packageInfo.versionCode;
