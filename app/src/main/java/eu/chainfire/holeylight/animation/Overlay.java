@@ -481,7 +481,7 @@ public class Overlay {
         if (linger > 0) {
             handler.removeCallbacks(removeTSP);
             if (!isDelayed && (spritePlayer.isTSPMode(lastMode) || (lastDoze && allowHideAOD && settings.isHideAOD())) && !(spritePlayer.isTSPMode(renderMode) || doze)) {
-                Slog.d("Overlay", "Linger: %d ms", linger);
+                log("Linger: %d ms", linger);
                 animation.setHideAOD(true, true);
                 handler.removeCallbacks(evaluateLoop);
                 if (!evaluateDelayedPosted) {
@@ -496,7 +496,9 @@ public class Overlay {
         boolean wantedEffective = (wanted || activeHide) && settings.isEnabledWhile(mode) && lockscreenOk;
         boolean hideAODEffective = activeHide || isHideAODAndDoze;
 
-        if (visible && wantedEffective && ((colors.length > 0) || activeHide)) {
+        if (forceRefresh) log("Force refresh");
+
+        if (visible && wantedEffective && (haveColors || activeHide)) {
             boolean blackFill = !doze && settings.isBlackFill();
             if (!lastState || colorsChanged() || renderMode != lastMode || blackFill != lastBlackFill || doze != lastDoze || hideAODEffective != lastHideAOD || forceRefresh) {
                 if (!wantAOD && AODControl.isAODEnabled(context) && settings.isAODHelperControl()) {
