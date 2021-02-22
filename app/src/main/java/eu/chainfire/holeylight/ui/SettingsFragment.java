@@ -686,7 +686,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         if (Manufacturer.isSamsung()) {
             prefAODHelperControl = check(catAODHelper, R.string.settings_aod_helper_control_title, 0, Settings.AOD_HELPER_CONTROL, Settings.AOD_HELPER_CONTROL_DEFAULT, true);
-            prefAODHelperControl.setSummary(Html.fromHtml(getString(Manufacturer.isSamsung() ? R.string.settings_aod_helper_control_description_samsung : Manufacturer.isGoogle() ? R.string.settings_aod_helper_control_description_google : R.string.manufacturer_detection_error)));
+            prefAODHelperControl.setSummary(Html.fromHtml(getString(Manufacturer.isSamsung() ? R.string.settings_aod_helper_control_description_samsung_2 : Manufacturer.isGoogle() ? R.string.settings_aod_helper_control_description_google : R.string.manufacturer_detection_error)));
         }
 
         if (Manufacturer.isGoogle()) {
