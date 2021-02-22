@@ -65,6 +65,7 @@ public class NotificationListenerService extends android.service.notification.No
     }
 
     private ContentObserver refreshLEDObserver = null;
+    private ContentObserver refreshLEDObserverSlow = null;
 
     @SuppressWarnings("unused")
     public static class ActiveNotification {
@@ -176,6 +177,7 @@ public class NotificationListenerService extends android.service.notification.No
     private boolean connected = false;
     private Handler handler;
     private final List<ActiveNotification> activeNotifications = new ArrayList<>();
+    private boolean forceRefresh = false;
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -232,19 +234,24 @@ public class NotificationListenerService extends android.service.notification.No
         settings.registerOnSettingsChangedListener(this);
 
         refreshLEDObserver = new ContentObserver(handler) {
-           @Override
-           public boolean deliverSelfNotifications() {
-               return true;
-           }
-
+           @Override public boolean deliverSelfNotifications() { return true; }
+           @Override public void onChange(boolean selfChange, Uri uri) { onChange(selfChange); }
            @Override
            public void onChange(boolean selfChange) {
-               handleLEDNotifications();
+               log("Force refresh");
+               forceRefresh = true;
+               handleLEDNotifications(100);
            }
+       };
 
+        refreshLEDObserverSlow = new ContentObserver(handler) {
+           @Override public boolean deliverSelfNotifications() { return true; }
+           @Override public void onChange(boolean selfChange, Uri uri) { onChange(selfChange); }
            @Override
-           public void onChange(boolean selfChange, Uri uri) {
-               onChange(selfChange);
+           public void onChange(boolean selfChange) {
+               log("Force refresh (slow)");
+               forceRefresh = true;
+               handleLEDNotifications(500);
            }
        };
     }
@@ -284,6 +291,10 @@ public class NotificationListenerService extends android.service.notification.No
         startMotionSensor();
         getContentResolver().registerContentObserver(android.provider.Settings.Global.getUriFor("zen_mode"), false, refreshLEDObserver);
         getContentResolver().registerContentObserver(android.provider.Settings.Global.getUriFor("aod_show_state"), false, refreshLEDObserver);
+        getContentResolver().registerContentObserver(android.provider.Settings.System.getUriFor("aod_show_state"), false, refreshLEDObserver); // moved!
+        getContentResolver().registerContentObserver(android.provider.Settings.System.getUriFor("aod_mode"), false, refreshLEDObserverSlow);
+        getContentResolver().registerContentObserver(android.provider.Settings.System.getUriFor("aod_mode_start_time"), false, refreshLEDObserverSlow);
+        getContentResolver().registerContentObserver(android.provider.Settings.System.getUriFor("aod_mode_end_time"), false, refreshLEDObserverSlow);
         AODControl.setAODBrightness(this, true, result -> {});
     }
 
@@ -293,6 +304,7 @@ public class NotificationListenerService extends android.service.notification.No
         instance = null;
         connected = false;
         getContentResolver().unregisterContentObserver(refreshLEDObserver);
+        getContentResolver().unregisterContentObserver(refreshLEDObserverSlow);
         stopMotionSensor();
         unregisterReceiver(broadcastReceiver);
         Overlay overlay = Overlay.getInstance();
@@ -346,10 +358,14 @@ public class NotificationListenerService extends android.service.notification.No
     private final Runnable runHandleLEDNotifications = this::handleLEDNotificationsInternal;
 
     private void handleLEDNotifications() {
+        handleLEDNotifications(100);
+    }
+
+    private void handleLEDNotifications(int delayMillis) {
         // Prevent update storm caused by updates in rapid succession, and us updating settings ourselves
         handler.removeCallbacks(runHandleLEDNotifications);
         if (!connected) return;
-        handler.postDelayed(runHandleLEDNotifications, 100);
+        handler.postDelayed(runHandleLEDNotifications, delayMillis);
     }
 
     private String sanitizeChannelId(String channelId) {
@@ -498,7 +514,7 @@ public class NotificationListenerService extends android.service.notification.No
                 }
             }
         }
-        if (changes) {
+        if (changes || forceRefresh) {
             currentNotifications = visibleNotifications;
             motionSensor.resetDuration();
             apply();
@@ -519,9 +535,15 @@ public class NotificationListenerService extends android.service.notification.No
                 currentColors[i] = currentNotifications.get(i).getColor();
                 currentIcons[i] = currentNotifications.get(i).getIconDrawable(this);
             }
-            if (overlay != null) overlay.show(currentColors, currentIcons);
+            if (overlay != null) {
+                overlay.show(currentColors, currentIcons, forceRefresh);
+                forceRefresh = false;
+            }
         } else {
-            if (overlay != null) overlay.hide(true);
+            if (overlay != null) {
+                overlay.hide(true);
+                forceRefresh = false;
+            }
         }
         startMotionSensor();
     }

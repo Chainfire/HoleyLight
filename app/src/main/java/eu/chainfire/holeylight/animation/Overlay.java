@@ -169,11 +169,14 @@ public class Overlay {
     private Drawable[] icons = new Drawable[0];
     private boolean wanted = false;
     private boolean kill = false;
+    private boolean forceRefresh = false;
     private boolean lastState = false;
     private int[] lastColors = new int[0];
     private SpritePlayer.Mode lastMode = SpritePlayer.Mode.SWIRL;
     private boolean lastBlackFill = false;
     private boolean lastDoze = false;
+    private boolean lastHideAOD = false;
+    private boolean lastWantAOD = false;
     private boolean added = false;
     private Point resolution;
     private int density;
@@ -440,11 +443,13 @@ public class Overlay {
         boolean on = Display.isOn(context, false);
         boolean doze = Display.isDoze(context);
         boolean visible = on || doze;
+        boolean inAODSchedule = AODControl.inAODSchedule(context, false);
+        boolean haveColors = colors.length > 0;
+        boolean allowHideAOD = settings.isEnabledWhileScreenOff();
         if (visible) {
             lastVisibleTime = SystemClock.elapsedRealtime();
         }
-        boolean allowHideAOD = settings.isEnabledWhileScreenOff();
-        if (!visible && settings.isHideAOD() && allowHideAOD && AODControl.inAODSchedule(context, false)) {
+        if (!visible && allowHideAOD && settings.isHideAOD() && inAODSchedule) {
             // we will be visible soon
             visible = true;
             doze = true;
@@ -452,20 +457,26 @@ public class Overlay {
         boolean lockscreen = on && keyguardManager.isKeyguardLocked();
         boolean charging = Battery.isCharging(context);
 
-        int mode = settings.getMode(charging, !doze);
+        int mode = settings.getMode(charging, !doze && (!spritePlayer.isTSPMode(lastMode) || on));
+        int modeOff = settings.getMode(charging, false);
         SpritePlayer.Mode renderMode = settings.getAnimationMode(mode);
+        SpritePlayer.Mode renderModeOff = settings.getAnimationMode(modeOff);
 
-        // We don't have the helper package that properly turns off AOD (passive hide) when we want
-        // to hide it, but we still want AOD to be invisible: active hide
-        boolean activeHide = (colors.length == 0) && doze && allowHideAOD && (settings.isHideAOD() || spritePlayer.isTSPMode(renderMode)) && !settings.isAODHelperControl();
-        if (activeHide) {
-            renderMode = SpritePlayer.Mode.TSP_HIDE;
-        }
+        boolean isHideAOD = allowHideAOD && (settings.isHideAOD() || spritePlayer.isTSPMode(renderMode));
+        boolean isHideAODAndDoze = isHideAOD && doze;
+        boolean isHideAODAndDozeOrOff = isHideAOD && (doze || !on);
+        boolean isHideAODIfOff = allowHideAOD && (settings.isHideAOD() || spritePlayer.isTSPMode(renderModeOff));
+
+        boolean activeHide = (!haveColors || !inAODSchedule) && isHideAODAndDozeOrOff;
+        if (activeHide) renderMode = SpritePlayer.Mode.TSP_HIDE;
+
+        boolean wantAOD = (haveColors || !isHideAODIfOff) && inAODSchedule;
+        if (wantAOD != lastWantAOD) forceRefresh = true;
 
         int linger = settings.getOverlayLinger();
         if (linger > 0) {
             handler.removeCallbacks(removeTSP);
-            if (!isDelayed && (spritePlayer.isTSPMode(lastMode) || (lastDoze && settings.isHideAOD())) && !(spritePlayer.isTSPMode(renderMode) || doze)) {
+            if (!isDelayed && (spritePlayer.isTSPMode(lastMode) || (lastDoze && allowHideAOD && settings.isHideAOD())) && !(spritePlayer.isTSPMode(renderMode) || doze)) {
                 Slog.d("Overlay", "Linger: %d ms", linger);
                 animation.setHideAOD(true, true);
                 handler.removeCallbacks(evaluateLoop);
@@ -479,66 +490,84 @@ public class Overlay {
 
         boolean lockscreenOk = !on || !lockscreen || settings.isEnabledOnLockscreen();
         boolean wantedEffective = (wanted || activeHide) && settings.isEnabledWhile(mode) && lockscreenOk;
+        boolean hideAODEffective = activeHide || isHideAODAndDoze;
 
         if (visible && wantedEffective && ((colors.length > 0) || activeHide)) {
             boolean blackFill = !doze && settings.isBlackFill();
-            if (!lastState || colorsChanged() || renderMode != lastMode || blackFill != lastBlackFill || doze != lastDoze) {
+            if (!lastState || colorsChanged() || renderMode != lastMode || blackFill != lastBlackFill || doze != lastDoze || hideAODEffective != lastHideAOD || forceRefresh) {
+                if (!wantAOD) {
+                    pokeWakeLocks(250);
+                    AODControl.setAODEnabled(spritePlayer.getContext(), wantAOD, null);
+                }
                 animation.setMode(renderMode, blackFill);
                 createOverlay();
-                animation.setHideAOD(spritePlayer.isTSPMode(renderMode) || (settings.isHideAOD() && doze && allowHideAOD), settings.isHideAODFully());
+                animation.setHideAOD(hideAODEffective, settings.isHideAODFully());
                 animation.setDoze(doze);
                 animation.play(activeHide ? new int[] { Color.BLACK } : colors, settings.isUnholeyLightIcons() ? icons : new Drawable[0], false, (renderMode != lastMode));
-                AODControl.setAODEnabled(spritePlayer.getContext(), (colors.length > 0), null);
                 lastColors = colors;
                 lastState = true;
                 lastMode = renderMode;
                 lastBlackFill = blackFill;
                 lastDoze = doze;
+                lastHideAOD = hideAODEffective;
+                lastWantAOD = wantAOD;
+                if (wantAOD) AODControl.setAODEnabled(spritePlayer.getContext(), wantAOD, null);
             }
         } else {
-            if (lastState) {
+            if (lastState || forceRefresh) {
                 final boolean fVisible = visible;
                 final boolean fDoze = doze;
+                final boolean fWantAOD = wantAOD;
                 Runnable goAway = () -> {
                     if (lastState) {
-                        if (spritePlayer.isTSPMode(lastMode)) {
-                            animation.setHideAOD(false);
-                        }
-                        if (settings.isHideAOD()) {
-                            animation.setHideAOD(false);
-                        }
+                        boolean remove = false;
                         if (animation.isPlaying()) {
                             boolean immediately = !fVisible || kill || isDelayed || settings.isAODHelperControl();
                             animation.stop(immediately);
-                            if (immediately) removeOverlay();
+                            if (immediately) remove = true;
                         } else {
+                            remove = true;
+                        }
+                        if (remove) {
                             removeOverlay();
+                            if (spritePlayer.isTSPMode(lastMode) || lastHideAOD) {
+                                animation.setHideAOD(false);
+                                lastHideAOD = false;
+                            }
                         }
                         lastState = false;
                         lastDoze = fDoze;
+                        lastWantAOD = fWantAOD;
                     }
                 };
-                if (doze && settings.isAODHelperControl()) {
+                if (doze && !wantAOD && settings.isAODHelperControl()) {
                     animation.setHideAOD(true, settings.isHideAODFully());
-                    AODControl.setAODEnabled(spritePlayer.getContext(), false, null);
+                    lastHideAOD = true;
+                    AODControl.setAODEnabled(spritePlayer.getContext(), wantAOD, null);
                     pokeWakeLocks(500);
                     handler.postDelayed(goAway, 250);
                 } else {
                     goAway.run();
-                    AODControl.setAODEnabled(spritePlayer.getContext(), false, result -> {});
+                    AODControl.setAODEnabled(spritePlayer.getContext(), wantAOD, null);
                 }
             }
         }
 
-        if (wantedEffective) handler.postDelayed(evaluateLoop, 500);
+        handler.removeCallbacks(evaluateLoop);
+        if (wantedEffective && (!doze || AODControl.isAODEnabled(context))) {
+            handler.postDelayed(evaluateLoop, 500);
+        }
+
+        forceRefresh = false;
     }
 
-    public void show(int[] colors, Drawable[] icons) {
+    public void show(int[] colors, Drawable[] icons, boolean forceRefresh) {
         handler.removeCallbacks(evaluateLoop);
         this.colors = colors;
         this.icons = icons;
         wanted = true;
         kill = false;
+        this.forceRefresh = forceRefresh;
         evaluate(true);
     }
 
