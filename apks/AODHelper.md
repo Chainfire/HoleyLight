@@ -66,7 +66,7 @@ completely shut it off to conserve power when no notifications are
 active.
 
 Note that your **AOD** configuration in Android Settings may be
-disable while this feature is on in the app.
+disabled while this feature is on in the app.
 
 # Google
 
