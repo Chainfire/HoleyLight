@@ -499,8 +499,8 @@ public class Overlay {
         if (visible && wantedEffective && ((colors.length > 0) || activeHide)) {
             boolean blackFill = !doze && settings.isBlackFill();
             if (!lastState || colorsChanged() || renderMode != lastMode || blackFill != lastBlackFill || doze != lastDoze || hideAODEffective != lastHideAOD || forceRefresh) {
-                if (!wantAOD) {
-                    pokeWakeLocks(250);
+                if (!wantAOD && AODControl.isAODEnabled(context) && settings.isAODHelperControl()) {
+                    pokeWakeLocks(250); // this is why we check ^^^ explicitly
                     AODControl.setAODEnabled(spritePlayer.getContext(), wantAOD, null);
                 }
                 animation.setMode(renderMode, blackFill);
@@ -544,7 +544,7 @@ public class Overlay {
                         lastWantAOD = fWantAOD;
                     }
                 };
-                if (doze && !wantAOD && settings.isAODHelperControl()) {
+                if (doze && !wantAOD) {
                     animation.setHideAOD(true, settings.isHideAODFully());
                     lastHideAOD = true;
                     AODControl.setAODEnabled(spritePlayer.getContext(), wantAOD, null);
@@ -558,8 +558,8 @@ public class Overlay {
         }
 
         handler.removeCallbacks(evaluateLoop);
-        if (wantedEffective && (!doze || AODControl.isAODEnabled(context))) {
-            handler.postDelayed(evaluateLoop, 500);
+        if (wantedEffective && ((doze && AODControl.isAODEnabled(context)) || on)) {
+            handler.postDelayed(evaluateLoop, (spritePlayer.isTSPMode(renderMode) || colors.length == 0) ? 5000 : 500);
         }
 
         forceRefresh = false;
