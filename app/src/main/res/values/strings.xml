@@ -293,5 +293,7 @@
     <string name="donate_sku_already_purchased">Already purchased</string>
     <string name="donate_description_paypal">PayPal: chainfire@chainfire.eu</string>
 
+    <!-- v0.71 RC3 -->
+
     <string name="tune_thickness">Add thickness: %.2fdp</string>
 </resources>
