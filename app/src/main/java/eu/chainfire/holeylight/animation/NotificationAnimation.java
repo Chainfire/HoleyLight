@@ -36,7 +36,6 @@ import com.android.systemui.VIDirector;
 import java.util.Locale;
 
 import androidx.core.view.WindowInsetsCompat;
-import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.misc.CameraCutout;
 import eu.chainfire.holeylight.misc.Fold;
 import eu.chainfire.holeylight.misc.Manufacturer;
@@ -45,6 +44,8 @@ import eu.chainfire.holeylight.misc.Slog;
 
 @SuppressWarnings({ "unused", "WeakerAccess" })
 public class NotificationAnimation implements Settings.OnSettingsChangedListener {
+    public static volatile Boolean test_lastHideAOD = null;
+
     private static final CameraCutout.Cutout OVERRIDE_CUTOUT = null; //CameraCutout.CUTOUT_S10PLUS;
     private static final String OVERRIDE_DEVICE = null; //"beyond2";
 
@@ -262,6 +263,8 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         });
 
         settings.registerOnSettingsChangedListener(this);
+
+        test_lastHideAOD = false;
     }
 
     private void loadJson() {
@@ -640,6 +643,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                 this.hideAODFully = fully;
                 applyDimensions();
             }
+            test_lastHideAOD = hide;
         }
     }
 

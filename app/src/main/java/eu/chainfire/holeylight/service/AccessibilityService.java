@@ -18,7 +18,10 @@
 
 package eu.chainfire.holeylight.service;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Build;
@@ -34,12 +37,14 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Locale;
 
+import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.animation.Overlay;
 import eu.chainfire.holeylight.misc.Display;
 import eu.chainfire.holeylight.misc.LocaleHelper;
 import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.misc.Slog;
 import eu.chainfire.holeylight.service.area.AreaFinder;
+import eu.chainfire.holeylight.test.TestRunner;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class AccessibilityService extends android.accessibilityservice.AccessibilityService {
@@ -48,6 +53,8 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     private Handler handlerMain = null;
     private Display.State lastState = null;
     private AreaFinder areaFinder = null;
+
+    private BroadcastReceiver testRunnerReceiver = null;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -179,6 +186,16 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         }
 
         Settings.getInstance(this).incUpdateCounter();
+
+        if (BuildConfig.DEBUG) {
+            testRunnerReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    TestRunner.start(AccessibilityService.this);
+                }
+            };
+            registerReceiver(testRunnerReceiver, new IntentFilter(BuildConfig.APPLICATION_ID + ".test"));
+        }
     }
 
     @Override

@@ -54,6 +54,8 @@ import eu.chainfire.holeylight.misc.Slog;
 
 @SuppressWarnings({ "WeakerAccess", "unused" })
 public class NotificationListenerService extends android.service.notification.NotificationListenerService implements Settings.OnSettingsChangedListener {
+    public static volatile Integer test_lastColorCount = null;
+
     private static NotificationListenerService instance = null;
     public static NotificationListenerService getInstance() {
         return instance;
@@ -538,11 +540,13 @@ public class NotificationListenerService extends android.service.notification.No
             if (overlay != null) {
                 overlay.show(currentColors, currentIcons, forceRefresh);
                 forceRefresh = false;
+                test_lastColorCount = currentColors.length;
             }
         } else {
             if (overlay != null) {
                 overlay.hide(true);
                 forceRefresh = false;
+                test_lastColorCount = 0;
             }
         }
         startMotionSensor();

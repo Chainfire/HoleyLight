@@ -51,6 +51,8 @@ import eu.chainfire.holeylight.misc.Slog;
 
 @SuppressWarnings({ "deprecation", "FieldCanBeLocal", "unused", "UnusedReturnValue" })
 public class SpritePlayer extends RelativeLayout {
+    public static volatile Mode test_lastDrawMode = null;
+
     public enum Mode { SWIRL, BLINK, SINGLE, TSP, TSP_HIDE }
 
     private final int TSP_FAST_DRAW_TIME = 10000;
@@ -157,6 +159,8 @@ public class SpritePlayer extends RelativeLayout {
                 // no action
             }
         }
+
+        test_lastDrawMode = drawMode;
     }
 
     @Override
@@ -756,6 +760,7 @@ public class SpritePlayer extends RelativeLayout {
                 drawMode = mode;
                 redraw = true;
             }
+            test_lastDrawMode = drawMode;
             if (blackFill != this.blackFill) {
                 this.blackFill = blackFill;
                 redraw = true;

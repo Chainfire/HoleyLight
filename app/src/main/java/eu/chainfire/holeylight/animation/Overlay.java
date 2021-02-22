@@ -60,6 +60,8 @@ import static android.content.Context.POWER_SERVICE;
 
 @SuppressWarnings({"WeakerAccess", "unused", "FieldCanBeLocal"})
 public class Overlay {
+    public static volatile Boolean test_lastVisible = null;
+
     private static Overlay instance;
     public static Overlay getInstance() {
         return getInstance(null, null);
@@ -385,6 +387,7 @@ public class Overlay {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        test_lastVisible = added;
     }
 
     private void updateOverlay() {
@@ -404,6 +407,7 @@ public class Overlay {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        test_lastVisible = added;
     }
 
     private boolean colorsChanged() {

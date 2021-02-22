@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import eu.chainfire.holeylight.BuildConfig;
+import eu.chainfire.holeylight.test.TestRunner;
 
 @SuppressWarnings({"WeakerAccess"})
 public class NotificationTracker {
@@ -187,7 +188,8 @@ public class NotificationTracker {
         List<StatusBarNotification> sbns = new ArrayList<>();
         for (StatusBarNotification sbn : active) {
             boolean isSelf = BuildConfig.APPLICATION_ID.equals(sbn.getPackageName());
-            boolean blockSelf = isSelf && !screenOn;
+            boolean blockSelf = isSelf && !screenOn && !TestRunner.isRunning();
+            boolean blockOther = !isSelf && TestRunner.isRunning();
 
             boolean found = false;
             for (Item item : items) {
@@ -197,7 +199,7 @@ public class NotificationTracker {
                             item.setSeen(screenOnForTracking);
                         } else {
                             item.shown++;
-                            if (!blockSelf) {
+                            if (!blockSelf && !blockOther) {
                                 sbns.add(sbn);
                             }
                         }
@@ -209,7 +211,7 @@ public class NotificationTracker {
             if (!found) {
                 Item item = new Item(sbn);
                 if (addNewNotifications || isSelf) {
-                    if (!blockSelf) {
+                    if (!blockSelf && !blockOther) {
                         sbns.add(sbn);
                     }
                 } else {
