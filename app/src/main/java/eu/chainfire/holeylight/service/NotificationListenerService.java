@@ -36,6 +36,8 @@ import android.os.Looper;
 import android.os.Process;
 import android.os.UserHandle;
 import android.service.notification.StatusBarNotification;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -180,6 +182,7 @@ public class NotificationListenerService extends android.service.notification.No
     private Handler handler;
     private final List<ActiveNotification> activeNotifications = new ArrayList<>();
     private boolean forceRefresh = false;
+    private int callState = TelephonyManager.CALL_STATE_IDLE;
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -206,6 +209,16 @@ public class NotificationListenerService extends android.service.notification.No
     };
     private IntentFilter intentFilter = null;
 
+    private final PhoneStateListener phoneStateListener = new PhoneStateListener() {
+        @Override
+        public void onCallStateChanged(int state, String phoneNumber) {
+            log("Call state --> %s", state == TelephonyManager.CALL_STATE_IDLE ? "IDLE" : "CALL");
+            callState = state;
+            forceRefresh = true;
+            handleLEDNotifications();
+        }
+    };
+
     private void log(String fmt, Object... args) {
         Slog.d("Listener", fmt, args);
     }
@@ -227,6 +240,8 @@ public class NotificationListenerService extends android.service.notification.No
 
         tracker = NotificationTracker.getInstance();
 
+        callState = ((TelephonyManager)getSystemService(TELEPHONY_SERVICE)).getCallState();
+
         intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
@@ -236,26 +251,26 @@ public class NotificationListenerService extends android.service.notification.No
         settings.registerOnSettingsChangedListener(this);
 
         refreshLEDObserver = new ContentObserver(handler) {
-           @Override public boolean deliverSelfNotifications() { return true; }
-           @Override public void onChange(boolean selfChange, Uri uri) { onChange(selfChange); }
-           @Override
-           public void onChange(boolean selfChange) {
-               log("Force refresh");
-               forceRefresh = true;
-               handleLEDNotifications(100);
-           }
-       };
+            @Override public boolean deliverSelfNotifications() { return true; }
+            @Override public void onChange(boolean selfChange, Uri uri) { onChange(selfChange); }
+            @Override
+            public void onChange(boolean selfChange) {
+                log("Force refresh");
+                forceRefresh = true;
+                handleLEDNotifications(100);
+            }
+        };
 
         refreshLEDObserverSlow = new ContentObserver(handler) {
-           @Override public boolean deliverSelfNotifications() { return true; }
-           @Override public void onChange(boolean selfChange, Uri uri) { onChange(selfChange); }
-           @Override
-           public void onChange(boolean selfChange) {
-               log("Force refresh (slow)");
-               forceRefresh = true;
-               handleLEDNotifications(500);
-           }
-       };
+            @Override public boolean deliverSelfNotifications() { return true; }
+            @Override public void onChange(boolean selfChange, Uri uri) { onChange(selfChange); }
+            @Override
+            public void onChange(boolean selfChange) {
+                log("Force refresh (slow)");
+                forceRefresh = true;
+                handleLEDNotifications(500);
+            }
+        };
     }
 
     @Override
@@ -288,6 +303,7 @@ public class NotificationListenerService extends android.service.notification.No
         connected = true;
         tracker.clear();
         isUserPresent = Display.isOn(this, false) && !keyguardManager.isKeyguardLocked();
+        ((TelephonyManager)getSystemService(TELEPHONY_SERVICE)).listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
         registerReceiver(broadcastReceiver, intentFilter);
         handleLEDNotifications();
         startMotionSensor();
@@ -309,6 +325,7 @@ public class NotificationListenerService extends android.service.notification.No
         getContentResolver().unregisterContentObserver(refreshLEDObserverSlow);
         stopMotionSensor();
         unregisterReceiver(broadcastReceiver);
+        ((TelephonyManager)getSystemService(TELEPHONY_SERVICE)).listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
         Overlay overlay = Overlay.getInstance();
         if (overlay != null) overlay.hide(true);
         tracker.clear();
@@ -530,7 +547,7 @@ public class NotificationListenerService extends android.service.notification.No
     private void apply() {
         if (!connected) return;
         Overlay overlay = Overlay.getInstance();
-        if (enabled) {
+        if (enabled && callState == TelephonyManager.CALL_STATE_IDLE) {
             int[] currentColors = new int[currentNotifications.size()];
             Drawable[] currentIcons = new Drawable[currentNotifications.size()];
             for (int i = 0; i < currentNotifications.size(); i++) {

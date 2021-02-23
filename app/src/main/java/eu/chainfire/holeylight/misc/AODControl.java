@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.SystemClock;
+import android.telephony.TelephonyManager;
 
 import java.util.Date;
 
@@ -134,6 +135,7 @@ public class AODControl {
     public static Boolean setAODEnabled(Context context, boolean enabled, HelperIntentResultReceiver async) {
         if (!Settings.getInstance(context).isAODHelperControl()) return false;
         if (isAODEnabled(context) == enabled) return true;
+        if (((TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE)).getCallState() != TelephonyManager.CALL_STATE_IDLE) return false;
         return (Boolean)sendHelperIntent(context, getIntent("SET_AOD", enabled), (context1, intent, resultCode, resultData, resultExtras) -> {
             if (resultCode == 1) {
                 Slog.d("AODControl", "SET_AOD called --> %d", enabled ? 1 : 0);
