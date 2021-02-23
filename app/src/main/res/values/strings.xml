@@ -23,8 +23,8 @@
     <string name="error_hide_notch"><![CDATA[<b>Holey Light</b> cannot function while the notch is hidden. Uncheck <b>Settings</b> - <b>Display</b> - <b>Full screen apps</b> - <b>Hide front camera</b>.]]></string>
     <string name="error_unsupported_device"><![CDATA[<b>Holey Light</b> does not appear support your device. If you are using a <b>Samsung/Google</b> device please report this code to the XDA thread:<br><br>[ <b>%s</b> ]]]></string>
 
-<!-- obsolete --><string name="help_basic_title">Help</string>
-<!-- obsolete --><string name="help_basic_descrption">Some basic advice</string>
+<!-- obsolete --><string translatable="false" name="help_basic_title">Help</string>
+<!-- obsolete --><string translatable="false" name="help_basic_descrption">Some basic advice</string>
 <!-- obsolete --><string translatable="false" name="help_basic_message"><![CDATA[
         <b>Holey Light</b> piggybacks on <b>Always On Display (AOD)</b> (see Android Settings) to show notifications when the screen is off,
         so AOD must be enabled for those modes to work.<br>
@@ -85,7 +85,7 @@
 <!-- obsolete --><string translatable="false" name="settings_animation_powersave_screen_on_battery">@string/battery_screen_on</string>
 <!-- obsolete --><string translatable="false" name="settings_animation_powersave_screen_off_battery">@string/battery_screen_off</string>
 
-    <string name="settings_category_chainfire_title">Chainfire</string>
+    <string translatable="false" name="settings_category_chainfire_title">Chainfire</string>
     <string name="settings_playstore_title">All my apps</string>
     <string name="settings_playstore_description">View all my apps available on Google Play</string>
     <string name="settings_follow_twitter_title">Follow me on Twitter</string>
@@ -270,7 +270,7 @@
     <string name="settings_aod_helper_update_description_normal"><![CDATA[<b>AOD Helper</b> is installed but outdated. It needs to updated to be used again. Tap for instructions.]]></string>
     <string name="settings_aod_helper_update_description_permissions"><![CDATA[<b>AOD Helper</b> is installed but does not have the required permissions. Tap for instructions.]]></string>
     <string name="settings_aod_helper_control_title">Automatic AOD control</string>
-<!-- obsolete --><string name="settings_aod_helper_control_description_samsung"><![CDATA[Enable and disable AOD automatically based on notification status. Reduces power usage when no notifications are active. <b>Not</b> compatible with AOD in <b>Tap to show</b> mode!]]></string>
+<!-- obsolete --><string translatable="false" name="settings_aod_helper_control_description_samsung"><![CDATA[Enable and disable AOD automatically based on notification status. Reduces power usage when no notifications are active. <b>Not</b> compatible with AOD in <b>Tap to show</b> mode!]]></string>
 <!-- Google --><string name="settings_aod_helper_control_description_google">Enabled and disable AOD automatically based on notification status. Reduces power usage when no notifications are active.</string>
 <!-- Google --><string name="settings_aod_helper_increase_brightness_title_google">Maximize AOD brightness</string>
 <!-- Google --><string name="settings_aod_helper_increase_brightness_description_google">While still limited to automatic brightness settings, this option usually does increase AOD brightness significantly.</string>
