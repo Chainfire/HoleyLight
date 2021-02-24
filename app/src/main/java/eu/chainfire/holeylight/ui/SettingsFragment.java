@@ -692,6 +692,22 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         if (Manufacturer.isSamsung()) {
             prefAODHelperControl = check(catAODHelper, R.string.settings_aod_helper_control_title, 0, Settings.AOD_HELPER_CONTROL, Settings.AOD_HELPER_CONTROL_DEFAULT, true);
             prefAODHelperControl.setSummary(Html.fromHtml(getString(Manufacturer.isSamsung() ? R.string.settings_aod_helper_control_description_samsung_2 : Manufacturer.isGoogle() ? R.string.settings_aod_helper_control_description_google : R.string.manufacturer_detection_error)));
+            prefAODHelperControl.setOnPreferenceChangeListener((preference, newValue) -> {
+                if ((Boolean) newValue) {
+                    (new AlertDialog.Builder(getContext()))
+                            .setTitle(getString(R.string.aod_helper_known_issues_samsung_title))
+                            .setMessage(Html.fromHtml(
+                                    getString(R.string.aod_helper_known_issues_samsung_description) + "<br><br>" +
+                                    getString(R.string.aod_helper_known_issues_samsung_tap_to_show) + "<br><br>" +
+                                    getString(R.string.aod_helper_known_issues_samsung_settings) + "<br><br>" +
+                                    getString(R.string.aod_helper_known_issues_samsung_hide_aod) + "<br><br>" +
+                                    getString(R.string.aod_helper_known_issues_samsung_unholey_clock)
+                            ))
+                            .setPositiveButton(android.R.string.ok, null)
+                            .show();
+                }
+                return true;
+            });
         }
 
         if (Manufacturer.isGoogle()) {

@@ -299,7 +299,15 @@
 <!-- Samsung --><string name="settings_aod_helper_control_description_samsung_2"><![CDATA[Enable and disable AOD automatically based on notification status. Reduces power usage when no notifications are active. <b>Not</b> compatible with AOD in <b>Tap to show</b> mode! AOD settings may be locked while enabled.]]></string>
 
     <!-- v0.71 RC5 -->
+
 <!-- Samsung --><string name="settings_animation_unholey_light_show_clock_title">Unholey Light: Clock</string>
 <!-- Samsung --><string name="settings_animation_unholey_light_show_clock_description">Show AOD\'s clock (if configured)</string>
 <!-- Samsung --><string name="settings_animation_unholey_light_show_clock_description_incompat"><![CDATA[<b>Not</b> compatible with <b>AOD Helper</b>.]]></string>
+
+<!-- Samsung --><string name="aod_helper_known_issues_samsung_title">Known issues</string>
+<!-- Samsung --><string name="aod_helper_known_issues_samsung_description"><![CDATA[Due to how <b>AOD Helper</b> works, some <b>Holey Light</b> options may behave differently than expected. For the best experience, use these settings:]]></string>
+<!-- Samsung --><string name="aod_helper_known_issues_samsung_settings"><![CDATA[You may need to temporarily disable <b>AOD Helper</b> to be able to change <b>AOD</b> options in <b>Android Settings</b>]]></string>
+<!-- Samsung --><string name="aod_helper_known_issues_samsung_tap_to_show"><![CDATA[<b>AOD</b> should <b>not</b> be in <b>Tap to show</b> mode in <b>Android Settings</b>]]></string>
+<!-- Samsung --><string name="aod_helper_known_issues_samsung_hide_aod"><![CDATA[The <b>Hide AOD</b> option should be set to <b>Full</b> or <b>Partial</b>]]></string>
+<!-- Samsung --><string name="aod_helper_known_issues_samsung_unholey_clock"><![CDATA[The <b>Unholey Light: Clock</b> option should be turned <b>off</b>]]></string>
 </resources>
