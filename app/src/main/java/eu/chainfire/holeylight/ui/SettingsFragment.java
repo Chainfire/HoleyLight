@@ -698,8 +698,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                             .setTitle(getString(R.string.aod_helper_known_issues_samsung_title))
                             .setMessage(Html.fromHtml(
                                     getString(R.string.aod_helper_known_issues_samsung_description) + "<br><br>" +
-                                    getString(R.string.aod_helper_known_issues_samsung_tap_to_show) + "<br><br>" +
                                     getString(R.string.aod_helper_known_issues_samsung_settings) + "<br><br>" +
+                                    getString(R.string.aod_helper_known_issues_samsung_tap_to_show) + "<br><br>" +
                                     getString(R.string.aod_helper_known_issues_samsung_hide_aod) + "<br><br>" +
                                     getString(R.string.aod_helper_known_issues_samsung_unholey_clock)
                             ))
