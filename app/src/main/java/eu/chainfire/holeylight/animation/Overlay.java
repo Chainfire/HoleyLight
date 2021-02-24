@@ -87,7 +87,9 @@ public class Overlay {
             Slog.d("Broadcast", "Intent: %s", intent.getAction());
 
             switch (intent.getAction()) {
+                case BuildConfig.APPLICATION_ID + ".ACTION_CONFIGURATION_CHANGED":
                 case Intent.ACTION_CONFIGURATION_CHANGED:
+                    boolean force = !intent.getAction().equals(Intent.ACTION_CONFIGURATION_CHANGED);
                     Point resolutionNow = getResolution();
                     int densityNow = getDensity();
                     float densityMult = getDensityMultiplier();
@@ -96,6 +98,8 @@ public class Overlay {
                             ((resolutionNow.x != resolution.y) || (resolutionNow.y != resolution.x))
                     ) || (
                             densityNow != density
+                    ) || (
+                            force
                     )) {
                         Slog.d("Broadcast", "Resolution: %dx%d --> %dx%d, Density: %d --> %d [%.5f]", resolution.x, resolution.y, resolutionNow.x, resolutionNow.y, density, densityNow, densityMult);
 
@@ -318,6 +322,7 @@ public class Overlay {
             });
 
             IntentFilter intentFilter = new IntentFilter();
+            if (BuildConfig.DEBUG) intentFilter.addAction(BuildConfig.APPLICATION_ID + ".ACTION_CONFIGURATION_CHANGED");
             intentFilter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
             intentFilter.addAction(Intent.ACTION_SCREEN_ON);
             intentFilter.addAction(Intent.ACTION_USER_PRESENT);

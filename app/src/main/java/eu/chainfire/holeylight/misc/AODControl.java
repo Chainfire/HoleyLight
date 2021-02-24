@@ -192,7 +192,6 @@ public class AODControl {
                     }
                 }
             } catch (Exception e) {
-                Slog.d("AODControl", "Could not find helper package");
             }
         }
 
