@@ -391,6 +391,7 @@ public class Overlay {
             windowManager.addView(spritePlayer, spritePlayer.getLayoutParams());
         } catch (Exception e) {
             e.printStackTrace();
+            if (e.toString().contains("BadTokenException")) System.exit(0); // we will not recover from this without restart
         }
         test_lastVisible = added;
     }
