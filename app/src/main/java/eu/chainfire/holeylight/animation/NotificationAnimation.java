@@ -140,9 +140,12 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
     private volatile boolean inDoze = false;
     private volatile boolean hideAOD = false;
     private volatile boolean hideAODFully = false;
+    private volatile boolean showAODClock = false;
+    private volatile boolean positionAODClock = false;
     private volatile SpritePlayer.Mode mode = SpritePlayer.Mode.SWIRL;
     private volatile boolean blackFill = false;
     private final Rect tspRect = new Rect(0, 0, 0, 0);
+    private final Rect clockRect = new Rect(0, 0, 0, 0);
     private volatile int tspOverlayBottom = 0;
     private volatile float currentDpAddThickness = 0;
 
@@ -358,25 +361,35 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                 float width;
                 float height;
 
-                if (mode == SpritePlayer.Mode.TSP) {
+                if (spritePlayer.isTSPMode(mode)) {
+                    top = tspRect.top;
+                    if (positionAODClock && clockRect.height() > 0) {
+                        top += clockRect.height() * 1.5f;
+                    }
+
+                    float centerX = tspRect.exactCenterX();
+                    float centerY = top + (tspRect.bottom - top)/2f;
+
                     // TSP saves the entire width
-                    tspRect.left = 0;
-                    tspRect.right = resolution.x;
+                    width = resolution.x;
+                    height = tspRect.bottom - top;
 
                     // Limit render square size to 60% of width (resolution)
-                    int squareSize = Math.min((int)(resolution.x * 0.6f), Math.min(tspRect.width(), tspRect.height()));
+                    int squareSize = (int)Math.min(resolution.x * 0.6f, Math.min(width, height));
 
                     // Apply
-                    left = tspRect.centerX() - (squareSize / 2f);
+                    left = centerX - (squareSize / 2f);
                     if (Manufacturer.isSamsung()) {
                         // Samsung: small screen area, stay at the top in case size changes when tapped, looks better
-                        top = tspRect.top;
+                        // do nothing, top is already set correctly
                     } else {
                         // Google: stay in center of found area
-                        top = tspRect.centerY() - (squareSize / 2f);
+                        top = centerY - (squareSize / 2f);
                     }
                     width = squareSize;
                     height = squareSize;
+                    if (left < 0) left = 0;
+                    if (left + width >= resolution.x) left = resolution.x - width;
                 } else {
                     if (viDirector != null) {
                         Rect r;
@@ -494,6 +507,12 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                     update.set(0, 0, (int)width, (int)height);
                 }
 
+                if (spritePlayer.isTSPMode(mode) && showAODClock) {
+                    Slog.d("Anim", "Apply/Clock %s [%s]", clockRect.toString(), mode.toString());
+                    spritePlayer.updateTransparentArea(clockRect);
+                } else {
+                    spritePlayer.updateTransparentArea(null);
+                }
                 Slog.d("Anim", "Apply/View %s [%s]", update.toString(), mode.toString());
                 spritePlayer.updateDisplayArea(update);
 
@@ -647,6 +666,20 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         }
     }
 
+    public boolean getShowAODClock() {
+        return showAODClock;
+    }
+
+    public void setShowAODClock(boolean show, boolean position) {
+        synchronized (getSynchronizer()) {
+            if (this.showAODClock != show || this.positionAODClock != (show || position)) {
+                this.showAODClock = show;
+                this.positionAODClock = show || position;
+                applyDimensions();
+            }
+        }
+    }
+
     public void setMode(SpritePlayer.Mode mode, boolean blackFill) {
         if (mode != this.mode) {
             boolean apply = spritePlayer.isTSPMode(mode) || spritePlayer.isTSPMode(this.mode);
@@ -661,11 +694,16 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
         }
     }
 
-    public void updateTSPRect(Rect rect, int overlayBottom) {
-        boolean apply = !rect.equals(tspRect);
-        Slog.d("AOD_TSP", "Anim " + rect.toString() + " bottom:" + overlayBottom + " apply:" + apply);
+    public void updateTSPRect(Rect rect, Rect clockRect, int overlayBottom) {
+        boolean apply = !rect.equals(tspRect) || !this.clockRect.equals(clockRect) || ((overlayBottom > 0) && (overlayBottom != tspOverlayBottom));
+        Slog.d("AOD_TSP", "Anim " + rect.toString() + " clock " + clockRect + " bottom:" + overlayBottom + " apply:" + apply);
         if (apply) {
             tspRect.set(rect);
+            if (clockRect != null)  {
+                this.clockRect.set(clockRect);
+            }  else {
+                this.clockRect.set(0, 0, 0, 0);
+            }
             if (overlayBottom > 0) tspOverlayBottom = overlayBottom;
             spritePlayer.setTSPBlank(rect.height() == 0);
             applyDimensions();

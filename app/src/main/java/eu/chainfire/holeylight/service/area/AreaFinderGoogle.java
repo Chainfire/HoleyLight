@@ -87,6 +87,11 @@ public class AreaFinderGoogle extends AreaFinder {
     }
 
     @Override
+    public Rect findClock(AccessibilityNodeInfo root) {
+        return null;
+    }
+
+    @Override
     public Integer findOverlayBottom(AccessibilityNodeInfo root) {
         // already included in the rectangle returned by find()
         return null;

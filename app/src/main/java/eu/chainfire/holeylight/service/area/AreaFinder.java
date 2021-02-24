@@ -21,5 +21,6 @@ public abstract class AreaFinder {
 
     public abstract void start(Context context);
     public abstract Rect find(AccessibilityNodeInfo root);
+    public abstract Rect findClock(AccessibilityNodeInfo root);
     public abstract Integer findOverlayBottom(AccessibilityNodeInfo root);
 }

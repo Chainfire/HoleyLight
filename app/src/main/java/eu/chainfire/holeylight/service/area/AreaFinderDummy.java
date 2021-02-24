@@ -15,6 +15,11 @@ public class AreaFinderDummy extends AreaFinder {
     }
 
     @Override
+    public Rect findClock(AccessibilityNodeInfo root) {
+        return null;
+    }
+
+    @Override
     public Integer findOverlayBottom(AccessibilityNodeInfo root) {
         return null;
     }

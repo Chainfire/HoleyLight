@@ -297,4 +297,9 @@
 
     <string name="tune_thickness">Add thickness: %.2fdp</string>
 <!-- Samsung --><string name="settings_aod_helper_control_description_samsung_2"><![CDATA[Enable and disable AOD automatically based on notification status. Reduces power usage when no notifications are active. <b>Not</b> compatible with AOD in <b>Tap to show</b> mode! AOD settings may be locked while enabled.]]></string>
+
+    <!-- v0.71 RC5 -->
+<!-- Samsung --><string name="settings_animation_unholey_light_show_clock_title">Unholey Light: Clock</string>
+<!-- Samsung --><string name="settings_animation_unholey_light_show_clock_description">Show AOD\'s clock (if configured)</string>
+<!-- Samsung --><string name="settings_animation_unholey_light_show_clock_description_incompat"><![CDATA[<b>Not</b> compatible with <b>AOD Helper</b>.]]></string>
 </resources>

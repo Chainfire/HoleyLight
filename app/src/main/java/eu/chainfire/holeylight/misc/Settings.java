@@ -235,6 +235,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     private static final String PURCHASES = "purchases";
 
+    public static final String AOD_SHOW_CLOCK = "aod_show_clock";
+    public static final boolean AOD_SHOW_CLOCK_DEFAULT = false;
+
     private static Settings instance;
     public static Settings getInstance(Context context) {
         synchronized (Settings.class) {
@@ -764,6 +767,14 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
             sb.append(sku);
             put(PURCHASES, sb.toString(), true);
         }
+    }
+
+    public boolean isShowAODClock() {
+        return prefs.getBoolean(AOD_SHOW_CLOCK, AOD_SHOW_CLOCK_DEFAULT);
+    }
+
+    public void setShowAODClock(boolean value) {
+        put(AOD_SHOW_CLOCK, value, true);
     }
 
     public boolean saveToUri(ContentResolver resolver, Uri uri) {

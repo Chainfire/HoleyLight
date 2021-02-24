@@ -53,6 +53,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     private Handler handlerMain = null;
     private Display.State lastState = null;
     private AreaFinder areaFinder = null;
+    private Settings settings = null;
 
     private BroadcastReceiver testRunnerReceiver = null;
 
@@ -120,6 +121,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                     root.refresh();
 
                     final Rect outerBounds = areaFinder.find(root);
+                    Rect clockArea = areaFinder.findClock(root);
                     final Integer overlayBottom = areaFinder.findOverlayBottom(root);
 
                     if (
@@ -131,11 +133,18 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                             (outerBounds.width() > 0) &&
                             (outerBounds.height() > 0)
                     ) {
-                        Slog.d("AOD_TSP", "Access " + outerBounds.toString() + " bottom:" + overlayBottom);
-                        handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(outerBounds, overlayBottom != null ? overlayBottom : 0));
+                        final Rect fClockArea;
+                        if ((clockArea != null) && (clockArea.left >= outerBounds.left && clockArea.top >= outerBounds.top && clockArea.right <= outerBounds.right && clockArea.bottom <= outerBounds.bottom)) {
+                            fClockArea = clockArea;
+                        } else {
+                            fClockArea = null;
+                        }
+
+                        Slog.d("AOD_TSP", "Access " + outerBounds.toString() + " clock " + fClockArea + " bottom:" + overlayBottom);
+                        handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(outerBounds, fClockArea, overlayBottom != null ? overlayBottom : 0));
                     } else if (outerBounds == null) {
                         Slog.d("AOD_TSP", "Access null");
-                        handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(new Rect(0, 0, 0, 0), 0));
+                        handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(new Rect(0, 0, 0, 0), null, 0));
                     }
                 }
             } catch (Exception e) {
@@ -185,7 +194,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             Overlay.getInstance(AccessibilityService.this);
         }
 
-        Settings.getInstance(this).incUpdateCounter();
+        settings.incUpdateCounter();
 
         if (BuildConfig.DEBUG) {
             testRunnerReceiver = new BroadcastReceiver() {
@@ -206,5 +215,6 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         handler = new Handler(handlerThread.getLooper());
         handlerMain = new Handler(Looper.getMainLooper());
         areaFinder = AreaFinder.factory();
+        settings = Settings.getInstance(this);
     }
 }

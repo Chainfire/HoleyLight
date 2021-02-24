@@ -84,6 +84,7 @@ public class SpritePlayer extends RelativeLayout {
 
     private final Paint paint = new Paint();
     private final Paint paintTsp = new Paint();
+    private final Paint paintTspTransparent = new Paint();
     private final float dpToPx;
 
     private volatile int frame = -1;
@@ -113,6 +114,8 @@ public class SpritePlayer extends RelativeLayout {
     private volatile boolean surfaceReady = false;
     private volatile boolean tspBlank = false;
     private volatile boolean blackFill = false;
+    private volatile Rect tspTransparentArea = null;
+    private volatile boolean tspTransparentDrawn = false;
 
     public SpritePlayer(Context context) {
         super(context);
@@ -135,6 +138,13 @@ public class SpritePlayer extends RelativeLayout {
         paintTsp.setAntiAlias(true);
         paintTsp.setDither(false);
         paintTsp.setFilterBitmap(false);
+
+        if (Settings.DEBUG_OVERLAY) {
+            paintTspTransparent.setColor(0x4000FF00);
+        } else {
+            paintTspTransparent.setColor(Color.TRANSPARENT);
+            paintTspTransparent.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        }
 
         handlerRender.post(() -> {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
@@ -214,6 +224,29 @@ public class SpritePlayer extends RelativeLayout {
         }
         return false;
     }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        if (isTSPMode() && !tspBlank && tspTransparentArea != null && SystemClock.elapsedRealtime() - modeStart > TSP_FIRST_DRAW_DELAY) {
+            Slog.d("Clock", "performDraw");
+            canvas.drawRect(tspTransparentArea, paintTspTransparent);
+            tspTransparentDrawn = true;
+        }
+    }
+
+    private final Runnable scheduleBackgroundDraw = new Runnable() {
+        @Override
+        public void run() {
+            handlerMain.removeCallbacks(scheduleBackgroundDraw);
+            if (isTSPMode() && tspTransparentArea != null) {
+                if (SystemClock.elapsedRealtime() - modeStart > TSP_FIRST_DRAW_DELAY) {
+                    invalidate();
+                } else {
+                    handlerMain.postDelayed(scheduleBackgroundDraw, Math.max(50, TSP_FIRST_DRAW_DELAY - (SystemClock.elapsedRealtime() - modeStart)));
+                }
+            }
+        }
+    };
 
     @SuppressWarnings("all")
     private void renderFrame(Canvas canvas, SpriteSheet spriteSheet, int frame, float startAngle, float radiusDecrease) {
@@ -694,6 +727,7 @@ public class SpritePlayer extends RelativeLayout {
         synchronized (sync) {
             if (!draw) {
                 modeStart = SystemClock.elapsedRealtime();
+                handlerMain.post(scheduleBackgroundDraw);
             }
             draw = true;
             callNextFrame(true);
@@ -759,6 +793,7 @@ public class SpritePlayer extends RelativeLayout {
                 }
                 drawMode = mode;
                 redraw = true;
+                handlerMain.post(scheduleBackgroundDraw);
             }
             test_lastDrawMode = drawMode;
             if (blackFill != this.blackFill) {
@@ -780,6 +815,12 @@ public class SpritePlayer extends RelativeLayout {
                 case SINGLE: return spriteSheetSingle;
             }
             return null;
+        }
+    }
+
+    public void updateTransparentArea(Rect rect) {
+        synchronized (sync) {
+            tspTransparentArea = rect == null ? null : new Rect(rect);
         }
     }
 

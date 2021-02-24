@@ -182,7 +182,7 @@ public class Overlay {
     private boolean added = false;
     private Point resolution;
     private int density;
-    private float densityMultiplier;
+    private final float densityMultiplier;
     private IBinder windowToken;
     private long lastVisibleTime;
 
@@ -426,7 +426,7 @@ public class Overlay {
     private boolean evaluateDelayedPosted = false;
     private final Runnable evaluateDelayed = () -> { evaluate(true, true); evaluateDelayedPosted = false; };
 
-    private final Runnable removeTSP = () -> animation.updateTSPRect(new Rect(0, 0, 0, 0), 0);
+    private final Runnable removeTSP = () -> animation.updateTSPRect(new Rect(0, 0, 0, 0), null, 0);
 
     public void evaluate(boolean refreshAll) {
         evaluate(refreshAll, false);
@@ -482,6 +482,7 @@ public class Overlay {
             handler.removeCallbacks(removeTSP);
             if (!isDelayed && (spritePlayer.isTSPMode(lastMode) || (lastDoze && allowHideAOD && settings.isHideAOD())) && !(spritePlayer.isTSPMode(renderMode) || doze)) {
                 log("Linger: %d ms", linger);
+                animation.setShowAODClock(false, settings.isShowAODClock());
                 animation.setHideAOD(true, true);
                 handler.removeCallbacks(evaluateLoop);
                 if (!evaluateDelayedPosted) {
@@ -507,6 +508,7 @@ public class Overlay {
                 }
                 animation.setMode(renderMode, blackFill);
                 createOverlay();
+                animation.setShowAODClock(settings.isShowAODClock(), settings.isShowAODClock());
                 animation.setHideAOD(hideAODEffective, settings.isHideAODFully());
                 animation.setDoze(doze);
                 animation.play(activeHide ? new int[] { Color.BLACK } : colors, settings.isUnholeyLightIcons() ? icons : new Drawable[0], false, (renderMode != lastMode));
@@ -584,12 +586,12 @@ public class Overlay {
         evaluate(true);
     }
 
-    public void updateTSPRect(Rect rect, int overlayBottom) {
+    public void updateTSPRect(Rect rect, Rect clockRect, int overlayBottom) {
         boolean apply = Display.isOff(spritePlayer.getContext(), true);
-        Slog.d("AOD_TSP", "Overlay " + rect.toString() + " bottom:" + overlayBottom + " apply:" + apply);
+        Slog.d("AOD_TSP", "Overlay " + rect.toString() + " clock " + clockRect + " bottom:" + overlayBottom + " apply:" + apply);
         if (apply) {
             pokeWakeLocks(250);
-            animation.updateTSPRect(rect, overlayBottom);
+            animation.updateTSPRect(rect, clockRect, overlayBottom);
         }
     }
 }
