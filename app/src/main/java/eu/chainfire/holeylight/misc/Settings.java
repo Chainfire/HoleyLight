@@ -182,7 +182,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     private static final String SPEED_FACTOR = "speed_factor";
 
     private static final String CHANNEL_COLOR = "CHANNEL_COLOR:";
+    private static final String CHANNEL_COLOR_CONVERSATION = "CHANNEL_COLOR_CONVERSATION:";
     private static final String CHANNEL_COLOR_FMT = CHANNEL_COLOR + "%s:%s";
+    private static final String CHANNEL_COLOR_CONVERSATION_FMT = CHANNEL_COLOR_CONVERSATION + "%s:%s";
     public static final String CHANNEL_NAME_DEFAULT = "default";
 
     private static final String CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE = "RESPECT_NOTIFICATION_COLOR_STATE:";
@@ -476,9 +478,12 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         return ret;
     }
 
-    public int getColorForPackageAndChannel(String packageName, String channelName, int defaultValue, boolean returnAppDefault) {
-        if (channelName == null) channelName = CHANNEL_NAME_DEFAULT;
-        String keyChannel = String.format(Locale.ENGLISH, CHANNEL_COLOR_FMT, packageName, channelName);
+    public int getColorForPackageAndChannel(String packageName, String channelName, boolean conversation, int defaultValue, boolean returnAppDefault) {
+        if (channelName == null) {
+            channelName = CHANNEL_NAME_DEFAULT;
+            conversation = false;
+        }
+        String keyChannel = String.format(Locale.ENGLISH, conversation ? CHANNEL_COLOR_CONVERSATION_FMT : CHANNEL_COLOR_FMT, packageName, channelName);
         String keyDefault = String.format(Locale.ENGLISH, CHANNEL_COLOR_FMT, packageName, CHANNEL_NAME_DEFAULT);
         if (prefs.contains(keyChannel)) {
             return prefs.getInt(keyChannel, defaultValue);
@@ -488,9 +493,12 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         return defaultValue;
     }
 
-    public void setColorForPackageAndChannel(String packageName, String channelName, int color, boolean fromListener) {
-        if (channelName == null) channelName = CHANNEL_NAME_DEFAULT;
-        String key = String.format(Locale.ENGLISH, CHANNEL_COLOR_FMT, packageName, channelName);
+    public void setColorForPackageAndChannel(String packageName, String channelName, boolean conversation, int color, boolean fromListener) {
+        if (channelName == null) {
+            channelName = CHANNEL_NAME_DEFAULT;
+            conversation = false;
+        }
+        String key = String.format(Locale.ENGLISH, conversation ? CHANNEL_COLOR_CONVERSATION_FMT : CHANNEL_COLOR_FMT, packageName, channelName);
         if (!prefs.contains(key) || (prefs.getInt(key, -1) != color)) {
             put(key, color, fromListener);
         }
@@ -509,14 +517,40 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
-    public Map<String, Integer> getPackagesChannelsAndColors() {
-        Map<String, Integer> ret = new HashMap<>();
+    public static class PackageColor {
+        public final String packageName;
+        public final String channelName;
+        public final boolean conversation;
+        public final int color;
+
+        public PackageColor(String packageName, String channelName, boolean conversation, int color) {
+            this.packageName = packageName;
+            this.channelName = channelName;
+            this.conversation = conversation;
+            this.color = color;
+        }
+    }
+
+    public Map<String, PackageColor> getPackagesChannelsAndColors() {
+        Map<String, PackageColor> ret = new HashMap<>();
         Map<String, ?> all = prefs.getAll();
         for (String key : all.keySet()) {
+            String content;
+            boolean conversation;
             if (key.startsWith(CHANNEL_COLOR)) {
-                String pkg = key.substring(CHANNEL_COLOR.length());
-                Integer color = prefs.getInt(key, 0);
-                ret.put(pkg, color);
+                content = key.substring(CHANNEL_COLOR.length());
+                conversation = false;
+            } else if (key.startsWith(CHANNEL_COLOR_CONVERSATION)) {
+                content = key.substring(CHANNEL_COLOR_CONVERSATION.length());
+                conversation = true;
+            } else continue;
+
+            int sep = content.indexOf(':');
+            if (sep >= 0) {
+                String pkg = content.substring(0, sep);
+                String chan = content.substring(sep + 1);
+                int color = prefs.getInt(key, 0);
+                ret.put(key, new PackageColor(pkg, chan, conversation, color));
             }
         }
         return ret;

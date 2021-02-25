@@ -31,6 +31,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Process;
@@ -79,6 +80,7 @@ public class NotificationListenerService extends android.service.notification.No
         private final String packageName;
         private final String channelName;
         private final CharSequence tickerText;
+        private boolean conversation = false;
         private int color = 0;
         private Icon icon = null;
 
@@ -93,9 +95,9 @@ public class NotificationListenerService extends android.service.notification.No
             return toCompare(false);
         }
 
-        public String toCompare(boolean withColor) {
-            if (withColor) {
-                return packageName + "::" + channelName + "::" + color;
+        public String toCompare(boolean withColorAndConversation) {
+            if (withColorAndConversation) {
+                return packageName + "::" + channelName + "::" + color + "::" + (conversation ? "conv" : "noconv");
             } else {
                 return packageName + "::" + channelName;
             }
@@ -127,6 +129,14 @@ public class NotificationListenerService extends android.service.notification.No
 
         public void setColor(int color) {
             this.color = color;
+        }
+
+        public boolean getConversation() {
+            return conversation;
+        }
+
+        public void setConversation(boolean conversation) {
+            this.conversation = conversation;
         }
 
         public Icon getIcon() {
@@ -417,6 +427,7 @@ public class NotificationListenerService extends android.service.notification.No
 
                 int c = 0xFF000000;
                 int cChan = c;
+                boolean conversation = false;
                 String channelName = "legacy";
 
                 Boolean shouldShowLights = null;
@@ -427,7 +438,16 @@ public class NotificationListenerService extends android.service.notification.No
                     List<NotificationChannel> chans = getNotificationChannels(sbn.getPackageName(), Process.myUserHandle());
                     for (NotificationChannel chan : chans) {
                         if (chan.getId().equals(not.getChannelId())) {
-                            if (chan.shouldShowLights()) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                for (NotificationChannel child : chans) {
+                                    if (!child.getId().equals(chan.getId()) && child.getConversationId() != null && child.getParentChannelId().equals(chan.getId())) {
+                                        conversation = true;
+
+                                    }
+                                }
+                            }
+
+                            if (chan.shouldShowLights() || conversation) {
                                 shouldShowLights = true;
                                 c = chan.getLightColor();
                                 cChan = c;
@@ -436,7 +456,17 @@ public class NotificationListenerService extends android.service.notification.No
                                 if ((c & 0xFFFFFF) == 0) c = 0xFFFFFF;
 
                                 // There's a lot of white notifications, try using the notification accent color instead
-                                if (((c & 0xFFFFFF) == 0xFFFFFF) && ((not.color & 0xFFFFFF) > 0) && !sbn.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
+                                if (
+                                        (
+                                                ((c & 0xFFFFFF) == 0xFFFFFF) && (
+                                                        ((not.color & 0xFFFFFF) > 0) &&
+                                                        !sbn.getPackageName().equals(BuildConfig.APPLICATION_ID)
+                                                )
+                                        ) || (
+                                                ((c & 0xFFFFFF) == 0x000000) &&
+                                                conversation
+                                        )
+                                ) {
 
                                     // Set dominant channel to max brightness
                                     int r = Color.red(not.color);
@@ -471,8 +501,8 @@ public class NotificationListenerService extends android.service.notification.No
                 activeNotifications.add(actNot);
 
                 // Save to prefs, or get overridden value from prefs
-                c = settings.getColorForPackageAndChannel(sbn.getPackageName(), channelName, c, (cChan & 0x00FFFFFF) != 0x000000);
-                settings.setColorForPackageAndChannel(sbn.getPackageName(), channelName, c, true);
+                c = settings.getColorForPackageAndChannel(sbn.getPackageName(), channelName, conversation, c, ((cChan & 0x00FFFFFF) != 0x000000) || conversation);
+                settings.setColorForPackageAndChannel(sbn.getPackageName(), channelName, conversation, c, true);
 
                 // Respect notification color being black? We normally don't want this as a lot of
                 // notifications that we do want to show would disappear, but sometimes the same
@@ -489,13 +519,14 @@ public class NotificationListenerService extends android.service.notification.No
                 c = c | 0xFF000000;
 
                 // user has set notification to full black, skip
-                log("%s [%s] (%s) --> #%08X / #%08X --> #%08X [%s][%s]", sbn.getKey(), sbn.getPackageName(), channelName, cChan, not.color, c, not.getSmallIcon() != null ? "I" : "x", shouldShowLights == null ? "x" : (shouldShowLights ? "Y" : "N"));
+                log("%s [%s] (%s) --> #%08X / #%08X --> #%08X [%s][%s][%s]", sbn.getKey(), sbn.getPackageName(), channelName, cChan, not.color, c, not.getSmallIcon() != null ? "I" : "x", shouldShowLights == null ? "x" : (shouldShowLights ? "Y" : "N"), conversation ? "C" : "x");
                 if ((c & 0xFFFFFF) == 0) {
                     continue;
                 }
 
-                // Log and save
+                // save
                 actNot.setColor(c);
+                actNot.setConversation(conversation);
                 actNot.setIcon(not.getSmallIcon());
             }
         } catch (SecurityException e) {

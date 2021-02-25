@@ -134,8 +134,8 @@ public class ColorActivity extends BaseActivity {
         for (AppAdapter.AppItem item : apps.items) {
             if (item.packageName != null) {
                 if (item.packageName.equals(packageName)) {
-                    if (((item.color & 0x00FFFFFF) != 0x00000000) || includeDisabled) {
-                        settings.setColorForPackageAndChannel(packageName, item.channelName, color, false);
+                    if (((item.color & 0x00FFFFFF) != 0x00000000) || item.conversation || includeDisabled) {
+                        settings.setColorForPackageAndChannel(packageName, item.channelName, item.conversation, color, false);
                         item.color = color;
                     }
                 }
@@ -193,7 +193,7 @@ public class ColorActivity extends BaseActivity {
                 holder.tvTitleOrPackage.setText(holder.appItem.title);
             } else if (holder.appItem.viewType == VIEW_TYPE_ITEM) {
                 holder.ivIcon.setImageDrawable(holder.appItem.icon);
-                holder.tvTitleOrPackage.setText(holder.appItem.title != null ? holder.appItem.title : holder.appItem.packageName);
+                holder.tvTitleOrPackage.setText((holder.appItem.title != null ? holder.appItem.title : holder.appItem.packageName) + (holder.appItem.conversation ? " (" + getString(R.string.colors_conversation) + ")" : ""));
                 if (holder.appItem.tickerText != null) {
                     holder.tvChannel.setText(Html.fromHtml("<small>" + holder.appItem.channelName + "<br>" + holder.appItem.tickerText.toString() + "</small>"));
                 } else {
@@ -228,7 +228,7 @@ public class ColorActivity extends BaseActivity {
                     popup.show(new ColorPickerPopup.ColorPickerObserver() {
                         @Override
                         public void onColorPicked(int color) {
-                            settings.setColorForPackageAndChannel(item.packageName, item.channelName, color | 0xFF000000, false);
+                            settings.setColorForPackageAndChannel(item.packageName, item.channelName, item.conversation, color | 0xFF000000, false);
                             item.color = color;
                             forceOverlayReload();
                             notifyDataSetChanged();
@@ -267,7 +267,7 @@ public class ColorActivity extends BaseActivity {
                             .setItems(entries, (dialog, which) -> {
                                 switch (which) {
                                     case 0: // disable
-                                        settings.setColorForPackageAndChannel(item.packageName, item.channelName, 0xFF000000, false);
+                                        settings.setColorForPackageAndChannel(item.packageName, item.channelName, item.conversation, 0xFF000000, false);
                                         item.color = 0xFF000000;
                                         forceOverlayReload();
                                         notifyDataSetChanged();
@@ -281,7 +281,7 @@ public class ColorActivity extends BaseActivity {
                                                     if (hexEdit != null) {
                                                         try {
                                                             int color = Integer.parseInt(hexEdit.getText().toString(), 16) | 0xFF000000;
-                                                            settings.setColorForPackageAndChannel(item.packageName, item.channelName, color, false);
+                                                            settings.setColorForPackageAndChannel(item.packageName, item.channelName, item.conversation, color, false);
                                                             item.color = color;
                                                             forceOverlayReload();
                                                             notifyDataSetChanged();
@@ -304,7 +304,7 @@ public class ColorActivity extends BaseActivity {
                                         notifyDataSetChanged();
                                         break;
                                     case 3: // default
-                                        settings.setColorForPackageAndChannel(item.packageName, null, item.color, false);
+                                        settings.setColorForPackageAndChannel(item.packageName, null, false, item.color, false);
                                         refresh();
                                         break;
                                     case 4: // apply
@@ -319,7 +319,7 @@ public class ColorActivity extends BaseActivity {
                                         colorCopy = item.color;
                                         break;
                                     case 6: // paste
-                                        settings.setColorForPackageAndChannel(item.packageName, item.channelName, colorCopy, false);
+                                        settings.setColorForPackageAndChannel(item.packageName, item.channelName, item.conversation, colorCopy, false);
                                         item.color = colorCopy;
                                         forceOverlayReload();
                                         notifyDataSetChanged();
@@ -389,7 +389,7 @@ public class ColorActivity extends BaseActivity {
         }
 
         @SuppressWarnings("ConstantConditions")
-        public void loadAppItems(Map<String, Integer> packagesChannelsAndColors) {
+        public void loadAppItems(Map<String, Settings.PackageColor> packagesChannelsAndColors) {
             List<NotificationListenerService.ActiveNotification> active = null;
             NotificationListenerService service = NotificationListenerService.getInstance();
             if (service != null) {
@@ -399,36 +399,34 @@ public class ColorActivity extends BaseActivity {
             List<AppItem> activeItems = new ArrayList<>();
             List<AppItem> inactiveItems = new ArrayList<>();
             PackageManager pm = getPackageManager();
-            for (String pkgChan : packagesChannelsAndColors.keySet()) {
-                int sep = pkgChan.indexOf(':');
-                if (sep >= 0) {
-                    String pkg = pkgChan.substring(0, sep);
-                    String chan = pkgChan.substring(sep + 1);
-                    try {
-                        NotificationListenerService.ActiveNotification found = null;
-                        if (active != null) {
-                            for (NotificationListenerService.ActiveNotification not : active) {
-                                if (not.getPackageName().equals(pkg) && not.getChannelName().equals(chan)) {
-                                    found = not;
-                                    break;
-                                }
+            for (String key : packagesChannelsAndColors.keySet()) {
+                try {
+                    Settings.PackageColor packageColor = packagesChannelsAndColors.get(key);
+
+                    NotificationListenerService.ActiveNotification found = null;
+                    if (active != null) {
+                        for (NotificationListenerService.ActiveNotification not : active) {
+                            if (not.getPackageName().equals(packageColor.packageName) && not.getChannelName().equals(packageColor.channelName) && not.getConversation() == packageColor.conversation) {
+                                found = not;
+                                break;
                             }
                         }
-
-                        List<AppItem> target = found != null ? activeItems : inactiveItems;
-                        ApplicationInfo info = pm.getApplicationInfo(pkg, 0);
-                        target.add(new AppItem(
-                                getLabel(pm, info),
-                                pkg,
-                                chan,
-                                found != null ? found.getTickerText() : null,
-                                getIcon(pm, info),
-                                packagesChannelsAndColors.get(pkgChan),
-                                VIEW_TYPE_ITEM
-                        ));
-                    } catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
                     }
+
+                    List<AppItem> target = found != null ? activeItems : inactiveItems;
+                    ApplicationInfo info = pm.getApplicationInfo(packageColor.packageName, 0);
+                    target.add(new AppItem(
+                            getLabel(pm, info),
+                            packageColor.packageName,
+                            packageColor.channelName,
+                            packageColor.conversation,
+                            found != null ? found.getTickerText() : null,
+                            getIcon(pm, info),
+                            packageColor.color,
+                            VIEW_TYPE_ITEM
+                    ));
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
                 }
             }
             Comparator<AppItem> sorter = (a, b) -> {
@@ -447,6 +445,9 @@ public class ColorActivity extends BaseActivity {
                         sort = -1;
                     } else {
                         sort = a.channelName.compareToIgnoreCase(b.channelName);
+                        if (sort == 0 && !a.conversation) {
+                            sort = -1;
+                        }
                     }
                 }
                 return sort;
@@ -456,10 +457,10 @@ public class ColorActivity extends BaseActivity {
             inactiveItems.sort(sorter);
 
             items.clear();
-            items.add(new AppItem("", null, null, null, null, 0, VIEW_TYPE_HELP));
-            items.add(new AppItem(getString(R.string.colors_header_active), null, null, null, null, 0, VIEW_TYPE_HEADER));
+            items.add(new AppItem("", null, null, false, null, null, 0, VIEW_TYPE_HELP));
+            items.add(new AppItem(getString(R.string.colors_header_active), null, null, false, null, null, 0, VIEW_TYPE_HEADER));
             items.addAll(activeItems);
-            items.add(new AppItem(getString(R.string.colors_header_inactive), null, null, null, null, 0, VIEW_TYPE_HEADER));
+            items.add(new AppItem(getString(R.string.colors_header_inactive), null, null, false, null, null, 0, VIEW_TYPE_HEADER));
             items.addAll(inactiveItems);
             notifyDataSetChanged();
         }
@@ -468,18 +469,20 @@ public class ColorActivity extends BaseActivity {
             public final String title;
             public final String packageName;
             public final String channelName;
+            public final boolean conversation;
             public final CharSequence tickerText;
             public final Drawable icon;
             public int color;
             public final int viewType;
 
-            public AppItem(String title, String packageName, String channelName, CharSequence tickerText, Drawable icon, int color, int viewType) {
+            public AppItem(String title, String packageName, String channelName, boolean conversation, CharSequence tickerText, Drawable icon, int color, int viewType) {
                 if ((title != null) && title.equals(packageName)) {
                     title = null;
                 }
                 this.title = title;
                 this.packageName = packageName;
                 this.channelName = channelName;
+                this.conversation = conversation;
                 this.tickerText = tickerText;
                 this.icon = icon;
                 this.color = color;

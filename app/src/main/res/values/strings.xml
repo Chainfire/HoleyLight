@@ -310,4 +310,6 @@
 <!-- Samsung --><string name="aod_helper_known_issues_samsung_tap_to_show"><![CDATA[<b>AOD</b> should <b>not</b> be in <b>Tap to show</b> mode in <b>Android Settings</b>]]></string>
 <!-- Samsung --><string name="aod_helper_known_issues_samsung_hide_aod"><![CDATA[The <b>Hide AOD</b> option should be set to <b>Full</b> or <b>Partial</b>]]></string>
 <!-- Samsung --><string name="aod_helper_known_issues_samsung_unholey_clock"><![CDATA[The <b>Unholey Light: Clock</b> option should be turned <b>off</b>]]></string>
+
+    <string name="colors_conversation">Conversation</string>
 </resources>
