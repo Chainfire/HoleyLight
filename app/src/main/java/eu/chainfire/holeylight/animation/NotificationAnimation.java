@@ -361,7 +361,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                 float width;
                 float height;
 
-                if (spritePlayer.isTSPMode(mode)) {
+                if (mode == SpritePlayer.Mode.TSP) {
                     top = tspRect.top;
                     if (positionAODClock && clockRect.height() > 0) {
                         top += clockRect.height() * 1.5f;

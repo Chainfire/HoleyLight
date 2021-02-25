@@ -536,7 +536,7 @@ public class Overlay {
                     if (lastState) {
                         boolean remove = false;
                         if (animation.isPlaying()) {
-                            boolean immediately = !fVisible || kill || isDelayed || settings.isAODHelperControl();
+                            boolean immediately = !fVisible || kill || isDelayed || spritePlayer.isTSPMode(lastMode) || lastHideAOD || settings.isAODHelperControl();
                             animation.stop(immediately);
                             if (immediately) remove = true;
                         } else {
