@@ -90,7 +90,7 @@ See [README_tech.md](./README_tech.md) for a more in-depth description.
 
 This app is 100% free, without ads, without tracking, but *with* GPLv3 [sauce](https://github.com/Chainfire/HoleyLight).
 
-In-app purchases exist to donate if you are so included, this does not unlock additional features, change app behavior, or entitle you to anything.
+In-app purchases exist to donate if you are so inclined, this does not unlock additional features, change app behavior, or entitle you to anything.
 
 ### Download
 
@@ -101,12 +101,7 @@ for the main APK (which may become outdated here) and the [AOD Helper](./apk/AOD
 package (which must stay updated because this is its main distribution
 channel).
 
-
-//TODO update
-
-[Screenshot#1](https://lh3.googleusercontent.com/jzDVR2wFkO8rd9dgEP_Pg6PKo5EjlL-O8fjLR5Widw5b-M5sxBujj_gh8QEBcaxMfBk)
-
-[Full options](./graphics/play/full_options.jpg)
+[Full options](https://raw.githubusercontent.com/Chainfire/HoleyLight/master/graphics/play/full_options.jpg)
 
 ### Feedback
 
