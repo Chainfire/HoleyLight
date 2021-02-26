@@ -96,8 +96,8 @@ In-app purchases exist to donate if you are so inclined, this does not unlock ad
 
 You can grab it from [Google Play](https://play.google.com/store/apps/details?id=eu.chainfire.holeylight).
 
-Alternatively, APKs are available from the [APK](./apk) directory, both
-for the main APK (which may become outdated here) and the [AOD Helper](./apk/AODHelper.md)
+Alternatively, APKs are available from the [APK](./apks) directory, both
+for the main APK (which may become outdated here) and the [AOD Helper](./apks/AODHelper.md)
 package (which must stay updated because this is its main distribution
 channel).
 
