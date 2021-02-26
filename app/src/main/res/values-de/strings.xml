@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="permission_required">Berechtigungen benötigt</string>
-    <string name="permission_battery"><![CDATA[Erlaube im nächsten Dialog <b>Holey Light</b> die Batterieoptimierung zu deaktivieren. Dies wird benötigt um die Benachrichtigungsanimation am laufen zu halten.]]></string>
+    <string name="permission_battery"><![CDATA[Erlaube im nächsten Dialog <b>Holey Light</b> die Akkuoptimierung zu deaktivieren. Dies wird benötigt um die Benachrichtigungsanimation am laufen zu halten.]]></string>
     <string name="permission_associate"><![CDATA[Verbinde bitte im nächsten Dialog <b>Holey Light</b> mit <b>irgendeinem</b> Gerät. Dies wird benötigt um Zugang zu Benachrichtigungsfarben zu erhalten. Es macht keinen Unterschied welches Gerät du wählst.<br><br>Bitte <b>schalte Wi-Fi und Bluetooth ein</b> bevor du fortfährst; hinterher kannst du sie wieder ausschalten.<br><br>Wenn kein Popup erscheint vergewissere dich dass <b>Nearby device scanning</b> aktiviert ist und verbinde dich mit einem Bluetooth Gerät.]]></string>
     <string name="permission_notifications"><![CDATA[Erlaube im nächsten Dialog <b>Holey Light</b> Benachrichtigungszugang. Das wird benötigt um Benachrichtigungen zu erkennen.]]></string>
     <string name="notification_test_title">Holey Light: Test</string>
@@ -15,10 +15,10 @@
     <string name="disabled">Deaktiviert</string>
     <string name="charging_screen_on">Laden: Bildschirm an</string>
     <string name="charging_screen_off">Laden: Bildschirm aus</string>
-    <string name="battery_screen_on">Batterie: Bildschirm an</string>
-    <string name="battery_screen_off">Batterie: Bildschirm aus</string>
+    <string name="battery_screen_on">Akku: Bildschirm an</string>
+    <string name="battery_screen_off">Akku: Bildschirm aus</string>
     <string name="settings_screen_off_charging_description">Zeige Benachrichtigungslicht während der Bildschirm aus ist und der Akku lädt</string>
-    <string name="settings_screen_off_battery_description">Zeige Benachrichtigungslicht während der Bildschirm aus im Batteriebetrieb. Verbraucht zusätzlich Energie</string>
+    <string name="settings_screen_off_battery_description">Zeige Benachrichtigungslicht während der Bildschirm aus im Akkubetrieb. Verbraucht zusätzlich Energie</string>
     <string name="settings_lockscreen_on_title">Sperrbildschirm</string>
     <string name="settings_lockscreen_on_description">Zeige Benachrichtigungslicht auf dem Sperrbildschirm; dies könnte komisch aussehen wenn Entsperren mit Gesichtserkennung aktiviert ist</string>
     <string name="settings_category_seen_pickup_description">Stationär für &gt;10s vor der Bewegung</string>
@@ -56,7 +56,7 @@
     <string name="settings_animation_colors_description_v3">Stelle die Benachrichtigungsfarbe per Paket und Kanal ein</string>
     <string name="permission_accessibility_v2"><![CDATA[Gehe im nächsten Bildschirm bitte zu <b>Installierte Dienste</b> und aktiviere <b>Holey Light</b>. Dies wird benötigt um Benachrichtigungen anzuzeigen und in der Lage zu sein ins AOD zu tippen. Versuche einen Neustart des Geräts wenn das nicht richtig funktioniert.]]></string>
     <string name="settings_screen_on_charging_description">Zeige Benachrichtigungslicht während der Bildschirm an ist und der Akku lädt</string>
-    <string name="settings_screen_on_battery_description">Zeige Benachrichtigungslicht während der Bildschirm an ist im Batteriebetrieb</string>
+    <string name="settings_screen_on_battery_description">Zeige Benachrichtigungslicht während der Bildschirm an ist im Akkubetrieb</string>
     <string name="settings_category_operation_title_v2">Wann und wie anzeigen</string>
     <string name="operation_mode_disabled_title">Deaktiviert</string>
     <string name="operation_mode_disabled_description">Zeige keine Benachrichtigungen</string>
@@ -66,8 +66,8 @@
     <string name="animation_style_tsp_title">Unholey Light</string>
     <string name="animation_style_location_camera">Kamera</string>
     <string name="animation_style_location_screen_center">Display mittig</string>
-    <string name="animation_style_percentage_up_to">Bis zu %.1f%% Batterie/Stunde</string>
-    <string name="animation_style_percentage_below">Unter %.0f%% Batterie/Stunde</string>
+    <string name="animation_style_percentage_up_to">Bis zu %.1f%% Akku/Stunde</string>
+    <string name="animation_style_percentage_below">Unter %.0f%% Akku/Stunde</string>
     <string name="settings_category_seen_title">Als gesehen markieren</string>
     <string name="settings_category_seen_description">Benachrichtigungen als abgelehnt behandeln</string>
     <string name="settings_seen_pickup_title">Bei Aufnahme</string>
@@ -75,7 +75,7 @@
     <string name="settings_hide_aod_description">Wenn der Bildschirm aus ist verstecke das Always On Display und zeige nur unsere Animation</string>
     <string name="notice_dialog_title">Hinweis</string>
 <!-- Samsung --><string name="notice_aod_required_message"><![CDATA[In der aktuellen Konfiguration muss <b>Always On Display</b> aktiviert sein.<br><br>Gehen sie bitte zu den <b>Einstellungen -> Sperrbildschirm -> Always On Display</b> und stellen Sie es auf <b>Immer anzeigen</b> (oder <b>Tippen zum anzeigen</b> wenn dies gewünscht ist).<br><br>Bitte stellen Sie auch sicher dass die <b>Bildschirmausrichtung</b> eingestellt ist auf <b>Hochfornat</b>.<br><br>Sie können auch AOD Zeitplan und die Helligkeit konfigurieren.]]></string>
-<!-- Samsung --><string name="notice_aod_with_image_required_message"><![CDATA[Die aktuelle Konfiguration erfordert ein Bild das auf <b>Always On Display</b> angewendet wird.<br><br>Bitte gehe zu <b>Themes (AOD Bereich)</b>, <b>Download</b> ein beliebiges (freies) Theme und <b>Verwende</b> es als <b>Nur Bild</b>.<br><br>Wenn Sie es als beides <b>Uhr und Bild</b> anwenden wird die Uhr irgendwann sichtbar werden.]]></string>
+<!-- Samsung --><string name="notice_aod_with_image_required_message"><![CDATA[Die aktuelle Konfiguration erfordert ein Bild das auf <b>Always On Display</b> angewendet wird.<br><br>Bitte gehe zu <b>Themes (AOD Bereich)</b>, <b>Download</b> ein beliebiges (kostenloses) Theme und <b>Verwende</b> es als <b>Nur Bild</b>.<br><br>Wenn Sie es als beides <b>Uhr und Bild</b> anwenden wird die Uhr irgendwann sichtbar werden.]]></string>
     <string name="open_android_settings">Öffne Android Einstellungen</string>
     <string name="open_theme_store">Öffne Galaxy Themes</string>
     <string name="yes">Ja</string>
@@ -83,9 +83,9 @@
     <string name="setup_wizard_title">Setup Wizard</string>
     <string name="setup_wizard_description">Hilft dir Holey Light zu konfigurieren</string>
     <string name="setup_wizard_welcome"><![CDATA[Willkommen bei <b>Holey Light</b>! Richten wir dich ein.<br><br>Ein Wort der Warnung diese App erfordert einige ziemlich extreme Berechtigungen um funktionieren zu können. Wenn Sie sich damit nicht wohlfühlen sollten Sie nicht fortfahren.<br><br>Beachte dass der Quellcode für diese App für jeden frei verfügbar ist um ihn zu überprüfen.<br><br>Es werden mehrere Popups folgen dies wird einige Minuten dauern!]]></string>
-    <string name="setup_wizard_run_while_screen_off"><![CDATA[Wir können Benachrichtigungen anzeigen während der Bildschirm ausgeschaltet ist aber dies verbraucht zwischen <b>1%</b> and <b>5.5%</b> Batterie in der  <b>Stunde</b> abhängig von deiner Einstellung.<br><br>Dazu muss auch die <b>Always On Display</b> Funktion aktiviert sein. Wenn Sie <b>AOD</b> nicht mögen können wir es später verstecken!<br><br>Möchten Sie Benachrichtigungen anzeigen während der Bildschirm ausgeschaltet ist?]]></string>
-    <string name="setup_wizard_choose_notification_style"><![CDATA[Wählen Sie bitte Ihren Animationsstil für den ausgeschalteten Bildchirm.<br><br><b>Swirl</b> ist ein Licht das um das Kameraloch kreist und bis zu <b>5.5%</b> Batterie in der Stunde verbraucht (schlimmster Fall).<br><br><b>Blink</b> ist ein blinkender Kreis um das Kameraloch und verbraucht bis zu <b>3.5%</Batterie in der Stunde (schlimmster Fall).<br><br><b>Unholy Light</b> ist ein großer Kreis in der Mitte Ihres Bildschirms. Er ist nicht animiert verbraucht aber weniger als <b>1%</b> Batterie in der Stunde. Diese Option versteckt <i>immer</i> <b>AOD</b> was bei den anderen 2 <i>optional</i> ist.]]></string>
-    <string name="setup_wizard_hide_aod"><![CDATA[<b>Always On Display</b> ist eine Funktion die verschiedene Informationen auf dem Bildschirm anzeigen kann während dieser ausgeschaltet ist und dabei weniger als 1% Batterie in der Stunde verbraucht. Manche finden es nützlich andere finden es ablenkend. Wir können AOD zusammen mit unserer Benachrichtigungsleuchte anzeigen oder wir können AOD ausblenden und Ihnen nur unsere Benachrichtigungsleuchte und ansonsten einen schwarzen Bildschirm präsentieren.]]></string>
+    <string name="setup_wizard_run_while_screen_off"><![CDATA[Wir können Benachrichtigungen anzeigen während der Bildschirm ausgeschaltet ist aber dies verbraucht zwischen <b>1%</b> and <b>5.5%</b> Akku in der  <b>Stunde</b> abhängig von deiner Einstellung.<br><br>Dazu muss auch die <b>Always On Display</b> Funktion aktiviert sein. Wenn Sie <b>AOD</b> nicht mögen können wir es später verstecken!<br><br>Möchten Sie Benachrichtigungen anzeigen während der Bildschirm ausgeschaltet ist?]]></string>
+    <string name="setup_wizard_choose_notification_style"><![CDATA[Wählen Sie bitte Ihren Animationsstil für den ausgeschalteten Bildchirm.<br><br><b>Swirl</b> ist ein Licht das um das Kameraloch kreist und bis zu <b>5.5%</b> Akku in der Stunde verbraucht (schlimmster Fall).<br><br><b>Blink</b> ist ein blinkender Kreis um das Kameraloch und verbraucht bis zu <b>3.5%</Akku in der Stunde (schlimmster Fall).<br><br><b>Unholey Light</b> ist ein großer Kreis in der Mitte Ihres Bildschirms. Er ist nicht animiert verbraucht aber weniger als <b>1%</b> Akku in der Stunde. Diese Option versteckt <i>immer</i> <b>AOD</b> was bei den anderen 2 <i>optional</i> ist.]]></string>
+    <string name="setup_wizard_hide_aod"><![CDATA[<b>Always On Display</b> ist eine Funktion die verschiedene Informationen auf dem Bildschirm anzeigen kann während dieser ausgeschaltet ist und dabei weniger als 1% Akku in der Stunde verbraucht. Manche finden es nützlich andere finden es ablenkend. Wir können AOD zusammen mit unserer Benachrichtigungsleuchte anzeigen oder wir können AOD ausblenden und Ihnen nur unsere Benachrichtigungsleuchte und ansonsten einen schwarzen Bildschirm präsentieren.]]></string>
     <string name="setup_wizard_option_show_aod">Zeige AOD</string>
     <string name="setup_wizard_option_hide_aod">Verstecke AOD</string>
     <string name="setup_wizard_complete"><![CDATA[Wir sind mit der Ersteinrichtung fertig. Es folgen weitere Popup Dialoge die Ihnen bei der Einrichtung von Berechtigungen helfen. damit diese App funktioniert.<br><br>Danach gibt es weitere Einstellungen die Sie selbst erkunden können!]]></string>
@@ -179,4 +179,36 @@
     <string name="donate_description_paypal">PayPal: chainfire@chainfire.eu</string>
     <string name="tune_thickness">Stärke einstellen: %.2fdp</string>
 <!-- Samsung --><string name="settings_aod_helper_control_description_samsung_2"><![CDATA[Aktivieren und deaktivieren Sie AOD automatisch basierend auf dem Benachrichtigungsstatus. Reduziert den Stromverbrauch, wenn keine Benachrichtigungen aktiv sind. <b>Nicht</b> kompatibel mit AOD im <b>Zum Anzeigen tippen</b> Modus! AOD Einstellungen können während der Aktivierung gesperrt sein.]]></string>
+
+    <!-- v0.71 RC5 -->
+
+<!-- Samsung --><string name="settings_animation_unholey_light_show_clock_title">Unholey Light: Uhr</string>
+<!-- Samsung --><string name="settings_animation_unholey_light_show_clock_description">Die Uhr des AOD anzeigen (falls konfiguriert)</string>
+<!-- Samsung --><string name="settings_animation_unholey_light_show_clock_description_incompat"><![CDATA[<b>Nicht</b> kompatibel mit <b>AOD Helper</b>.]]></string>
+
+<!-- Samsung --><string name="aod_helper_known_issues_samsung_title">Bekannte Fehler</string>
+<!-- Samsung --><string name="aod_helper_known_issues_samsung_description"><![CDATA[Aufgrund der Funktionsweise von <b>AOD Helper</b> können sich einige <b>Holey Light</b> Optionen anders verhalten als erwartet. Für die beste Erfahrung verwenden Sie diese Einstellungen:]]></string>
+<!-- Samsung --><string name="aod_helper_known_issues_samsung_settings"><![CDATA[Möglicherweise müssen Sie <b>AOD Helper</b> vorübergehend deaktivieren, um die <b>AOD</b> Optionen in den <b>Android-Einstellungen</b> ändern zu können]]></string>
+<!-- Samsung --><string name="aod_helper_known_issues_samsung_tap_to_show"><![CDATA[<b>AOD</b> sollte <b>nicht</b> im Modus <b>Tippen zum Anzeigen</b> in den <b>Android-Einstellungen</b> sein]]></string>
+<!-- Samsung --><string name="aod_helper_known_issues_samsung_hide_aod"><![CDATA[Die Option <b>Verstecke AOD</b> sollte auf <b>Komplett</b> oder <b>Teilweise</b> gesetzt werden]]></string>
+<!-- Samsung --><string name="aod_helper_known_issues_samsung_unholey_clock"><![CDATA[Die <b>Unholey Light: Uhr</b> Option sollte <b>ausgeschaltet</b sein>]]></string>
+
+    <string name="colors_conversation">Konversation</string>
+
+    <string name="settings_category_operation_description_v2"><![CDATA[Dies ist <b>keine</b> Akkustandsanzeige!]]></string>
+
+    <string name="settings_category_tips">Tips</string>
+<!-- Samsung --><string name="tips_samsung_aod_image_title">AOD: Bild and Theme</string>
+<!-- Samsung --><string name="tips_samsung_aod_image_description"><![CDATA[Wenn <b>Unholey Light</b> oder <b>Verstecke AOD</b> nicht richtig funktioniert, überprüfen Sie Ihr AOD Hintergrundbild oder die Themeneinstellungen. Tippen Sie für Anweisungen.]]></string>
+<!-- Samsung --><string name="tips_samsung_fingerprint_title">AOD: Fingerprint icon</string>
+<!-- Samsung --><string name="tips_samsung_fingerprint_description"><![CDATA[Die Anzeige des Fingerabdruck Symbols wird von Android gesteuert, <b>Einstellungen -> Biometrische Daten und Sicherheit -> Fingerabdrücke -> Symbol anzeigen, wenn der Bildsch. aus</b>. Es kann auch erscheinen, wenn <b>Verstecke AOD</b> aktiviert ist!]]></string>
+<!-- Samsung --><string name="tips_samsung_battery_title">AOD: Battery Status</string>
+<!-- Samsung --><string name="tips_samsung_battery_description"><![CDATA[Die Anzeige des Akkustatus wird von Android gesteuert, <b>Einstellungen -> Akku und Gerätewartung -> Akku -> Weitere Akkueinstellungen -> Ladeinformationen anzeigen</b>.]]></string>
+
+    <string name="notice_aod_image_required"><![CDATA[Die aktuelle Konfiguration erfordert ein Bild, das auf <b>Always On Display</b> angewendet wird. Es kann nicht erkannt werden, wenn Sie diesen Schritt bereits ausgeführt haben.]]></string>
+    <string name="notice_aod_image_image"><![CDATA[Ein schwarzes <b>Bild</b> kann für Sie vorinstalliert werden, oder Sie können Ihr eigenes Bild aus der Galerie auswählen. Diese Option enthält immer eine Uhr.]]></string>
+    <string name="notice_aod_image_theme"><![CDATA[To apply a <b>theme</b>, go to <b>Themes (AOD section)</b>, <b>Download</b> any (free) theme, and <b>Apply</b> it, optionally with a clock.]]></string>
+    <string name="notice_aod_image_clock"><![CDATA[Auf älteren Geräten kann die Konfiguration eines Bildes <b>mit</b> Uhr die Option <b>AOD ausblenden</b> stören.]]></string>
+    <string name="image">Bild</string>
+    <string name="theme">Theme</string>
 </resources>
