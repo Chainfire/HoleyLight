@@ -237,6 +237,8 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final String AOD_SHOW_CLOCK = "aod_show_clock";
     public static final boolean AOD_SHOW_CLOCK_DEFAULT = false;
 
+    public static final String AOD_IMAGE_INSTRUCTIONS_SHOWN = "aod_image_instructions_shown";
+
     private static Settings instance;
     public static Settings getInstance(Context context) {
         synchronized (Settings.class) {
@@ -761,6 +763,14 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public void setLocale(String locale) {
         put(LOCALE, locale != null ? locale : LOCALE_DEFAULT, true);
+    }
+
+    public boolean isAODImageInstructionsShown() {
+        return prefs.getBoolean(AOD_IMAGE_INSTRUCTIONS_SHOWN, false);
+    }
+
+    public void setAODImageInstructionsShown() {
+        put(AOD_IMAGE_INSTRUCTIONS_SHOWN, true, true);
     }
 
     public String[] getPurchased() {

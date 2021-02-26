@@ -39,7 +39,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import androidx.core.content.FileProvider;
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
@@ -465,6 +464,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         root.addPreference(setupWizard);
 
         PreferenceCategory catOperation = category(root, R.string.settings_category_operation_title_v2, 0);
+        catOperation.setSummary(Html.fromHtml(getString(R.string.settings_category_operation_description_v2)));
 
         Preference.OnPreferenceClickListener operationClickListener = preference -> {
             final int mode = getModeFromPreference(preference);
@@ -766,6 +766,19 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 }
                 return false;
             });
+        }
+
+        if (Manufacturer.isSamsung()) {
+            PreferenceCategory catTips = category(root, R.string.settings_category_tips, 0);
+            pref(catTips, R.string.tips_samsung_aod_image_title, 0, null, true, (preference) -> {
+                Activity activity = getActivity();
+                if (activity instanceof MainActivity) {
+                    ((MainActivity)activity).showAODImageThemeInstructions(false);
+                }
+                return true;
+            }).setSummary(Html.fromHtml(getString(R.string.tips_samsung_aod_image_description)));
+            pref(catTips, R.string.tips_samsung_fingerprint_title, 0, null, true, null).setSummary(Html.fromHtml(getString(R.string.tips_samsung_fingerprint_description)));
+            pref(catTips, R.string.tips_samsung_battery_title, 0, null, true, null).setSummary(Html.fromHtml(getString(R.string.tips_samsung_battery_description)));
         }
 
         updatePrefs(null, true);

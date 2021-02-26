@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.companion.AssociationRequest;
 import android.companion.CompanionDeviceManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.net.Uri;
@@ -46,6 +47,11 @@ import com.android.billingclient.api.SkuDetailsParams;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -57,6 +63,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.FileProvider;
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.SpritePlayer;
@@ -313,7 +320,7 @@ public class MainActivity extends BaseActivity implements Settings.OnSettingsCha
         if (aodRequired) {
             aodRequired = !AODControl.isAODEnabled(this) && !settings.isAODHelperControl();
             if (aodWithImageRequired) {
-                aodWithImageRequired = (Manufacturer.isSamsung() && AODControl.getAODThemePackage(this) == null);
+                aodWithImageRequired = Manufacturer.isSamsung();
             }
             if (aodRequired) {
                 (currentDialog = newAlert(false)
@@ -338,22 +345,10 @@ public class MainActivity extends BaseActivity implements Settings.OnSettingsCha
                         .show()).setCanceledOnTouchOutside(false);
                 return true;
             } else if (aodWithImageRequired) {
-                (currentDialog = newAlert(false)
-                        .setTitle(R.string.notice_dialog_title)
-                        .setMessage(Html.fromHtml(getString(R.string.notice_aod_with_image_required_message)))
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .setPositiveButton(R.string.open_theme_store, (dialog, which) -> {
-                            try {
-                                Intent intent = new Intent();
-                                intent.setPackage("com.samsung.android.themestore");
-                                intent.setData(Uri.parse("themestore://MainPage?contentsType=aods"));
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        })
-                        .show()).setCanceledOnTouchOutside(false);
+                if (!settings.isAODImageInstructionsShown()) {
+                    showAODImageThemeInstructions(true);
+                    settings.setAODImageInstructionsShown();
+                }
                 return true;
             }
         }
@@ -538,6 +533,79 @@ public class MainActivity extends BaseActivity implements Settings.OnSettingsCha
             startActivity(i);
         } catch (Exception e) {
             //  no action
+        }
+    }
+
+    public void showAODImageThemeInstructions(boolean required) {
+        StringBuilder sb = new StringBuilder();
+        if (required) {
+            sb.append(getString(R.string.notice_aod_image_required));
+            sb.append("<br><br>");
+        }
+        sb.append(getString(R.string.notice_aod_image_image));
+        sb.append("<br><br>");
+        sb.append(getString(R.string.notice_aod_image_theme));
+        sb.append("<br><br>");
+        sb.append(getString(R.string.notice_aod_image_clock));
+        sb.append("<br><br>");
+        final String message = sb.toString();
+        (currentDialog = newAlert(false)
+                .setTitle(R.string.notice_dialog_title)
+                .setMessage(Html.fromHtml(message))
+                .setNeutralButton(required ? R.string.ignore : android.R.string.cancel, null)
+                .setNegativeButton(R.string.image, (dialog, which) -> {
+                    setBlackAODImage();
+                })
+                .setPositiveButton(R.string.theme, (dialog, which) -> {
+                    try {
+                        Intent intent = new Intent();
+                        intent.setPackage("com.samsung.android.themestore");
+                        intent.setData(Uri.parse("themestore://MainPage?contentsType=aods"));
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                })
+                .show()).setCanceledOnTouchOutside(false);
+    }
+
+    private void setBlackAODImage() {
+        boolean ok = false;
+        File file = new File(getExternalFilesDir(null), "black_1x1.png");
+        if (!file.exists()) {
+            Uri uri = Uri.parse("android.resource://" + BuildConfig.APPLICATION_ID + "/drawable/black_1x1");
+            try {
+                InputStream is = getContentResolver().openInputStream(uri);
+                OutputStream os = new FileOutputStream(file);
+                try {
+                    byte[] buf = new byte[1024];
+                    while (is.read(buf) > 0) {
+                        os.write(buf);
+                    }
+                    ok = true;
+                } catch (IOException ignored) {
+                } finally {
+                    try { is.close(); } catch (Exception ignored) { }
+                    try { os.close(); } catch (Exception ignored) { }
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else {
+            ok = true;
+        }
+
+        if (ok) {
+            Intent intent = new Intent("com.samsung.android.app.aodservice.intent.action.SET_AS_AOD");
+            intent.setComponent(new ComponentName("com.samsung.android.app.aodservice", "com.samsung.android.app.aodservice.settings.opreditor.ImageOprEditActivity"));
+
+            Uri uri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", file);
+            intent.setDataAndType(uri, "image/jpeg");
+            intent.putExtra("filePath", uri.toString());
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            startActivity(intent);
         }
     }
 
