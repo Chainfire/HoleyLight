@@ -12,6 +12,13 @@ import eu.chainfire.holeylight.misc.Slog;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+/* This is a mess of different algos doing more or less the same thing across several
+   Samsung Android versions and firmwares. Touching == breaking. Unfortunately there
+   isn't really a way to go back and verify after the fact now unless you had a
+   bunch of different compatible Samsung devices and then several of each running
+   different Android versions :/
+ */
+
 public class AreaFinderSamsung extends AreaFinder {
     private String previousNodeClass = null;
     private boolean seenXViewPager = false;
@@ -28,6 +35,48 @@ public class AreaFinderSamsung extends AreaFinder {
             }
             if (sb.length() > 0) sb.append(" ");
             Slog.d(TAG, "Node " + sb.toString() + node.getClassName().toString() + " " + bounds.toString() + " " + node.getViewIdResourceName());
+        }
+    }
+
+    private void inspectClockNode(AccessibilityNodeInfo node, int level, Rect outerBounds) {
+        for (int i = 0; i < node.getChildCount(); i++) {
+            AccessibilityNodeInfo child = node.getChild(i);
+            String childId = child.getViewIdResourceName();
+            if ((childId != null) && (
+                    // either of those can be not present and draw into parent node itself
+                    childId.equals("com.samsung.android.app.aodservice:id/common_hourMin") ||
+                    childId.equals("com.samsung.android.app.aodservice:id/common_date")
+            )) {
+                Rect childBounds = new Rect();
+                child.getBoundsInScreen(childBounds);
+                if ((childBounds.top >= 0) && (childBounds.left >= 0) && (childBounds.width() > 0) && (childBounds.height() > 0)) {
+                    if (clockArea == null) {
+                        clockArea = new Rect(
+                                min(outerBounds.left, childBounds.left),
+                                min(outerBounds.top, childBounds.top),
+                                max(outerBounds.right, childBounds.right),
+                                childBounds.bottom
+                        );
+                    } else {
+                        clockArea.left = min(clockArea.left, childBounds.left);
+                        clockArea.top = min(clockArea.top, childBounds.top);
+                        clockArea.right = max(clockArea.right, childBounds.right);
+                        clockArea.bottom = max(clockArea.bottom, childBounds.bottom);
+                    }
+                    logNode(level, child, childBounds);
+                    Slog.d(TAG, "+++++++++++++++++++++++++++++++++++++++++++++++++++");
+                } else {
+                    logNode(level, child, childBounds);
+                }
+            } else if (childId != null && childId.equals("com.samsung.android.app.aodservice:id/common_clock_widget_container")) {
+                Rect childBounds = new Rect();
+                logNode(level, child, childBounds);
+                inspectClockNode(child, level + 1, outerBounds);
+            } else if (Settings.DEBUG) {
+                Rect childBounds = new Rect();
+                child.getBoundsInScreen(childBounds);
+                logNode(level + 1, child, childBounds);
+            }
         }
     }
 
@@ -93,36 +142,7 @@ public class AreaFinderSamsung extends AreaFinder {
                 if ((bounds.top >= 0) && (bounds.bottom >= 0) && ((outerBounds.bottom == -1) || (bounds.bottom > outerBounds.bottom))) outerBounds.bottom = bounds.bottom;
                 Slog.d(TAG, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 
-                // not another inspectNode recursion because it complicates things even more
-                for (int i = 0; i < node.getChildCount(); i++) {
-                    AccessibilityNodeInfo child = node.getChild(i);
-                    String childId = child.getViewIdResourceName();
-                    if ((childId != null) && (
-                            // either of those can be not present and draw into parent node itself
-                            childId.equals("com.samsung.android.app.aodservice:id/common_hourMin") ||
-                            childId.equals("com.samsung.android.app.aodservice:id/common_date")
-                    )) {
-                        Rect childBounds = new Rect();
-                        child.getBoundsInScreen(childBounds);
-                        if ((childBounds.top >= 0) && (childBounds.left >= 0) && (childBounds.width() > 0) && (childBounds.height() > 0)) {
-                            if (clockArea == null) {
-                                clockArea = new Rect(
-                                        min(outerBounds.left, childBounds.left),
-                                        min(outerBounds.top, childBounds.top),
-                                        max(outerBounds.right, childBounds.right),
-                                        childBounds.bottom
-                                );
-                            } else {
-                                clockArea.left = min(clockArea.left, childBounds.left);
-                                clockArea.top = min(clockArea.top, childBounds.top);
-                                clockArea.right = max(clockArea.right, childBounds.right);
-                                clockArea.bottom = max(clockArea.bottom, childBounds.bottom);
-                            }
-                            logNode(level + 1, child, childBounds);
-                            Slog.d(TAG, "+++++++++++++++++++++++++++++++++++++++++++++++++++");
-                        }
-                    }
-                }
+                inspectClockNode(node, level + 1, outerBounds);
             }
         } else if (node.getClassName().equals("android.widget.FrameLayout") || Settings.DEBUG)  {
             for (int i = 0; i < node.getChildCount(); i++) {
