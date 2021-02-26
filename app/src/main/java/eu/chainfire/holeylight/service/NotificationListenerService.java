@@ -438,11 +438,10 @@ public class NotificationListenerService extends android.service.notification.No
                     List<NotificationChannel> chans = getNotificationChannels(sbn.getPackageName(), Process.myUserHandle());
                     for (NotificationChannel chan : chans) {
                         if (chan.getId().equals(not.getChannelId())) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            if (Build.VERSION.SDK_INT >= 30) {
                                 for (NotificationChannel child : chans) {
                                     if (!child.getId().equals(chan.getId()) && child.getConversationId() != null && child.getParentChannelId().equals(chan.getId())) {
                                         conversation = true;
-
                                     }
                                 }
                             }
