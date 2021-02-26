@@ -565,9 +565,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         });
         prefBlackFill = check(catAnimation, R.string.settings_animation_black_fill_title, R.string.settings_animation_black_fill_description, Settings.BLACK_FILL, Settings.BLACK_FILL_DEFAULT, true);
         prefUnholeyIcons = check(catAnimation, R.string.settings_animation_unholey_light_icons_title, R.string.settings_animation_unholey_light_icons_description, Settings.UNHOLEY_LIGHT_ICONS, Settings.UNHOLEY_LIGHT_ICONS_DEFAULT, true);
-        if (Manufacturer.isSamsung()) {
-            prefUnholeyClock = check(catAnimation, R.string.settings_animation_unholey_light_show_clock_title, 0, Settings.AOD_SHOW_CLOCK, Settings.AOD_SHOW_CLOCK_DEFAULT, true);
-        }
+        prefUnholeyClock = check(catAnimation, R.string.settings_animation_unholey_light_show_clock_title, 0, Settings.AOD_SHOW_CLOCK, Settings.AOD_SHOW_CLOCK_DEFAULT, true);
 
         prefOverlayLinger = check(catAnimation, R.string.settings_animation_overlay_linger_title, 0, null, false, true);
         prefOverlayLinger.setOnPreferenceChangeListener((preference, newValue) -> false);
@@ -877,14 +875,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             prefColors.setEnabled(settings.isEnabled());
             prefBlackFill.setEnabled(settings.isEnabled());
             prefUnholeyIcons.setEnabled(settings.isEnabled());
-            if (prefUnholeyClock != null) {
-                prefUnholeyClock.setEnabled(settings.isEnabled());
-                String summary = getString(R.string.settings_animation_unholey_light_show_clock_description);
-                if (aodHelperState != AODControl.AODHelperState.NOT_INSTALLED) {
-                    summary += ". " + getString(R.string.settings_animation_unholey_light_show_clock_description_incompat);
-                }
-                prefUnholeyClock.setSummary(Html.fromHtml(summary));
+
+            prefUnholeyClock.setEnabled(settings.isEnabled());
+            String sSummary = getString(R.string.settings_animation_unholey_light_show_clock_description);
+            if (Manufacturer.isSamsung() && aodHelperState != AODControl.AODHelperState.NOT_INSTALLED) {
+                sSummary += ". " + getString(R.string.settings_animation_unholey_light_show_clock_description_incompat);
             }
+            prefUnholeyClock.setSummary(Html.fromHtml(sSummary));
 
             prefOverlayLinger.setEnabled(settings.isEnabled());
             prefOverlayLinger.setChecked(settings.getOverlayLinger() > 0);
@@ -965,14 +962,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
             if (activity != null) {
                 boolean donateAtTop = activity.iapAvailable && settings.getPurchased().length == 0;
-                int summary = activity.iapAvailable ? R.string.donate_description_iap : R.string.donate_description_paypal;
+                int iSummary = activity.iapAvailable ? R.string.donate_description_iap : R.string.donate_description_paypal;
                 boolean enabled = activity.iapAvailable;
                 
-                prefDonateTop.setSummary(summary);
+                prefDonateTop.setSummary(iSummary);
                 prefDonateTop.setEnabled(enabled);
                 prefDonateTop.setVisible(donateAtTop);
 
-                prefDonateBottom.setSummary(summary);
+                prefDonateBottom.setSummary(iSummary);
                 prefDonateBottom.setEnabled(enabled);
                 prefDonateBottom.setVisible(!donateAtTop);
             }

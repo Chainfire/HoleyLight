@@ -10,6 +10,8 @@ import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.misc.Slog;
 
 public class AreaFinderGoogle extends AreaFinder {
+    private Rect clockArea = null;
+
     private void inspectNode(AccessibilityNodeInfo node, Rect outerBounds, int level) {
         if (
                 (node == null) ||
@@ -37,6 +39,17 @@ public class AreaFinderGoogle extends AreaFinder {
         }
 
         if (level == 2 && (node.getViewIdResourceName() == null || !node.getViewIdResourceName().startsWith("com.android.systemui:id/keyguard_"))) {
+            if (node.getViewIdResourceName() != null && node.getViewIdResourceName().equals("com.android.systemui:id/default_clock_view")) {
+                // named text view with clock
+                if (bounds.left >= 0 && bounds.top >= 0 && bounds.width() > 0 && bounds.height() > 0) {
+                    clockArea = new Rect(bounds);
+                }
+            } else if (clockArea != null && node.getClassName() != null && node.getClassName().equals("android.widget.TextView")) {
+                // unnamed text views below clock with date and weather
+                if (bounds.top == clockArea.bottom) {
+                    clockArea.bottom = bounds.bottom;
+                }
+            }
             if ((bounds.left >= 0) && (bounds.right >= 0) && ((outerBounds.left == -1) || (bounds.left < outerBounds.left))) outerBounds.left = bounds.left;
             if ((bounds.top >= 0) && (bounds.bottom >= 0) && ((outerBounds.top == -1) || (bounds.top < outerBounds.top))) outerBounds.top = bounds.top;
             if ((bounds.left >= 0) && (bounds.right >= 0) && ((outerBounds.right == -1) || (bounds.right > outerBounds.right))) outerBounds.right = bounds.right;
@@ -51,6 +64,7 @@ public class AreaFinderGoogle extends AreaFinder {
 
     @Override
     public void start(Context context) {
+        clockArea = null;
     }
 
     @Override
@@ -68,15 +82,13 @@ public class AreaFinderGoogle extends AreaFinder {
                     outerBounds.left = bounds.left;
                     outerBounds.right = bounds.right;
                     int h = outerBounds.height();
-                    outerBounds.top -= (int)h/2;
-                    outerBounds.bottom += (int)h/2;
-                    while (outerBounds.top < bounds.top) {
-                        outerBounds.top += (int)h/4;
-                        outerBounds.bottom += (int)h/4;
+                    if (clockArea != null) {
+                        outerBounds.bottom += (clockArea.height()*3/2);
                     }
+                    outerBounds.top = Math.max(bounds.top, outerBounds.top - (int)h/2);
+                    outerBounds.bottom += (int)h/2;
                     while (outerBounds.bottom > bounds.bottom * 0.9) {
-                        outerBounds.top -= (int)h/4;
-                        outerBounds.bottom -= (int)h/4;
+                        outerBounds.bottom = (int)(bounds.bottom * 0.9);
                     }
                     break;
                 }
@@ -88,7 +100,7 @@ public class AreaFinderGoogle extends AreaFinder {
 
     @Override
     public Rect findClock(AccessibilityNodeInfo root) {
-        return null;
+        return clockArea;
     }
 
     @Override

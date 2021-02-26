@@ -364,7 +364,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
                 if (mode == SpritePlayer.Mode.TSP) {
                     top = tspRect.top;
                     if (positionAODClock && clockRect.height() > 0) {
-                        top += clockRect.height() * 1.5f;
+                        top = clockRect.bottom + clockRect.height()/2f;
                     }
 
                     float centerX = tspRect.exactCenterX();
@@ -379,13 +379,6 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
 
                     // Apply
                     left = centerX - (squareSize / 2f);
-                    if (Manufacturer.isSamsung()) {
-                        // Samsung: small screen area, stay at the top in case size changes when tapped, looks better
-                        // do nothing, top is already set correctly
-                    } else {
-                        // Google: stay in center of found area
-                        top = centerY - (squareSize / 2f);
-                    }
                     width = squareSize;
                     height = squareSize;
                     if (left < 0) left = 0;
