@@ -428,6 +428,8 @@ public class NotificationListenerService extends android.service.notification.No
                 int c = 0xFF000000;
                 int cChan = c;
                 boolean conversation = false;
+                boolean bubble = false;
+                boolean bubbleUnread = false;
                 String channelName = "legacy";
 
                 Boolean shouldShowLights = null;
@@ -438,9 +440,16 @@ public class NotificationListenerService extends android.service.notification.No
                     List<NotificationChannel> chans = getNotificationChannels(sbn.getPackageName(), Process.myUserHandle());
                     for (NotificationChannel chan : chans) {
                         if (chan.getId().equals(not.getChannelId())) {
+                            if (Build.VERSION.SDK_INT >= 29) {
+                                bubble = not.getBubbleMetadata() != null;
+                                if (bubble) {
+                                    bubbleUnread |= !not.getBubbleMetadata().isNotificationSuppressed();
+                                }
+                            }
                             if (Build.VERSION.SDK_INT >= 30) {
                                 for (NotificationChannel child : chans) {
                                     if (!child.getId().equals(chan.getId()) && child.getConversationId() != null && child.getParentChannelId().equals(chan.getId())) {
+                                        log("CHILD %s --> #%08X [%s]", child.getId(), child.getLightColor(), child.shouldShowLights() ? "Y" : "N");
                                         conversation = true;
                                     }
                                 }
@@ -505,20 +514,23 @@ public class NotificationListenerService extends android.service.notification.No
 
                 // Respect notification color being black? We normally don't want this as a lot of
                 // notifications that we do want to show would disappear, but sometimes the same
-                // channel is used with and without color. See Facebook Messenger in "bubble" mode,
-                // notification color is black if the bubble is active but there are no unseen
-                // messages
+                // channel is used with and without color
                 if (settings.isRespectNotificationColorStateForPackageAndChannel(sbn.getPackageName(), channelName)) {
                     if (((not.color & 0xFFFFFF) == 0) || (shouldShowLights != null && !shouldShowLights)) {
                         c = 0;
                     }
                 }
 
+                // Only light up with unread bubbles. Detected by seeing if the notification is suppressed (== read)
+                if (bubble && !bubbleUnread) {
+                    c = 0;
+                }
+
                 // Make sure we have alpha (again)
                 c = c | 0xFF000000;
 
                 // user has set notification to full black, skip
-                log("%s [%s] (%s) --> #%08X / #%08X --> #%08X [%s][%s][%s]", sbn.getKey(), sbn.getPackageName(), channelName, cChan, not.color, c, not.getSmallIcon() != null ? "I" : "x", shouldShowLights == null ? "x" : (shouldShowLights ? "Y" : "N"), conversation ? "C" : "x");
+                log("%s [%s] (%s) --> #%08X / #%08X --> #%08X [%s][%s][%s][%s]", sbn.getKey(), sbn.getPackageName(), channelName, cChan, not.color, c, not.getSmallIcon() != null ? "I" : "x", shouldShowLights == null ? "x" : (shouldShowLights ? "Y" : "N"), conversation ? "C" : "x", bubble ? (bubbleUnread ? "U" : "B") : "x");
                 if ((c & 0xFFFFFF) == 0) {
                     continue;
                 }

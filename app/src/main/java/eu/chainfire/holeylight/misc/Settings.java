@@ -189,9 +189,6 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     private static final String CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE = "RESPECT_NOTIFICATION_COLOR_STATE:";
     private static final String CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE_FMT = CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE + "%s:%s";
-    private static final String[] CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE_PACKAGES = new String[] {
-            "com.facebook.orca"
-    };
 
     public static final String HIDE_AOD = "hide_aod";
     private static final boolean HIDE_AOD_DEFAULT = false;
@@ -557,14 +554,7 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public boolean isRespectNotificationColorStateForPackageAndChannel(String packageName, String channelName) {
-        boolean defaultValue = false;
-        for (String pkg : CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE_PACKAGES) {
-            if (pkg.equals(packageName)) {
-                defaultValue = true;
-                break;
-            }
-        }
-        return prefs.getBoolean(String.format(CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE_FMT, packageName, channelName), defaultValue);
+        return prefs.getBoolean(String.format(CHANNEL_RESPECT_NOTIFICATION_COLOR_STATE_FMT, packageName, channelName), false);
     }
     
     public void setRespectNotificationColorStateForPackageAndChannel(String packageName, String channelName, boolean value) {
