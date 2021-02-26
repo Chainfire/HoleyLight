@@ -49,6 +49,7 @@ import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.animation.Overlay;
 import eu.chainfire.holeylight.misc.AODControl;
 import eu.chainfire.holeylight.misc.Battery;
+import eu.chainfire.holeylight.misc.ColorAnalyzer;
 import eu.chainfire.holeylight.misc.Display;
 import eu.chainfire.holeylight.misc.LocaleHelper;
 import eu.chainfire.holeylight.misc.MotionSensor;
@@ -467,15 +468,11 @@ public class NotificationListenerService extends android.service.notification.No
                                 if (
                                         (
                                                 ((c & 0xFFFFFF) == 0xFFFFFF) && (
-                                                        ((not.color & 0xFFFFFF) > 0) &&
+                                                        (((not.color & 0xFFFFFF) > 0) || conversation) &&
                                                         !sbn.getPackageName().equals(BuildConfig.APPLICATION_ID)
                                                 )
-                                        ) || (
-                                                ((c & 0xFFFFFF) == 0x000000) &&
-                                                conversation
                                         )
                                 ) {
-
                                     // Set dominant channel to max brightness
                                     int r = Color.red(not.color);
                                     int g = Color.green(not.color);
@@ -491,6 +488,9 @@ public class NotificationListenerService extends android.service.notification.No
 
                                     c = Color.rgb(r, g, b);
                                 }
+
+                                // Override colors by analyzing icon (unless system, or Holey Light itself)
+                                c = ColorAnalyzer.analyze(this, sbn.getPackageName(), c);
 
                                 // Make sure we have alpha
                                 c = c | 0xFF000000;
