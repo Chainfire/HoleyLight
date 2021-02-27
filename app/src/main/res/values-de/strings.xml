@@ -198,11 +198,11 @@
     <string name="settings_category_operation_description_v2"><![CDATA[Dies ist <b>keine</b> Akkustandsanzeige!]]></string>
 
     <string name="settings_category_tips">Tips</string>
-<!-- Samsung --><string name="tips_samsung_aod_image_title">AOD: Bild and Theme</string>
+<!-- Samsung --><string name="tips_samsung_aod_image_title">AOD: Bild und Theme</string>
 <!-- Samsung --><string name="tips_samsung_aod_image_description"><![CDATA[Wenn <b>Unholey Light</b> oder <b>Verstecke AOD</b> nicht richtig funktioniert, überprüfen Sie Ihr AOD Hintergrundbild oder die Themeneinstellungen. Tippen Sie für Anweisungen.]]></string>
-<!-- Samsung --><string name="tips_samsung_fingerprint_title">AOD: Fingerprint icon</string>
+<!-- Samsung --><string name="tips_samsung_fingerprint_title">AOD: Fingerabdruck Symbol</string>
 <!-- Samsung --><string name="tips_samsung_fingerprint_description"><![CDATA[Die Anzeige des Fingerabdruck Symbols wird von Android gesteuert, <b>Einstellungen -> Biometrische Daten und Sicherheit -> Fingerabdrücke -> Symbol anzeigen, wenn der Bildsch. aus</b>. Es kann auch erscheinen, wenn <b>Verstecke AOD</b> aktiviert ist!]]></string>
-<!-- Samsung --><string name="tips_samsung_battery_title">AOD: Battery Status</string>
+<!-- Samsung --><string name="tips_samsung_battery_title">AOD: Akku Status</string>
 <!-- Samsung --><string name="tips_samsung_battery_description"><![CDATA[Die Anzeige des Akkustatus wird von Android gesteuert, <b>Einstellungen -> Akku und Gerätewartung -> Akku -> Weitere Akkueinstellungen -> Ladeinformationen anzeigen</b>.]]></string>
 
     <string name="notice_aod_image_required"><![CDATA[Die aktuelle Konfiguration erfordert ein Bild, das auf <b>Always On Display</b> angewendet wird. Es kann nicht erkannt werden, wenn Sie diesen Schritt bereits ausgeführt haben.]]></string>
