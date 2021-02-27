@@ -8,7 +8,7 @@
     <string name="animation_style_single_title">Постоянно</string>
     <string name="animation_style_swirl_title">Змейка</string>
     <string name="animation_style_tsp_title">Кольцо</string>
-    <string name="app_details">Авторское право © 2019 – Chainfire\nTwitter: @ChainfireXDA\nИсточник: github.com/Chainfire/HoleyLight\nНажмите, для посещения темы на XDA</string>
+    <string name="app_details">Авторское право © 2019-2021 – Chainfire\nTwitter: @ChainfireXDA\nИсточник: github.com/Chainfire/HoleyLight\nНажмите, для посещения темы на XDA</string>
     <string name="battery_screen_off">От батареи: экран выключен</string>
     <string name="battery_screen_on">От батареи: экран включен</string>
     <string name="charging_screen_off">От зарядки: экран выключен</string>
