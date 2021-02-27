@@ -329,4 +329,13 @@
     <string name="notice_aod_image_clock"><![CDATA[On older devices, configuring an image <b>with</b> clock can interfere with the <b>Hide AOD</b> option.]]></string>
     <string name="image">Image</string>
     <string name="theme">Theme</string>
+
+    <!-- v0.91 -->
+
+    <string translatable="false" name="debug_dialog_title">Select debug mode</string>
+    <string translatable="false" name="debug_mode_disabled">Disabled</string>
+    <string translatable="false" name="debug_mode_logging">Logging</string>
+    <string translatable="false" name="debug_mode_overlay">Logging + Overlay</string>
+    <string translatable="false" name="debug_mode_default">Default</string>
+    <string translatable="false" name="debug_mode_current">(current)</string>
 </resources>

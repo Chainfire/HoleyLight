@@ -20,7 +20,10 @@ package eu.chainfire.holeylight.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.companion.AssociationRequest;
 import android.companion.CompanionDeviceManager;
 import android.content.ComponentName;
@@ -30,6 +33,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -519,6 +523,54 @@ public class MainActivity extends BaseActivity implements Settings.OnSettingsCha
         switchMaster = layout.findViewById(R.id.toolbar_switch);
         switchMaster.setChecked(settings.isEnabled());
         switchMaster.setOnCheckedChangeListener((buttonView, isChecked) -> settings.setEnabled(isChecked));
+        switchMaster.setOnLongClickListener(v -> {
+            String current = " " + getString(R.string.debug_mode_current);
+            int selected;
+            Boolean isDebug = settings.getDebug(true);
+            Boolean isDebugOverlay = settings.getDebugOverlay(true);
+            if ((isDebug == null) || (isDebugOverlay == null)) {
+                selected = 3;
+            } else if (isDebug) {
+                if (isDebugOverlay) {
+                    selected = 2;
+                } else {
+                    selected = 1;
+                }
+            } else {
+                selected = 0;
+            }
+            (currentDialog = newAlert(false)
+                    .setTitle(R.string.debug_dialog_title)
+                    .setItems(new CharSequence[] {
+                            getString(R.string.debug_mode_disabled) + (selected == 0 ? current : ""),
+                            getString(R.string.debug_mode_logging) + (selected == 1 ? current : ""),
+                            getString(R.string.debug_mode_overlay) + (selected == 2 ? current : ""),
+                            getString(R.string.debug_mode_default) + (selected == 3 ? current : "")
+                    }, (dialog, which) -> {
+                        switch (which) {
+                            case 0: settings.setDebug(false, false); break;
+                            case 1: settings.setDebug(true, false); break;
+                            case 2: settings.setDebug(true, true); break;
+                            case 3: settings.setDebug(null, null); break;
+                        }
+
+                        AlarmManager alarmManager = (AlarmManager)getSystemService(Service.ALARM_SERVICE);
+                        alarmManager.setExactAndAllowWhileIdle(
+                                AlarmManager.ELAPSED_REALTIME,
+                                SystemClock.elapsedRealtime() + 1000,
+                                PendingIntent.getActivity(
+                                        MainActivity.this,
+                                        0,
+                                        new Intent(MainActivity.this, MainActivity.class),
+                                        0
+                                )
+                        );
+                        System.exit(0);
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()).setCanceledOnTouchOutside(false);
+            return true;
+        });
 
         MenuItem item = menu.add("");
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);

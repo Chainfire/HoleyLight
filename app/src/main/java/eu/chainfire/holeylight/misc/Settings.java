@@ -45,8 +45,8 @@ import eu.chainfire.holeylight.animation.SpritePlayer;
 
 @SuppressWarnings({"WeakerAccess", "unused", "UnusedReturnValue"})
 public class Settings implements SharedPreferences.OnSharedPreferenceChangeListener {
-    public static final boolean DEBUG = BuildConfig.DEBUG;
-    public static final boolean DEBUG_OVERLAY = false;
+    public static volatile boolean DEBUG = BuildConfig.DEBUG;
+    public static volatile boolean DEBUG_OVERLAY = false;
 
     public static boolean tuning = false;
 
@@ -239,6 +239,9 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public static final String AOD_IMAGE_INSTRUCTIONS_SHOWN = "aod_image_instructions_shown";
 
+    private static final String ENABLE_DEBUG = "enable_debug";
+    private static final String ENABLE_DEBUG_OVERLAY = "enable_debug_overlay";
+
     private static Settings instance;
     public static Settings getInstance(Context context) {
         synchronized (Settings.class) {
@@ -257,6 +260,37 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     private Settings(Context context) {
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
         prefs.registerOnSharedPreferenceChangeListener(this);
+        DEBUG = getDebug(false);
+        DEBUG_OVERLAY = getDebugOverlay(false);
+    }
+
+    public void setDebug(Boolean debug, Boolean overlay) {
+        edit();
+        try {
+            if (debug == null || overlay == null) {
+                editor.remove(ENABLE_DEBUG);
+                editor.remove(ENABLE_DEBUG_OVERLAY);
+                DEBUG = BuildConfig.DEBUG;
+                DEBUG_OVERLAY = false;
+            } else {
+                editor.putBoolean(ENABLE_DEBUG, debug);
+                editor.putBoolean(ENABLE_DEBUG_OVERLAY, debug && overlay);
+                DEBUG = debug;
+                DEBUG_OVERLAY = debug && overlay;
+            }
+        } finally {
+            save(true);
+        }
+    }
+
+    public Boolean getDebug(boolean allowNull) {
+        if (!prefs.contains(ENABLE_DEBUG) && allowNull) return null;
+        return prefs.getBoolean(ENABLE_DEBUG, BuildConfig.DEBUG);
+    }
+
+    public Boolean getDebugOverlay(boolean allowNull) {
+        if (!prefs.contains(ENABLE_DEBUG_OVERLAY) && allowNull) return null;
+        return getDebug(false) && prefs.getBoolean(ENABLE_DEBUG_OVERLAY, false);
     }
 
     @Override

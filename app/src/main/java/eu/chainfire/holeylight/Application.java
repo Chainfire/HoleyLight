@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import eu.chainfire.holeylight.misc.LocaleHelper;
+import eu.chainfire.holeylight.misc.Settings;
 
 public class Application extends android.app.Application {
     @Override
@@ -13,6 +14,8 @@ public class Application extends android.app.Application {
         super.onCreate();
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+
+        Settings.getInstance(this); // init DEBUG variables
     }
 
     @Override
