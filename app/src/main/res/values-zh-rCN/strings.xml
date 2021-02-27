@@ -164,7 +164,7 @@
     <string name="settings_category_seen_pickup_description">拿起手机前手机需处于静止大于10s</string>
     <string name="settings_category_seen_pickup_title">标记为已读: 抬腕</string>
     <string name="settings_category_seen_title">标记为已读</string>
-    <string name="settings_category_tips">Tips</string>
+    <string name="settings_category_tips">提示</string>
     <string name="settings_customization_locale_default">默认</string>
     <string name="settings_customization_locale_title">语言</string>
     <string name="settings_follow_twitter_description">随时了解我的动态</string>
