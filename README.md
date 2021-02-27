@@ -101,7 +101,15 @@ for the main APK (which may become outdated here) and the [AOD Helper](./apks/AO
 package (which must stay updated because this is its main distribution
 channel).
 
-[Full options](https://raw.githubusercontent.com/Chainfire/HoleyLight/master/graphics/play/full_options.jpg)
+Screenshots:
+[Full options](https://raw.githubusercontent.com/Chainfire/HoleyLight/master/graphics/play/full_options.jpg) -
+[1](https://raw.githubusercontent.com/Chainfire/HoleyLight/master/graphics/play/screenshot_v1.00_1.png) -
+[2](https://raw.githubusercontent.com/Chainfire/HoleyLight/master/graphics/play/screenshot_v1.00_2.png) -
+[3](https://raw.githubusercontent.com/Chainfire/HoleyLight/master/graphics/play/screenshot_v1.00_3.png) -
+[4](https://raw.githubusercontent.com/Chainfire/HoleyLight/master/graphics/play/screenshot_v1.00_4.png) -
+[5](https://raw.githubusercontent.com/Chainfire/HoleyLight/master/graphics/play/screenshot_v1.00_5.png) -
+[6](https://raw.githubusercontent.com/Chainfire/HoleyLight/master/graphics/play/screenshot_v1.00_6.png) -
+[7](https://raw.githubusercontent.com/Chainfire/HoleyLight/master/graphics/play/screenshot_v1.00_7.png)
 
 ### Feedback
 
