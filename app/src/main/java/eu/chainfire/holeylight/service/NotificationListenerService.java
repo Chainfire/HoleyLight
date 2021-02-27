@@ -431,6 +431,7 @@ public class NotificationListenerService extends android.service.notification.No
                 boolean conversation = false;
                 boolean bubble = false;
                 boolean bubbleUnread = false;
+                String groupName = null;
                 String channelName = "legacy";
 
                 Boolean shouldShowLights = null;
@@ -450,11 +451,12 @@ public class NotificationListenerService extends android.service.notification.No
                             if (Build.VERSION.SDK_INT >= 30) {
                                 for (NotificationChannel child : chans) {
                                     if (!child.getId().equals(chan.getId()) && child.getConversationId() != null && child.getParentChannelId().equals(chan.getId())) {
-                                        log("CHILD %s --> #%08X [%s]", child.getId(), child.getLightColor(), child.shouldShowLights() ? "Y" : "N");
+                                        log("CHILD %s --> #%08X [%s][%s]", child.getId(), child.getLightColor(), child.shouldShowLights() ? "Y" : "N", child.getGroup() == null ? "null" : child.getGroup());
                                         conversation = true;
                                     }
                                 }
                             }
+                            if (groupName == null) groupName = chan.getGroup();
 
                             if (chan.shouldShowLights() || conversation) {
                                 shouldShowLights = true;
@@ -526,11 +528,16 @@ public class NotificationListenerService extends android.service.notification.No
                     c = 0;
                 }
 
+                // Ignore auto-groups
+                if (not.getGroup() != null && not.getGroup().equals("ranker_group")) {
+                    c = 0;
+                }
+
                 // Make sure we have alpha (again)
                 c = c | 0xFF000000;
 
                 // user has set notification to full black, skip
-                log("%s [%s] (%s) --> #%08X / #%08X --> #%08X [%s][%s][%s][%s]", sbn.getKey(), sbn.getPackageName(), channelName, cChan, not.color, c, not.getSmallIcon() != null ? "I" : "x", shouldShowLights == null ? "x" : (shouldShowLights ? "Y" : "N"), conversation ? "C" : "x", bubble ? (bubbleUnread ? "U" : "B") : "x");
+                log("%s [%s] (%s) --> #%08X / #%08X --> #%08X [%s][%s][%s][%s][%s][%s]", sbn.getKey(), sbn.getPackageName(), channelName, cChan, not.color, c, not.getSmallIcon() != null ? "I" : "x", shouldShowLights == null ? "x" : (shouldShowLights ? "Y" : "N"), conversation ? "C" : "x", bubble ? (bubbleUnread ? "U" : "B") : "x", not.getGroup() == null ? "null" : not.getGroup(), groupName == null ? "null" : groupName);
                 if ((c & 0xFFFFFF) == 0) {
                     continue;
                 }
