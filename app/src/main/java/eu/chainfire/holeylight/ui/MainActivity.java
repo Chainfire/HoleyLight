@@ -20,10 +20,7 @@ package eu.chainfire.holeylight.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.Dialog;
-import android.app.PendingIntent;
-import android.app.Service;
 import android.companion.AssociationRequest;
 import android.companion.CompanionDeviceManager;
 import android.content.ComponentName;
@@ -33,7 +30,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -85,6 +81,7 @@ public class MainActivity extends BaseActivity implements Settings.OnSettingsCha
     private SwitchCompat switchMaster = null;
     private Dialog currentDialog = null;
     private boolean checkPermissionsOnResume = false;
+    private boolean allowHideNotification = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -187,7 +184,7 @@ public class MainActivity extends BaseActivity implements Settings.OnSettingsCha
                         .show()).setCanceledOnTouchOutside(false);
                 break;
             case DEVICE_OFFICIAL_SUPPORT:
-                (currentDialog = newAlert(!Settings.DEBUG)
+                (currentDialog = newAlert(false)
                         .setTitle(R.string.notice_dialog_title)
                         .setMessage(Html.fromHtml(getString(R.string.notice_not_officially_supported_device, device)))
                         .setPositiveButton(android.R.string.ok, null)
@@ -489,7 +486,7 @@ public class MainActivity extends BaseActivity implements Settings.OnSettingsCha
     protected void onStop() {
         handler.removeCallbacks(checkPermissionsRunnable);
         handler.removeCallbacks(billingConnectorRunnable);
-        TestNotification.hide(this, TestNotification.NOTIFICATION_ID_MAIN);
+        if (allowHideNotification) TestNotification.hide(this, TestNotification.NOTIFICATION_ID_MAIN);
         super.onStop();
     }
 
@@ -512,8 +509,13 @@ public class MainActivity extends BaseActivity implements Settings.OnSettingsCha
 
     @Override
     public void finish() {
-        TestNotification.hide(this, TestNotification.NOTIFICATION_ID_MAIN);
+        if (allowHideNotification) TestNotification.hide(this, TestNotification.NOTIFICATION_ID_MAIN);
         super.finish();
+    }
+
+    public void finish(boolean allowHideNotification) {
+        this.allowHideNotification = allowHideNotification;
+        finish();
     }
 
     @SuppressLint("AlwaysShowAction")
@@ -553,19 +555,6 @@ public class MainActivity extends BaseActivity implements Settings.OnSettingsCha
                             case 2: settings.setDebug(true, true); break;
                             case 3: settings.setDebug(null, null); break;
                         }
-
-                        AlarmManager alarmManager = (AlarmManager)getSystemService(Service.ALARM_SERVICE);
-                        alarmManager.setExactAndAllowWhileIdle(
-                                AlarmManager.ELAPSED_REALTIME,
-                                SystemClock.elapsedRealtime() + 1000,
-                                PendingIntent.getActivity(
-                                        MainActivity.this,
-                                        0,
-                                        new Intent(MainActivity.this, MainActivity.class),
-                                        0
-                                )
-                        );
-                        System.exit(0);
                     })
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()).setCanceledOnTouchOutside(false);

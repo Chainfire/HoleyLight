@@ -30,25 +30,22 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.os.SystemClock;
-import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.WindowManager;
-
-import java.lang.reflect.Method;
 
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.misc.AODControl;
 import eu.chainfire.holeylight.misc.Battery;
 import eu.chainfire.holeylight.misc.Display;
-import eu.chainfire.holeylight.misc.Manufacturer;
+import eu.chainfire.holeylight.misc.ResolutionTracker;
 import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.misc.Slog;
 import eu.chainfire.holeylight.service.AccessibilityService;
@@ -90,46 +87,42 @@ public class Overlay {
                 case BuildConfig.APPLICATION_ID + ".ACTION_CONFIGURATION_CHANGED":
                 case Intent.ACTION_CONFIGURATION_CHANGED:
                     boolean force = !intent.getAction().equals(Intent.ACTION_CONFIGURATION_CHANGED);
-                    Point resolutionNow = getResolution();
-                    int densityNow = getDensity();
-                    float densityMult = getDensityMultiplier();
-                    if ((
-                            ((resolutionNow.x != resolution.x) || (resolutionNow.y != resolution.y)) &&
-                            ((resolutionNow.x != resolution.y) || (resolutionNow.y != resolution.x))
-                    ) || (
-                            densityNow != density
-                    ) || (
-                            force
-                    )) {
-                        Slog.d("Broadcast", "Resolution: %dx%d --> %dx%d, Density: %d --> %d [%.5f]", resolution.x, resolution.y, resolutionNow.x, resolutionNow.y, density, densityNow, densityMult);
-
-                        // Resolution changed
-                        // This is an extremely ugly hack, don't try this at home
-                        // There are some internal states that are hard to figure out, including
-                        // oddities with Lottie's renderer. We just hard exit and let Android
-                        // restart us.
-                        resolution = resolutionNow;
-                        density = densityNow;
-                        Intent start = new Intent(context, DetectCutoutActivity.class);
-                        start.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        context.startActivity(start);
-                        handler.postDelayed(() -> {
-                            Context context1 = spritePlayer.getContext();
-                            Intent intent1 = new Intent(context1, DetectCutoutActivity.class);
-                            intent1.putExtra(BuildConfig.APPLICATION_ID + "/notifications", NotificationTracker.getInstance().saveToBytes());
-                            AlarmManager alarmManager = (AlarmManager) context1.getSystemService(Service.ALARM_SERVICE);
-                            alarmManager.setExactAndAllowWhileIdle(
-                                    AlarmManager.ELAPSED_REALTIME,
-                                    SystemClock.elapsedRealtime() + 1000,
-                                    PendingIntent.getActivity(
-                                            context1,
-                                            0,
-                                            intent1,
-                                            0
-                                    )
-                            );
-                            System.exit(0);
-                        }, 1000);
+                    if (resolutionTracker.changed() || force) {
+                        if (Build.VERSION.SDK_INT < 30) {
+                            // Resolution changed
+                            // This is an extremely ugly hack, don't try this at home
+                            // There are some internal states that are hard to figure out, including
+                            // oddities with Lottie's renderer. We just hard exit and let Android
+                            // restart us. This can certainly cause issues, hence using the
+                            // shutdown() call on Android 11+. There's no way for me to extensively
+                            // test this on older Android versions though, hence the API level
+                            // split.
+                            Intent start = new Intent(context, DetectCutoutActivity.class);
+                            start.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            context.startActivity(start);
+                            handler.postDelayed(() -> {
+                                Context context1 = spritePlayer.getContext();
+                                Intent intent1 = new Intent(context1, DetectCutoutActivity.class);
+                                intent1.putExtra(BuildConfig.APPLICATION_ID + "/notifications", NotificationTracker.getInstance().saveToBytes());
+                                AlarmManager alarmManager = (AlarmManager) context1.getSystemService(Service.ALARM_SERVICE);
+                                alarmManager.setExactAndAllowWhileIdle(
+                                        AlarmManager.ELAPSED_REALTIME,
+                                        SystemClock.elapsedRealtime() + 1000,
+                                        PendingIntent.getActivity(
+                                                context1,
+                                                0,
+                                                intent1,
+                                                0
+                                        )
+                                );
+                                System.exit(0);
+                            }, 1000);
+                        } else {
+                            // AccessibilityService/NotifificationListenerService should create a
+                            // new overlay with updated resources/configuration/etc as needed
+                            // within a few seconds
+                            shutdown();
+                        }
                     } else {
                         updateParams();
                     }
@@ -184,11 +177,10 @@ public class Overlay {
     private boolean lastHideAOD = false;
     private boolean lastWantAOD = false;
     private boolean added = false;
-    private Point resolution;
-    private int density;
-    private final float densityMultiplier;
+    private final ResolutionTracker resolutionTracker;
     private IBinder windowToken;
     private long lastVisibleTime;
+    private volatile boolean terminated = false;
 
     private Overlay(Context context) {
         windowManager = (WindowManager)context.getSystemService(Activity.WINDOW_SERVICE);
@@ -197,9 +189,7 @@ public class Overlay {
         drawWakeLock = ((PowerManager)context.getSystemService(POWER_SERVICE)).newWakeLock(0x00000080 | 0x40000000, BuildConfig.APPLICATION_ID + ":draw"); /* DRAW_WAKE_LOCK | UNIMPORTANT_FOR_LOGGING */
         handler = new Handler(Looper.getMainLooper());
         settings = Settings.getInstance(context);
-        resolution = getResolution();
-        density = getDensity();
-        densityMultiplier = getDensityMultiplier();
+        resolutionTracker = new ResolutionTracker("Overlay", context);
     }
 
     @SuppressWarnings("all")
@@ -219,37 +209,6 @@ public class Overlay {
         drawWakeLock.acquire(timeout_ms);
     }
 
-    private Point getResolution() {
-        DisplayMetrics metrics = new DisplayMetrics();
-        windowManager.getDefaultDisplay().getRealMetrics(metrics);
-        return new Point(metrics.widthPixels, metrics.heightPixels);
-    }
-
-    private int getDensity() {
-        DisplayMetrics metrics = new DisplayMetrics();
-        windowManager.getDefaultDisplay().getRealMetrics(metrics);
-        return metrics.densityDpi;
-    }
-
-    private float getDensityMultiplier() {
-        float ret = 1.0f;
-        if (Manufacturer.isGoogle()) {
-            // things work differently on Samsung
-            try {
-                @SuppressLint("PrivateApi") Class<?> c = Class.forName("android.os.SystemProperties");
-                Method get = c.getMethod("get", String.class);
-                String d = (String)get.invoke(null, "ro.sf.lcd_density");
-                if (d != null) {
-                    int i = Integer.parseInt(d);
-                    ret = (float)i / (float)density;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return ret;
-    }
-
     private void initActualOverlay(Context context, IBinder windowToken) {
         synchronized (this) {
             if (this.windowToken == null && windowToken != null) this.windowToken = windowToken;
@@ -258,7 +217,7 @@ public class Overlay {
             spritePlayer = new SpritePlayer(context);
 
             initParams();
-            animation = new NotificationAnimation(context, spritePlayer, densityMultiplier, new NotificationAnimation.OnNotificationAnimationListener() {
+            animation = new NotificationAnimation(context, spritePlayer, resolutionTracker.getDensityMultiplier(), new NotificationAnimation.OnNotificationAnimationListener() {
                 private int skips = 0;
 
                 @Override
@@ -339,13 +298,17 @@ public class Overlay {
     @Override
     protected void finalize() throws Throwable {
         if (spritePlayer != null) {
-            spritePlayer.getContext().getApplicationContext().unregisterReceiver(broadcastReceiver);
+            try {
+                spritePlayer.getContext().getApplicationContext().unregisterReceiver(broadcastReceiver);
+            } catch (Exception ignored) {
+            }
         }
         super.finalize();
     }
 
     @SuppressLint("RtlHardcoded")
     private void initParams() {
+        if (terminated) return;
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 0,
                 0,
@@ -380,10 +343,12 @@ public class Overlay {
     }
 
     private void updateParams() {
+        if (terminated) return;
         animation.applyDimensions();
     }
 
     private void createOverlay() {
+        if (terminated) return;
         if (added) return;
         try {
             updateParams();
@@ -391,12 +356,18 @@ public class Overlay {
             windowManager.addView(spritePlayer, spritePlayer.getLayoutParams());
         } catch (Exception e) {
             e.printStackTrace();
-            if (e.toString().contains("BadTokenException")) System.exit(0); // we will not recover from this without restart
+            if (e.toString().contains("BadTokenException")) {
+                // we will not recover from this without restart
+                // unfortunately this may cause the AccessibilityService to get excessive delays
+                // in processing until reboot or reinstall :/
+                System.exit(0);
+            }
         }
         test_lastVisible = added;
     }
 
     private void updateOverlay() {
+        if (terminated) return;
         if (!added) return;
         try {
             updateParams();
@@ -439,6 +410,8 @@ public class Overlay {
     }
 
     public void evaluate(boolean refreshAll, boolean isDelayed) {
+        if (terminated) return;
+
         if (spritePlayer == null) {
             if (wanted) handler.postDelayed(evaluateLoop, 500);
             return;
@@ -576,6 +549,7 @@ public class Overlay {
     }
 
     public void show(int[] colors, Drawable[] icons, boolean forceRefresh) {
+        if (terminated) return;
         handler.removeCallbacks(evaluateLoop);
         this.colors = colors;
         this.icons = icons;
@@ -586,6 +560,7 @@ public class Overlay {
     }
 
     public void hide(boolean immediately) {
+        if (terminated) return;
         handler.removeCallbacks(evaluateLoop);
         wanted = false;
         kill = immediately;
@@ -593,11 +568,26 @@ public class Overlay {
     }
 
     public void updateTSPRect(Rect rect, Rect clockRect, int overlayBottom) {
+        if (terminated) return;
         boolean apply = Display.isOff(spritePlayer.getContext(), true);
         Slog.d("AOD_TSP", "Overlay " + rect.toString() + " clock " + clockRect + " bottom:" + overlayBottom + " apply:" + apply);
         if (apply) {
             pokeWakeLocks(250);
             animation.updateTSPRect(rect, clockRect, overlayBottom);
+        }
+    }
+
+    public void shutdown() {
+        if (Build.VERSION.SDK_INT >= 30) {
+            synchronized (Overlay.class) {
+                instance = null;
+                terminated = true;
+            }
+            if (animation.isPlaying()) animation.stop(true);
+            removeOverlay();
+            animation = null;
+            spritePlayer.getContext().getApplicationContext().unregisterReceiver(broadcastReceiver);
+            spritePlayer = null;
         }
     }
 }

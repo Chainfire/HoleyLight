@@ -9,6 +9,8 @@ import eu.chainfire.holeylight.misc.LocaleHelper;
 import eu.chainfire.holeylight.misc.Settings;
 
 public class Application extends android.app.Application {
+    public static volatile String defaultLocale = "";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -20,6 +22,8 @@ public class Application extends android.app.Application {
 
     @Override
     protected void attachBaseContext(Context context) {
+        defaultLocale = context.getResources().getConfiguration().getLocales().get(0).getLanguage();
+        if (defaultLocale == null) defaultLocale = "";
         super.attachBaseContext(LocaleHelper.getContext(context));
     }
 

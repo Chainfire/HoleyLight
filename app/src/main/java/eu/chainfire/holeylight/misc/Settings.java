@@ -39,6 +39,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import androidx.preference.PreferenceManager;
+import eu.chainfire.holeylight.Application;
 import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.R;
 import eu.chainfire.holeylight.animation.SpritePlayer;
@@ -230,7 +231,6 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
     public static final boolean AOD_HELPER_BRIGHTNESS_DEFAULT = false;
 
     public static final String LOCALE = "locale";
-    private static final String LOCALE_DEFAULT = "";
 
     private static final String PURCHASES = "purchases";
 
@@ -791,12 +791,15 @@ public class Settings implements SharedPreferences.OnSharedPreferenceChangeListe
         put(AOD_HELPER_BRIGHTNESS, value, true);
     }
 
-    public String getLocale() {
-        return prefs.getString(LOCALE, LOCALE_DEFAULT);
+    public String getLocale(boolean resolveDefault) {
+        String ret = prefs.getString(LOCALE, "");
+        if (ret == null) ret = "";
+        if (ret.equals("") && resolveDefault) ret = Application.defaultLocale;
+        return ret;
     }
 
     public void setLocale(String locale) {
-        put(LOCALE, locale != null ? locale : LOCALE_DEFAULT, true);
+        put(LOCALE, locale != null ? locale : "", true);
     }
 
     public boolean isAODImageInstructionsShown() {

@@ -81,6 +81,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private CheckBoxPreference prefAODHelperControl = null;
     private CheckBoxPreference prefAODHelperBrightness = null;
     private ListPreference prefLocale = null;
+    private PreferenceCategory catDebug = null;
+    private Preference prefDebug = null;
 
     private Preference prefDonateTop = null;
     private Preference prefDonateBottom = null;
@@ -755,16 +757,16 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         PreferenceCategory catCustomizations = category(root, R.string.settings_category_customization, 0);
         prefLocale = getLocalesPreference(catCustomizations);
 
-        if (Settings.DEBUG) {
-            PreferenceCategory catDebug = category(root, R.string.settings_category_debug, 0);
-            pref(catDebug, R.string.logcat_dump_title, R.string.logcat_dump_description, null, true, preference -> {
-                Activity activity = getActivity();
-                if (activity instanceof MainActivity) {
-                    ((MainActivity)activity).logcatDumpRequest();
-                }
-                return false;
-            });
-        }
+        catDebug = category(root, R.string.settings_category_debug, 0);
+        catDebug.setVisible(false);
+        prefDebug = pref(catDebug, R.string.logcat_dump_title, R.string.logcat_dump_description, null, true, preference -> {
+            Activity activity = getActivity();
+            if (activity instanceof MainActivity) {
+                ((MainActivity)activity).logcatDumpRequest();
+            }
+            return false;
+        });
+        prefDebug.setVisible(false);
 
         if (Manufacturer.isSamsung()) {
             PreferenceCategory catTips = category(root, R.string.settings_category_tips, 0);
@@ -935,8 +937,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 prefAODHelperBrightness.setEnabled(settings.isEnabled() && aodHelperState == AODControl.AODHelperState.OK);
             }
 
+            catDebug.setVisible(Settings.DEBUG);
+            prefDebug.setVisible(Settings.DEBUG);
+
             if ((key == null) || (key.equals(Settings.LOCALE))) {
-                String lang = settings.getLocale();
+                String lang = settings.getLocale(false);
                 if ("".equals(lang)) {
                     prefLocale.setSummary(String.format(Locale.ENGLISH, "[ %s ]", getString(R.string.settings_customization_locale_default)));
                 } else {
@@ -950,13 +955,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 }
 
                 if (key != null) {
-                    getActivity().finish();
+                    if (activity != null) activity.finish(false);
                     Intent i = new Intent(getActivity(), getActivity().getClass());
                     i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     getActivity().startActivity(i);
                     getActivity().overridePendingTransition(0, 0);
-                    settings.setLocale(settings.getLocale()); // force save before exit
-                    System.exit(0);
+                    settings.setLocale(settings.getLocale(false)); // force save
                 }
             }
 

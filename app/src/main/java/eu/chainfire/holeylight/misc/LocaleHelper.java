@@ -29,8 +29,8 @@ public class LocaleHelper {
         try {
             Configuration config = context.getResources().getConfiguration();
 
-            String lang = Settings.getInstance(context).getLocale();
-            if (!"".equals(lang) && !config.getLocales().get(0).getLanguage().replace('-', '_').equals(lang.replace('-', '_'))) {
+            String lang = Settings.getInstance(context).getLocale(true);
+            if (lang != null && !"".equals(lang) && !config.getLocales().get(0).getLanguage().replace('-', '_').equals(lang.replace('-', '_'))) {
                 if (lang.contains("_")) {
                     locale = new Locale(lang.substring(0, lang.indexOf("_")), lang.substring(lang.indexOf("_") + 1));
                 } else {

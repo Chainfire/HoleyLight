@@ -26,6 +26,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.database.ContentObserver;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -53,6 +54,7 @@ import eu.chainfire.holeylight.misc.ColorAnalyzer;
 import eu.chainfire.holeylight.misc.Display;
 import eu.chainfire.holeylight.misc.LocaleHelper;
 import eu.chainfire.holeylight.misc.MotionSensor;
+import eu.chainfire.holeylight.misc.ResolutionTracker;
 import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.misc.Slog;
 
@@ -76,6 +78,9 @@ public class NotificationListenerService extends android.service.notification.No
     @SuppressWarnings("unused")
     public static class ActiveNotification {
         private static final Map<String, Drawable> drawableCache = new HashMap<>();
+        public static void clearCache() {
+            drawableCache.clear();
+        }
 
         private final String key;
         private final String packageName;
@@ -194,6 +199,7 @@ public class NotificationListenerService extends android.service.notification.No
     private final List<ActiveNotification> activeNotifications = new ArrayList<>();
     private boolean forceRefresh = false;
     private int callState = TelephonyManager.CALL_STATE_IDLE;
+    private ResolutionTracker resolutionTracker = null;
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -240,6 +246,15 @@ public class NotificationListenerService extends android.service.notification.No
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        LocaleHelper.updateResources(this);
+        if (resolutionTracker.changed()) ActiveNotification.clearCache();
+        forceRefresh = true;
+        handleLEDNotifications(250);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
         settings = Settings.getInstance(this);
@@ -282,6 +297,8 @@ public class NotificationListenerService extends android.service.notification.No
                 handleLEDNotifications(500);
             }
         };
+
+        resolutionTracker = new ResolutionTracker("Listener", this);
     }
 
     @Override

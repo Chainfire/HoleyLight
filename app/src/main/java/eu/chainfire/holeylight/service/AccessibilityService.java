@@ -41,6 +41,7 @@ import eu.chainfire.holeylight.BuildConfig;
 import eu.chainfire.holeylight.animation.Overlay;
 import eu.chainfire.holeylight.misc.Display;
 import eu.chainfire.holeylight.misc.LocaleHelper;
+import eu.chainfire.holeylight.misc.ResolutionTracker;
 import eu.chainfire.holeylight.misc.Settings;
 import eu.chainfire.holeylight.misc.Slog;
 import eu.chainfire.holeylight.service.area.AreaFinder;
@@ -54,6 +55,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     private Display.State lastState = null;
     private AreaFinder areaFinder = null;
     private Settings settings = null;
+    private ResolutionTracker resolutionTracker = null;
 
     private BroadcastReceiver testRunnerReceiver = null;
 
@@ -66,91 +68,127 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         LocaleHelper.updateResources(this);
+        if (resolutionTracker.changed()) {
+            Overlay.getInstance(this);
+            handlerMain.postDelayed(() -> Overlay.getInstance(AccessibilityService.this), 100);
+        }
     }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        // AOD runs inside the SystemUI package. The main image (or clock) is displayed inside
-        // a ViewPager, and notification icons below that in ImageViews.
-        //
-        // The area of the combined ViewPager and ImageViews is saved to the screen when it goes
-        // into DOZE_SUSPEND mode, and requires no power nor CPU to keep displaying it.
-        //
-        // Update: on Android 11 it seems the ViewPager is no longer always used as container, the
-        // elements are now often part of a FrameLayout directly.
-        //
-        // Of course it is possible we're getting the wrong views inside some random Android
-        // activity, so we make sure elsewhere the system is actually in doze mode before using it.
-        //
-        // The refresh calls are quite costly, abandon processing as soon as possible if no match.
-        //
-        // We also track screen state here, we regularly get that information here before we
-        // receive SCREEN_ON/OFF events.
+        Slog.d("Access", "onAccessibilityEvent ENTER");
+        try {
+            // AOD runs inside the SystemUI package. The main image (or clock) is displayed inside
+            // a ViewPager, and notification icons below that in ImageViews.
+            //
+            // The area of the combined ViewPager and ImageViews is saved to the screen when it goes
+            // into DOZE_SUSPEND mode, and requires no power nor CPU to keep displaying it.
+            //
+            // Update: on Android 11 it seems the ViewPager is no longer always used as container, the
+            // elements are now often part of a FrameLayout directly.
+            //
+            // Of course it is possible we're getting the wrong views inside some random Android
+            // activity, so we make sure elsewhere the system is actually in doze mode before using it.
+            //
+            // The refresh calls are quite costly, abandon processing as soon as possible if no match.
+            //
+            // We also track screen state here, we regularly get that information here before we
+            // receive SCREEN_ON/OFF events.
 
-        Display.State state = Display.get(this);
-        if (state != lastState) {
-            Slog.d("Access", String.format(Locale.ENGLISH, "display %s --> %s [%d/%s]", lastState != null ? lastState.toString() : "null", state.toString(), event.getEventType(), event.getPackageName() != null ? event.getPackageName() : "null"));
-            lastState = state;
-            Overlay.getInstance(this).evaluate(true);
-            NotificationListenerService.checkNotifications();
-        }
+            Display.State state = Display.get(this);
+            if (state != lastState) {
+                Slog.d("Access", String.format(Locale.ENGLISH, "display %s --> %s [%d/%s]", lastState != null ? lastState.toString() : "null", state.toString(), event.getEventType(), event.getPackageName() != null ? event.getPackageName() : "null"));
+                lastState = state;
+                Overlay.getInstance(this).evaluate(true);
+                NotificationListenerService.checkNotifications();
+            }
 
-        if ((lastState == Display.State.ON) || (lastState == Display.State.OTHER)) {
-            return;
-        }
+            if ((lastState == Display.State.ON) || (lastState == Display.State.OTHER)) {
+                return;
+            }
 
-        if (event.getPackageName() == null) return;
-        if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) return;
-        if (!event.getPackageName().toString().equals("com.android.systemui")) return;
+            if (event.getPackageName() == null) return;
+            if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) return;
+            if (!event.getPackageName().toString().equals("com.android.systemui")) return;
 
-        handler.post(() -> {
-            try {
-                areaFinder.start(this);
-
+            final AccessibilityNodeInfo root;
+            if (Build.VERSION.SDK_INT < 30) {
+                // No more Android 9 and 10 test devices, this is closest to old code
+                AccessibilityNodeInfo assign = null;
                 List<AccessibilityWindowInfo> windows = getWindows();
                 for (AccessibilityWindowInfo window : windows) {
-                    AccessibilityNodeInfo root = window.getRoot();
+                    if (window.getId() == event.getWindowId()) {
+                        assign = window.getRoot();
+                    }
+                }
+                root = assign;
+            } else {
+                // On Android 11 it has been observed that using getWindows() can sometimes introduce
+                // a few seconds to half a minute delay, particularly when the Accessibility service
+                // has been restarted a couple of times (due to System.exit() or crash)
+                //
+                // This call seems to work, though I'm pretty sure on Android 9 there was an issue
+                // with it which made it unfit for our purposes, hence the API level split. I would
+                // prefer using this call on older Android versions as well but I have no way to
+                // extensively re-test it.
+                root = getRootInActiveWindow();
+            }
 
-                    if (
+            if (root == null) {
+                Slog.d("Access", "onAccessibilityEvent empty root");
+                return;
+            }
+
+            handler.post(() -> {
+                Slog.d("Access", "onAccessibilityEvent::runnable ENTER");
+                try {
+                    if (root != null) root.refresh();
+
+                    Slog.d("Access", "root: %s / children: %d / package: %s", root == null ? "null" : "set", root == null ? -1 : root.getChildCount(), root != null && root.getPackageName() != null ? root.getPackageName() : "null");
+
+                    if (!(
                             (root == null) ||
                             (root.getChildCount() == 0) ||
                             (root.getPackageName() == null) ||
                             (!root.getPackageName().toString().equals("com.android.systemui"))
-                    ) continue;
+                    )) {
+                        areaFinder.start(this);
+                        final Rect outerBounds = areaFinder.find(root);
+                        Rect clockArea = areaFinder.findClock(root);
+                        final Integer overlayBottom = areaFinder.findOverlayBottom(root);
 
-                    root.refresh();
+                        if (
+                                (outerBounds != null) &&
+                                (outerBounds.left > -1) &&
+                                (outerBounds.top > -1) &&
+                                (outerBounds.right > -1) &&
+                                (outerBounds.bottom > -1) &&
+                                (outerBounds.width() > 0) &&
+                                (outerBounds.height() > 0)
+                        ) {
+                            final Rect fClockArea;
+                            if ((clockArea != null) && (clockArea.left >= outerBounds.left && clockArea.top >= outerBounds.top && clockArea.right <= outerBounds.right && clockArea.bottom <= outerBounds.bottom)) {
+                                fClockArea = clockArea;
+                            } else {
+                                fClockArea = null;
+                            }
 
-                    final Rect outerBounds = areaFinder.find(root);
-                    Rect clockArea = areaFinder.findClock(root);
-                    final Integer overlayBottom = areaFinder.findOverlayBottom(root);
-
-                    if (
-                            (outerBounds != null) &&
-                            (outerBounds.left > -1) &&
-                            (outerBounds.top > -1) &&
-                            (outerBounds.right > -1) &&
-                            (outerBounds.bottom > -1) &&
-                            (outerBounds.width() > 0) &&
-                            (outerBounds.height() > 0)
-                    ) {
-                        final Rect fClockArea;
-                        if ((clockArea != null) && (clockArea.left >= outerBounds.left && clockArea.top >= outerBounds.top && clockArea.right <= outerBounds.right && clockArea.bottom <= outerBounds.bottom)) {
-                            fClockArea = clockArea;
-                        } else {
-                            fClockArea = null;
+                            Slog.d("AOD_TSP", "Access " + outerBounds.toString() + " clock " + fClockArea + " bottom:" + overlayBottom);
+                            handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(outerBounds, fClockArea, overlayBottom != null ? overlayBottom : 0));
+                        } else if (outerBounds == null) {
+                            Slog.d("AOD_TSP", "Access null");
+                            handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(new Rect(0, 0, 0, 0), null, 0));
                         }
-
-                        Slog.d("AOD_TSP", "Access " + outerBounds.toString() + " clock " + fClockArea + " bottom:" + overlayBottom);
-                        handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(outerBounds, fClockArea, overlayBottom != null ? overlayBottom : 0));
-                    } else if (outerBounds == null) {
-                        Slog.d("AOD_TSP", "Access null");
-                        handlerMain.post(() -> Overlay.getInstance(AccessibilityService.this).updateTSPRect(new Rect(0, 0, 0, 0), null, 0));
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    Slog.d("Access", "onAccessibilityEvent::runnable EXIT");
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+            });
+        } finally {
+            Slog.d("Access", "onAccessibilityEvent EXIT");
+        }
     }
 
     @Override
@@ -216,5 +254,6 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         handlerMain = new Handler(Looper.getMainLooper());
         areaFinder = AreaFinder.factory();
         settings = Settings.getInstance(this);
+        resolutionTracker = new ResolutionTracker("Access", this);
     }
 }
