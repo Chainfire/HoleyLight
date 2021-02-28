@@ -112,8 +112,8 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             if (!event.getPackageName().toString().equals("com.android.systemui")) return;
 
             final AccessibilityNodeInfo root;
-            if (Build.VERSION.SDK_INT < 30) {
-                // No more Android 9 and 10 test devices, this is closest to old code
+            if (Build.VERSION.SDK_INT < 29) {
+                // No more Android 9 test devices, this is closest to old code
                 AccessibilityNodeInfo assign = null;
                 List<AccessibilityWindowInfo> windows = getWindows();
                 for (AccessibilityWindowInfo window : windows) {
@@ -128,9 +128,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                 // has been restarted a couple of times (due to System.exit() or crash)
                 //
                 // This call seems to work, though I'm pretty sure on Android 9 there was an issue
-                // with it which made it unfit for our purposes, hence the API level split. I would
-                // prefer using this call on older Android versions as well but I have no way to
-                // extensively re-test it.
+                // with it which made it unfit for our purposes, hence the API level split.
                 root = getRootInActiveWindow();
             }
 

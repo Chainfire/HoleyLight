@@ -88,15 +88,14 @@ public class Overlay {
                 case Intent.ACTION_CONFIGURATION_CHANGED:
                     boolean force = !intent.getAction().equals(Intent.ACTION_CONFIGURATION_CHANGED);
                     if (resolutionTracker.changed() || force) {
-                        if (Build.VERSION.SDK_INT < 30) {
+                        if (Build.VERSION.SDK_INT < 29) {
                             // Resolution changed
                             // This is an extremely ugly hack, don't try this at home
                             // There are some internal states that are hard to figure out, including
                             // oddities with Lottie's renderer. We just hard exit and let Android
                             // restart us. This can certainly cause issues, hence using the
-                            // shutdown() call on Android 11+. There's no way for me to extensively
-                            // test this on older Android versions though, hence the API level
-                            // split.
+                            // shutdown() call on Android 10+. There's no way for me to extensively
+                            // test this on Android 9 though, hence the API level split.
                             Intent start = new Intent(context, DetectCutoutActivity.class);
                             start.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             context.startActivity(start);
@@ -578,7 +577,7 @@ public class Overlay {
     }
 
     public void shutdown() {
-        if (Build.VERSION.SDK_INT >= 30) {
+        if (Build.VERSION.SDK_INT >= 29) {
             synchronized (Overlay.class) {
                 instance = null;
                 terminated = true;
