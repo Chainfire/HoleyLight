@@ -61,7 +61,7 @@ public class JSONAnimationManipulator {
        } else if (obj instanceof Integer) {
            d = (double)(Integer)obj;
        }
-       double e = d == 0 ? 0 : d < 0 ? d + thickness : d - thickness;
+       double e = Math.abs(d) < 1f ? d : d < 0 ? d + thickness : d - thickness;
        Slog.d("JSON", "%.5f --> %.5f", (float)d, (float)e);
        return e;
     }
