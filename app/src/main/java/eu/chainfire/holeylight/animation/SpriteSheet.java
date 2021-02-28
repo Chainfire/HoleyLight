@@ -52,25 +52,32 @@ public class SpriteSheet {
     }
 
     private static Bitmap blackFrame(Bitmap superimposedFrame) {
-        int[] pixels = new int[superimposedFrame.getWidth() * superimposedFrame.getHeight()];
-        int[] pixelsBlack = new int[superimposedFrame.getWidth() * superimposedFrame.getHeight()];
+        Bitmap bigFrame = Bitmap.createBitmap(superimposedFrame.getWidth() * 4, superimposedFrame.getHeight() * 4, Bitmap.Config.ARGB_8888);
+        Canvas bigCanvas = new Canvas(bigFrame);
 
-        Bitmap frame = Bitmap.createBitmap(superimposedFrame.getWidth(), superimposedFrame.getHeight(), Bitmap.Config.ARGB_8888);
+        Paint paint = new Paint();
+        paint.setFilterBitmap(true);
+        paint.setDither(true);
+        paint.setAntiAlias(true);
+        bigCanvas.drawBitmap(superimposedFrame, new Rect(0, 0, superimposedFrame.getWidth(), superimposedFrame.getHeight()), new Rect(0, 0, bigFrame.getWidth(), bigFrame.getHeight()), paint);
 
-        superimposedFrame.getPixels(pixels, 0, superimposedFrame.getWidth(), 0, 0, superimposedFrame.getWidth(), superimposedFrame.getHeight());
-        for (int y = 0; y < superimposedFrame.getHeight(); y++) {
+        int[] pixels = new int[bigFrame.getWidth() * bigFrame.getHeight()];
+        int[] pixelsBlack = new int[bigFrame.getWidth() * bigFrame.getHeight()];
+
+        bigFrame.getPixels(pixels, 0, bigFrame.getWidth(), 0, 0, bigFrame.getWidth(), bigFrame.getHeight());
+        for (int y = 0; y < bigFrame.getHeight(); y++) {
             int last = 0;
             boolean inside = false;
             int start = -1;
             int end = -1;
 
-            int index = y * superimposedFrame.getWidth();
-            for (int x = 0; x < superimposedFrame.getWidth(); x++) {
+            int index = y * bigFrame.getWidth();
+            for (int x = 0; x < bigFrame.getWidth(); x++) {
                 int p = pixels[index];
-                if ((p == 0) && (last != 0)) {
+                if ((p != 0xFFFFFFFF) && (last == 0xFFFFFFFF)) {
                     start = x;
                     inside = true;
-                } else if (inside && (p != 0) && (last == 0)) {
+                } else if (inside && (p == 0xFFFFFFFF) && (last != 0xFFFFFFFF)) {
                     end = x;
                     break;
                 }
@@ -79,15 +86,24 @@ public class SpriteSheet {
             }
 
             if ((start >= 0) && (end >= 0) && (end >= start)) {
-                index = y * superimposedFrame.getWidth();
+                index = y * bigFrame.getWidth();
                 for (int x = start; x < end; x++) {
                     pixelsBlack[index + x] = (int)0xFF000000;
                 }
             }
         }
-        frame.setPixels(pixelsBlack, 0, superimposedFrame.getWidth(), 0, 0, superimposedFrame.getWidth(), superimposedFrame.getHeight());
 
-        return frame;
+        Bitmap bigBlackFrame = Bitmap.createBitmap(bigFrame.getWidth(), bigFrame.getHeight(), Bitmap.Config.ARGB_8888);
+        bigBlackFrame.setPixels(pixelsBlack, 0, bigFrame.getWidth(), 0, 0, bigFrame.getWidth(), bigFrame.getHeight());
+
+        Bitmap blackFrame = Bitmap.createBitmap(superimposedFrame.getWidth(), superimposedFrame.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas blackCanvas = new Canvas(blackFrame);
+        blackCanvas.drawBitmap(bigBlackFrame, new Rect(0, 0, bigBlackFrame.getWidth(), bigBlackFrame.getHeight()), new Rect(0, 0, blackFrame.getWidth(), blackFrame.getHeight()), paint);
+        
+        bigFrame.recycle();
+        bigBlackFrame.recycle();
+
+        return blackFrame;
     }
 
     public static SpriteSheet fromLottieComposition(LottieComposition lottieComposition, int width, int height, SpritePlayer.Mode mode) {
