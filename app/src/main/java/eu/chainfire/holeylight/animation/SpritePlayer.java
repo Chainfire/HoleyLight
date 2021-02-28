@@ -85,6 +85,7 @@ public class SpritePlayer extends RelativeLayout {
     private final Paint paint = new Paint();
     private final Paint paintTsp = new Paint();
     private final Paint paintTspTransparent = new Paint();
+    private final Paint paintTspTransparentDebug = new Paint();
     private final float dpToPx;
 
     private volatile int frame = -1;
@@ -139,12 +140,9 @@ public class SpritePlayer extends RelativeLayout {
         paintTsp.setDither(false);
         paintTsp.setFilterBitmap(false);
 
-        if (Settings.DEBUG_OVERLAY) {
-            paintTspTransparent.setColor(0x4000FF00);
-        } else {
-            paintTspTransparent.setColor(Color.TRANSPARENT);
-            paintTspTransparent.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        }
+        paintTspTransparent.setColor(Color.TRANSPARENT);
+        paintTspTransparent.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        paintTspTransparentDebug.setColor(0x4000FF00);
 
         handlerRender.post(() -> {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
@@ -229,7 +227,7 @@ public class SpritePlayer extends RelativeLayout {
     protected void onDraw(Canvas canvas) {
         if (isTSPMode() && !tspBlank && tspTransparentArea != null && SystemClock.elapsedRealtime() - modeStart > TSP_FIRST_DRAW_DELAY) {
             Slog.d("Clock", "performDraw");
-            canvas.drawRect(tspTransparentArea, paintTspTransparent);
+            canvas.drawRect(tspTransparentArea, Settings.DEBUG_OVERLAY ? paintTspTransparentDebug : paintTspTransparent);
             tspTransparentDrawn = true;
         }
     }
