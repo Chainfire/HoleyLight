@@ -20,6 +20,7 @@ package eu.chainfire.holeylight.animation;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BlendMode;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -333,6 +334,10 @@ public class SpritePlayer extends RelativeLayout {
                             float l = x - w/2f;
                             float t = y - h/2f;
                             icons[i].setBounds(Math.round(l), Math.round(t), Math.round(l + w), Math.round(h + t));
+                            icons[i].setColorFilter(null);
+                            icons[i].setTintList(null);
+                            icons[i].setTintBlendMode(BlendMode.SRC_IN);
+                            icons[i].setTintMode(PorterDuff.Mode.SRC_IN);
                             icons[i].setTint(colors[i]);
                             icons[i].draw(canvas);
                         }
