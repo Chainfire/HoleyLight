@@ -20,7 +20,8 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep public class com.android.systemui.LsRune
--keep public class com.android.systemui.wallpaper.WallpaperUtils
--keep public class com.android.systemui.util.DeviceState
+-keep public class com.android.systemui.LsRune { *; }
+-keep public class com.android.systemui.wallpaper.WallpaperUtils { *; }
+-keep public class com.android.systemui.util.DeviceState { *; }
+-keep public class top.defaults.colorpicker.ColorPickerPopup { *; }
 -keepattributes LineNumberTable,SourceFile

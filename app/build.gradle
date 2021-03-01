@@ -9,18 +9,10 @@ android {
         versionCode 71
         versionName "0.71"
     }
-    signingConfigs { //TODO IAP TESTING
-        debug {
-            storeFile file('E:/SoftDev/android-keystore/keystore-Chainfire-Debug')
-        }
-    }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-        debug { //TODO IAP TESTING
-            signingConfig signingConfigs.debug
         }
     }
     compileOptions {
