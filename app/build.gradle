@@ -6,8 +6,8 @@ android {
         applicationId "eu.chainfire.holeylight"
         minSdkVersion 28
         targetSdkVersion 30
-        versionCode 91
-        versionName "0.91"
+        versionCode 100
+        versionName "1.00"
     }
     buildTypes {
         release {

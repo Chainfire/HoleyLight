@@ -22667,94 +22667,94 @@ eu.chainfire.holeylight.animation.SpritePlayer -> eu.chainfire.holeylight.a.d:
     java.lang.Runnable scheduleBackgroundDraw -> W
     android.view.Choreographer$FrameCallback frameCallback -> aa
     java.lang.Runnable tspFrame -> ab
-    58:507:void <init>(android.content.Context) -> <init>
-    176:179:void finalize() -> finalize
-    183:185:void onVisibilityChanged(android.view.View,int) -> onVisibilityChanged
-    216:223:boolean colorsChanged(int[]) -> a
-    228:233:void onDraw(android.graphics.Canvas) -> onDraw
-    251:387:void renderFrame(android.graphics.Canvas,eu.chainfire.holeylight.animation.SpriteSheet,int,float,float) -> a
-    510:512:void cancelNextFrame() -> g
-    515:522:void callNextFrame(boolean) -> a
-    525:599:void callOnSpriteSheetNeeded(int,int) -> a
-    602:608:void setOnSpriteSheetNeededListener(eu.chainfire.holeylight.animation.SpritePlayer$OnSpriteSheetNeededListener) -> setOnSpriteSheetNeededListener
-    611:612:void setOnAnimationListener(eu.chainfire.holeylight.animation.SpritePlayer$OnAnimationListener) -> setOnAnimationListener
-    615:653:void resetSpriteSheet(eu.chainfire.holeylight.animation.SpritePlayer$Mode) -> c
-    656:686:void swapSpriteSheet(eu.chainfire.holeylight.animation.SpritePlayer$Mode) -> d
-    689:709:void setSpriteSheet(eu.chainfire.holeylight.animation.SpriteSheet,eu.chainfire.holeylight.animation.SpritePlayer$Mode) -> a
-    712:716:void setColors(int[]) -> setColors
-    719:722:void setIcons(android.graphics.drawable.Drawable[]) -> setIcons
-    725:733:void startUpdating() -> h
-    736:740:void stopUpdating() -> i
-    743:750:void evaluate() -> j
-    753:758:void playAnimation() -> a
-    761:765:void cancelAnimation() -> b
-    768:768:boolean isAnimating() -> c
-    772:776:void setSpeed(float) -> setSpeed
-    779:779:eu.chainfire.holeylight.animation.SpritePlayer$Mode getMode() -> getMode
-    783:806:void setMode(eu.chainfire.holeylight.animation.SpritePlayer$Mode,boolean) -> a
-    809:816:eu.chainfire.holeylight.animation.SpriteSheet getSpriteSheet() -> getSpriteSheet
-    820:823:void updateTransparentArea(android.graphics.Rect) -> a
-    826:827:void updateDisplayArea(android.graphics.Rect) -> b
-    830:845:void updateDisplayArea(int,int,int,int) -> a
-    848:854:void invalidateDisplayArea() -> d
-    857:863:void setDrawBackground(boolean) -> setDrawBackground
-    866:866:java.lang.Object getSynchronizer() -> getSynchronizer
-    870:870:boolean isTSPMode() -> e
-    874:874:boolean isTSPMode(eu.chainfire.holeylight.animation.SpritePlayer$Mode) -> a
-    882:882:boolean isMultiColorMode(eu.chainfire.holeylight.animation.SpritePlayer$Mode) -> b
-    890:892:void setTSPBlank(boolean) -> setTSPBlank
-    895:896:void forceReload() -> f
-    561:597:void lambda$callOnSpriteSheetNeeded$2(long,boolean,int,int) -> a
-    507:507:void lambda$new$1() -> k
-    148:150:void lambda$new$0() -> l
-    53:53:boolean access$002(eu.chainfire.holeylight.animation.SpritePlayer,boolean) -> a
-    53:53:boolean access$102(eu.chainfire.holeylight.animation.SpritePlayer,boolean) -> b
-    53:53:java.lang.Object access$200(eu.chainfire.holeylight.animation.SpritePlayer) -> a
-    53:53:int access$302(eu.chainfire.holeylight.animation.SpritePlayer,int) -> a
-    53:53:int access$402(eu.chainfire.holeylight.animation.SpritePlayer,int) -> b
-    53:53:void access$500(eu.chainfire.holeylight.animation.SpritePlayer,int,int) -> a
-    53:53:void access$600(eu.chainfire.holeylight.animation.SpritePlayer) -> b
-    53:53:java.lang.Runnable access$700(eu.chainfire.holeylight.animation.SpritePlayer) -> c
-    53:53:android.os.Handler access$800(eu.chainfire.holeylight.animation.SpritePlayer) -> d
-    53:53:android.graphics.Rect access$900(eu.chainfire.holeylight.animation.SpritePlayer) -> e
-    53:53:long access$1000(eu.chainfire.holeylight.animation.SpritePlayer) -> f
-    53:53:eu.chainfire.holeylight.animation.SpriteSheet access$1100(eu.chainfire.holeylight.animation.SpritePlayer) -> g
-    53:53:boolean access$1200(eu.chainfire.holeylight.animation.SpritePlayer) -> h
-    53:53:boolean access$100(eu.chainfire.holeylight.animation.SpritePlayer) -> i
-    53:53:boolean access$000(eu.chainfire.holeylight.animation.SpritePlayer) -> j
-    53:53:eu.chainfire.holeylight.animation.SpritePlayer$OnAnimationListener access$1300(eu.chainfire.holeylight.animation.SpritePlayer) -> k
-    53:53:android.view.SurfaceView access$1400(eu.chainfire.holeylight.animation.SpritePlayer) -> l
-    53:53:float access$1500(eu.chainfire.holeylight.animation.SpritePlayer) -> m
-    53:53:void access$1600(eu.chainfire.holeylight.animation.SpritePlayer,android.graphics.Canvas,eu.chainfire.holeylight.animation.SpriteSheet,int,float,float) -> a
-    53:53:int access$1700(eu.chainfire.holeylight.animation.SpritePlayer) -> n
-    53:53:int access$1702(eu.chainfire.holeylight.animation.SpritePlayer,int) -> c
-    53:53:float access$1800(eu.chainfire.holeylight.animation.SpritePlayer) -> o
-    53:53:boolean access$1900(eu.chainfire.holeylight.animation.SpritePlayer,int[]) -> a
-    53:53:int[] access$2000(eu.chainfire.holeylight.animation.SpritePlayer) -> p
-    53:53:boolean access$1202(eu.chainfire.holeylight.animation.SpritePlayer,boolean) -> c
-    53:53:void access$2100(eu.chainfire.holeylight.animation.SpritePlayer,boolean) -> d
-    54:54:void <clinit>() -> <clinit>
+    59:512:void <init>(android.content.Context) -> <init>
+    177:180:void finalize() -> finalize
+    184:186:void onVisibilityChanged(android.view.View,int) -> onVisibilityChanged
+    217:224:boolean colorsChanged(int[]) -> a
+    229:234:void onDraw(android.graphics.Canvas) -> onDraw
+    252:392:void renderFrame(android.graphics.Canvas,eu.chainfire.holeylight.animation.SpriteSheet,int,float,float) -> a
+    515:517:void cancelNextFrame() -> g
+    520:527:void callNextFrame(boolean) -> a
+    530:604:void callOnSpriteSheetNeeded(int,int) -> a
+    607:613:void setOnSpriteSheetNeededListener(eu.chainfire.holeylight.animation.SpritePlayer$OnSpriteSheetNeededListener) -> setOnSpriteSheetNeededListener
+    616:617:void setOnAnimationListener(eu.chainfire.holeylight.animation.SpritePlayer$OnAnimationListener) -> setOnAnimationListener
+    620:658:void resetSpriteSheet(eu.chainfire.holeylight.animation.SpritePlayer$Mode) -> c
+    661:691:void swapSpriteSheet(eu.chainfire.holeylight.animation.SpritePlayer$Mode) -> d
+    694:714:void setSpriteSheet(eu.chainfire.holeylight.animation.SpriteSheet,eu.chainfire.holeylight.animation.SpritePlayer$Mode) -> a
+    717:721:void setColors(int[]) -> setColors
+    724:727:void setIcons(android.graphics.drawable.Drawable[]) -> setIcons
+    730:738:void startUpdating() -> h
+    741:745:void stopUpdating() -> i
+    748:755:void evaluate() -> j
+    758:763:void playAnimation() -> a
+    766:770:void cancelAnimation() -> b
+    773:773:boolean isAnimating() -> c
+    777:781:void setSpeed(float) -> setSpeed
+    784:784:eu.chainfire.holeylight.animation.SpritePlayer$Mode getMode() -> getMode
+    788:811:void setMode(eu.chainfire.holeylight.animation.SpritePlayer$Mode,boolean) -> a
+    814:821:eu.chainfire.holeylight.animation.SpriteSheet getSpriteSheet() -> getSpriteSheet
+    825:828:void updateTransparentArea(android.graphics.Rect) -> a
+    831:832:void updateDisplayArea(android.graphics.Rect) -> b
+    835:850:void updateDisplayArea(int,int,int,int) -> a
+    853:859:void invalidateDisplayArea() -> d
+    862:868:void setDrawBackground(boolean) -> setDrawBackground
+    871:871:java.lang.Object getSynchronizer() -> getSynchronizer
+    875:875:boolean isTSPMode() -> e
+    879:879:boolean isTSPMode(eu.chainfire.holeylight.animation.SpritePlayer$Mode) -> a
+    887:887:boolean isMultiColorMode(eu.chainfire.holeylight.animation.SpritePlayer$Mode) -> b
+    895:897:void setTSPBlank(boolean) -> setTSPBlank
+    900:901:void forceReload() -> f
+    566:602:void lambda$callOnSpriteSheetNeeded$2(long,boolean,int,int) -> a
+    512:512:void lambda$new$1() -> k
+    149:151:void lambda$new$0() -> l
+    54:54:boolean access$002(eu.chainfire.holeylight.animation.SpritePlayer,boolean) -> a
+    54:54:boolean access$102(eu.chainfire.holeylight.animation.SpritePlayer,boolean) -> b
+    54:54:java.lang.Object access$200(eu.chainfire.holeylight.animation.SpritePlayer) -> a
+    54:54:int access$302(eu.chainfire.holeylight.animation.SpritePlayer,int) -> a
+    54:54:int access$402(eu.chainfire.holeylight.animation.SpritePlayer,int) -> b
+    54:54:void access$500(eu.chainfire.holeylight.animation.SpritePlayer,int,int) -> a
+    54:54:void access$600(eu.chainfire.holeylight.animation.SpritePlayer) -> b
+    54:54:java.lang.Runnable access$700(eu.chainfire.holeylight.animation.SpritePlayer) -> c
+    54:54:android.os.Handler access$800(eu.chainfire.holeylight.animation.SpritePlayer) -> d
+    54:54:android.graphics.Rect access$900(eu.chainfire.holeylight.animation.SpritePlayer) -> e
+    54:54:long access$1000(eu.chainfire.holeylight.animation.SpritePlayer) -> f
+    54:54:eu.chainfire.holeylight.animation.SpriteSheet access$1100(eu.chainfire.holeylight.animation.SpritePlayer) -> g
+    54:54:boolean access$1200(eu.chainfire.holeylight.animation.SpritePlayer) -> h
+    54:54:boolean access$100(eu.chainfire.holeylight.animation.SpritePlayer) -> i
+    54:54:boolean access$000(eu.chainfire.holeylight.animation.SpritePlayer) -> j
+    54:54:eu.chainfire.holeylight.animation.SpritePlayer$OnAnimationListener access$1300(eu.chainfire.holeylight.animation.SpritePlayer) -> k
+    54:54:android.view.SurfaceView access$1400(eu.chainfire.holeylight.animation.SpritePlayer) -> l
+    54:54:float access$1500(eu.chainfire.holeylight.animation.SpritePlayer) -> m
+    54:54:void access$1600(eu.chainfire.holeylight.animation.SpritePlayer,android.graphics.Canvas,eu.chainfire.holeylight.animation.SpriteSheet,int,float,float) -> a
+    54:54:int access$1700(eu.chainfire.holeylight.animation.SpritePlayer) -> n
+    54:54:int access$1702(eu.chainfire.holeylight.animation.SpritePlayer,int) -> c
+    54:54:float access$1800(eu.chainfire.holeylight.animation.SpritePlayer) -> o
+    54:54:boolean access$1900(eu.chainfire.holeylight.animation.SpritePlayer,int[]) -> a
+    54:54:int[] access$2000(eu.chainfire.holeylight.animation.SpritePlayer) -> p
+    54:54:boolean access$1202(eu.chainfire.holeylight.animation.SpritePlayer,boolean) -> c
+    54:54:void access$2100(eu.chainfire.holeylight.animation.SpritePlayer,boolean) -> d
+    55:55:void <clinit>() -> <clinit>
 eu.chainfire.holeylight.animation.SpritePlayer$1 -> eu.chainfire.holeylight.a.d$1:
     eu.chainfire.holeylight.animation.SpritePlayer this$0 -> a
-    187:187:void <init>(eu.chainfire.holeylight.animation.SpritePlayer) -> <init>
-    190:191:void surfaceRedrawNeeded(android.view.SurfaceHolder) -> surfaceRedrawNeeded
-    195:197:void surfaceCreated(android.view.SurfaceHolder) -> surfaceCreated
-    201:206:void surfaceChanged(android.view.SurfaceHolder,int,int,int) -> surfaceChanged
-    210:212:void surfaceDestroyed(android.view.SurfaceHolder) -> surfaceDestroyed
+    188:188:void <init>(eu.chainfire.holeylight.animation.SpritePlayer) -> <init>
+    191:192:void surfaceRedrawNeeded(android.view.SurfaceHolder) -> surfaceRedrawNeeded
+    196:198:void surfaceCreated(android.view.SurfaceHolder) -> surfaceCreated
+    202:207:void surfaceChanged(android.view.SurfaceHolder,int,int,int) -> surfaceChanged
+    211:213:void surfaceDestroyed(android.view.SurfaceHolder) -> surfaceDestroyed
 eu.chainfire.holeylight.animation.SpritePlayer$2 -> eu.chainfire.holeylight.a.d$2:
     eu.chainfire.holeylight.animation.SpritePlayer this$0 -> a
-    235:235:void <init>(eu.chainfire.holeylight.animation.SpritePlayer) -> <init>
-    238:246:void run() -> run
+    236:236:void <init>(eu.chainfire.holeylight.animation.SpritePlayer) -> <init>
+    239:247:void run() -> run
 eu.chainfire.holeylight.animation.SpritePlayer$3 -> eu.chainfire.holeylight.a.d$3:
     long startTimeNanos -> b
     int lastFrameDrawn -> c
     int[] lastColors -> d
     eu.chainfire.holeylight.animation.SpritePlayer this$0 -> a
-    389:392:void <init>(eu.chainfire.holeylight.animation.SpritePlayer) -> <init>
-    396:504:void doFrame(long) -> doFrame
+    394:397:void <init>(eu.chainfire.holeylight.animation.SpritePlayer) -> <init>
+    401:509:void doFrame(long) -> doFrame
 eu.chainfire.holeylight.animation.SpritePlayer$4 -> eu.chainfire.holeylight.a.d$4:
     int[] $SwitchMap$eu$chainfire$holeylight$animation$SpritePlayer$Mode -> a
-    696:696:void <clinit>() -> <clinit>
+    701:701:void <clinit>() -> <clinit>
 eu.chainfire.holeylight.animation.SpritePlayer$Mode -> eu.chainfire.holeylight.a.d$a:
     eu.chainfire.holeylight.animation.SpritePlayer$Mode SWIRL -> a
     eu.chainfire.holeylight.animation.SpritePlayer$Mode BLINK -> b
@@ -22762,10 +22762,10 @@ eu.chainfire.holeylight.animation.SpritePlayer$Mode -> eu.chainfire.holeylight.a
     eu.chainfire.holeylight.animation.SpritePlayer$Mode TSP -> d
     eu.chainfire.holeylight.animation.SpritePlayer$Mode TSP_HIDE -> e
     eu.chainfire.holeylight.animation.SpritePlayer$Mode[] $VALUES -> f
-    56:56:eu.chainfire.holeylight.animation.SpritePlayer$Mode[] values() -> values
-    56:56:eu.chainfire.holeylight.animation.SpritePlayer$Mode valueOf(java.lang.String) -> valueOf
-    56:56:void <init>(java.lang.String,int) -> <init>
-    56:56:void <clinit>() -> <clinit>
+    57:57:eu.chainfire.holeylight.animation.SpritePlayer$Mode[] values() -> values
+    57:57:eu.chainfire.holeylight.animation.SpritePlayer$Mode valueOf(java.lang.String) -> valueOf
+    57:57:void <init>(java.lang.String,int) -> <init>
+    57:57:void <clinit>() -> <clinit>
 eu.chainfire.holeylight.animation.SpritePlayer$OnAnimationListener -> eu.chainfire.holeylight.a.d$b:
     boolean onAnimationFrameStart(boolean) -> a
     void onAnimationFrameEnd(boolean) -> b
