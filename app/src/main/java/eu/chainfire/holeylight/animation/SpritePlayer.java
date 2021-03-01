@@ -317,22 +317,22 @@ public class SpritePlayer extends RelativeLayout {
 
                     for (int i = 0; i < icons.length; i++) {
                         if (icons[i] != null) {
-                            float x = (right + left)/2;
-                            float y = (bottom + top)/2;
+                            float x = (right + left)/2f;
+                            float y = (bottom + top)/2f;
                             if (drawableIcons > 1) {
                                 x += Math.cos(Math.toRadians(startAngle + 270 + (anglePerColor * i))) * radius/2;
                                 y += Math.sin(Math.toRadians(startAngle + 270 + (anglePerColor * i))) * radius/2;
                             }
 
-                            int w = icons[i].getIntrinsicWidth();
-                            int h = icons[i].getIntrinsicHeight();
+                            float w = 24 * dpToPx;
+                            float h = 24 * dpToPx;
                             if (drawableIcons == 1) {
-                                w *= 2;
-                                h *= 2;
+                                w *= 2f;
+                                h *= 2f;
                             }
-                            int l = (int)(x - (float)w/2);
-                            int t = (int)(y - (float)h/2);
-                            icons[i].setBounds(l, t, l + w, h + t);
+                            float l = x - w/2f;
+                            float t = y - h/2f;
+                            icons[i].setBounds(Math.round(l), Math.round(t), Math.round(l + w), Math.round(h + t));
                             icons[i].setTint(colors[i]);
                             icons[i].draw(canvas);
                         }
