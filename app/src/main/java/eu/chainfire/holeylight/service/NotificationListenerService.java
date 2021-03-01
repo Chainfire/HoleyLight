@@ -576,7 +576,8 @@ public class NotificationListenerService extends android.service.notification.No
                     for (ActiveNotification vis : visibleNotifications) {
                         if (not.toCompare().equals(vis.toCompare()) || (
                                 not.getIconId() != null &&
-                                not.getIconId().equals(vis.getIconId())
+                                not.getIconId().equals(vis.getIconId()) &&
+                                not.color == vis.color
                         )) {
                             found = true;
                             break;
