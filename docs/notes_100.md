@@ -35,7 +35,7 @@ over the past month, and in particular the dozen or so truly hardcore
 supporters who stuck with me through the entire process and/or updated
 translations. You know who you are!
 
-//TODO DIRECT DOWNLOAD LINKS, GOOGLE PLAY
+Downloads: [GitHub direct](https://raw.githubusercontent.com/Chainfire/HoleyLight/22c8a05fda5292115daa9413267fd33bdbe7c746/apks/HoleyLight.apk) - [XDA](https://forum.xda-developers.com/t/app-2019-02-10-holey-light-s10-notification-led-v0-70-beta.3917675/) - [Google Play](https://play.google.com/store/apps/details?id=eu.chainfire.holeylight&hl=en&gl=US)
 
 Following is a far more in-depth story about the changes, covering some
 technical details as well. Perhaps a little long and relatively dry, but
@@ -204,6 +204,11 @@ this is a better setup for the *average* user). However, these
 customized notifications each create their own *notification channel*,
 and thus they can be manually overridden again in the *Colors* section
 of *Holey Light*.
+
+#### Further issues
+
+No doubt a massive update like this one will see more issues we haven't
+run into during testing. Report them and maybe I'll look them :)
 
 ### EOF
 
