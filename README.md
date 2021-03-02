@@ -9,7 +9,7 @@ camera cut-out (AKA punch-hole) as replacement for the sadly missing
 LED on many modern devices.
 
 Additionally, it provides a notification display for when the screen is
-"off", replacing - or working in conjuction with - the *Always-On Display*
+"off", replacing - or working in conjunction with - the *Always-On Display*
 feature. As this display is not around the camera hole, it is aptly named
 the ***Un*holey Light**.
 
