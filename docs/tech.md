@@ -1,6 +1,6 @@
-Notice: the following texts were written with Samsung devices in mind.
-While it largely translates to other manufacturers, there are some
-differences.
+Notice: the following texts were written some time ago with Samsung
+devices in mind, and may be somewhat outdated. While things largely
+translate to other manufacturers, there are some differences.
 
 ### Battery use
 

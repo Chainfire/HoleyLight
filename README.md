@@ -10,7 +10,8 @@ LED on many modern devices.
 
 Additionally, it provides a notification display for when the screen is
 "off", replacing - or working in conjuction with - the *Always-On Display*
-feature.
+feature. As this display is not around the camera hole, it is aptly named
+the ***Un*holey Light**.
 
 While it was originally written for the Samsung Galaxy S10, the latest
 version at the time of writing supports *all* Samsung devices and
@@ -74,23 +75,27 @@ different modes use different amounts. The **Unholey Light** (which
 as the name implies, is *not* centered around the camera hole) uses
 least by staying on-screen without the CPU having to be awake.
 
-See [README_tech.md](./README_tech.md) for a more in-depth description.
+See [tech.md](./docs/tech.md) for a more in-depth description.
 
 ### Rendering
 
-Entire section moved to [README_tech.md](./README_tech.md)
+Entire section moved to [tech.md](./docs/tech.md)
 
 ### Burn-in
 
 Both the app and Android shift pixels around to reduce risk of burn-in.
 
-See [README_tech.md](./README_tech.md) for a more in-depth description.
+See [tech.md](./docs/tech.md) for a more in-depth description.
 
 ### Freedom!
 
 This app is 100% free, without ads, without tracking, but *with* GPLv3 [sauce](https://github.com/Chainfire/HoleyLight).
 
 In-app purchases exist to donate if you are so inclined, this does not unlock additional features, change app behavior, or entitle you to anything.
+
+### Changelogs and release notes
+
+See the [changelog](./docs/changelogs.md) page.
 
 ### Download
 
