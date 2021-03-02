@@ -8,7 +8,7 @@ however quickly became a massive update as testers came in, features
 and device-compatibility were requested, and new ways of doing things
 were discovered.
 
-Then full and rather vast changelogs can be found [here](./changelogs.md); these are
+The full and rather vast changelogs can be found [here](./changelogs.md); these are
 the highlights:
 
 - Android 11 support
