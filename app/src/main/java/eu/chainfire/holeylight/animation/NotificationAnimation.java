@@ -96,7 +96,7 @@ public class NotificationAnimation implements Settings.OnSettingsChangedListener
             /* Samsung S10+       */ new DeviceSpecs("beyond2", false, jsonBeyond2, 5, 1, 0.25f, -1.75f, 1f, true, true),
 
             /* Google Pixel 4a    */ new DeviceSpecs("sunfish", true, jsonDefault, -7, 0, 5.5f, 5.5f, 3f, true, true),
-//TUNE      /* Google Pixel 4 5G  */ new DeviceSpecs("bramble", true, jsonDefault, -7, 0, 5.5f, 5.5f, 3f, true, true),
+            /* Google Pixel 4a 5G */ new DeviceSpecs("bramble", true, jsonDefault, -7, 0, 3.5f, 3.5f, 3f, true, true),
             /* Google Pixel 5     */ new DeviceSpecs("redfin", true, jsonDefault, -11.75f, 0, 3.25f, 4.75f, 3f, true, true),
 
             /* Samsung Generic    */ new DeviceSpecs("_samsung", true, jsonDefault, 0, 0, 0, 0, 1f, true, false),
